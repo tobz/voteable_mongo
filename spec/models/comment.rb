@@ -7,5 +7,5 @@ class Comment
   referenced_in :post
   
   vote_point self, :up => +1, :down => -3
-  vote_point Post, :up => +2, :down => -1
+  vote_point Post, :up => +2, :down => -1 #, :not_update_counters => true
 end
