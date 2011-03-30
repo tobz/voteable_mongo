@@ -1,0 +1,733 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module: Mongoid::Voteable::Stats</title>
+<link rel="stylesheet" href="../../css/style.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="../../css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  relpath = '../..';
+  if (relpath != '') relpath += '/';
+</script>
+<script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+  </head>
+  <body>
+    <script type="text/javascript" charset="utf-8">
+      if (window.top.frames.main) document.body.className = 'frames';
+    </script>
+    
+    <div id="header">
+      <div id="menu">
+  
+    <a href="../../_index.html">Index (S)</a> &raquo; 
+    <span class='title'><span class='object_link'><a href="../../Mongoid.html" title="Mongoid (module)">Mongoid</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Voteable.html" title="Mongoid::Voteable (module)">Voteable</a></span></span>
+     &raquo; 
+    <span class="title">Stats</span>
+  
+  
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  <a id="class_list_link" href="#">Class List</a>
+  <a id="method_list_link" href="#">Method List</a>
+  <a id ="file_list_link" href="#">File List</a>
+</div>
+
+      <div class="clear"></div>
+    </div>
+    
+    <iframe id="search_frame"></iframe>
+    
+    <div id="content"><h1>Module: Mongoid::Voteable::Stats
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+  
+    
+      <dt class="r1">Extended by:</dt>
+      <dd class="r1">ActiveSupport::Concern</dd>
+      
+    
+  
+    
+  
+  
+  
+    <dt class="r2 last">Defined in:</dt>
+    <dd class="r2 last">lib/voteable_mongoid/voteable/stats.rb</dd>
+  
+</dl>
+<div class="clear"></div>
+
+
+
+  
+
+  
+    <h2>
+      Class Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#remake-class_method" title="remake (class method)">+ (Object) <strong>remake</strong>(log = false) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Re-generate vote counters and vote points.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#remake_stats-class_method" title="remake_stats (class method)">+ (Object) <strong>remake_stats</strong>(log) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#update_parent_stats-class_method" title="update_parent_stats (class method)">+ (Object) <strong>update_parent_stats</strong>(log) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#down_votes_count-instance_method" title="#down_votes_count (instance method)">- (Object) <strong>down_votes_count</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Get the number of down votes.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#remake_stats-instance_method" title="#remake_stats (instance method)">- (Object) <strong>remake_stats</strong>(value_point) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#up_votes_count-instance_method" title="#up_votes_count (instance method)">- (Object) <strong>up_votes_count</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Get the number of up votes.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#update_parent_stats-instance_method" title="#update_parent_stats (instance method)">- (Object) <strong>update_parent_stats</strong>(parent_class, foreign_key, value_point) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#votes_count-instance_method" title="#votes_count (instance method)">- (Object) <strong>votes_count</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Get the number of votes.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#votes_point-instance_method" title="#votes_point (instance method)">- (Object) <strong>votes_point</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Get the votes point.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+    
+    
+      <div class="method_details first">
+  <p class="signature first" id="remake-class_method">
+  
+    + (<tt>Object</tt>) <strong>remake</strong>(log = false) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    
+<p>Re-generate vote counters and vote points</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+39
+40
+41
+42</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/voteable_mongoid/voteable/stats.rb', line 39</span>
+
+<span class='def def kw'>def</span> <span class='self self kw'>self</span><span class='dot token'>.</span><span class='remake identifier id'>remake</span><span class='lparen token'>(</span><span class='log identifier id'>log</span> <span class='assign token'>=</span> <span class='false false kw'>false</span><span class='rparen token'>)</span>
+  <span class='remake_stats identifier id'>remake_stats</span><span class='lparen token'>(</span><span class='log identifier id'>log</span><span class='rparen token'>)</span>
+  <span class='update_parent_stats identifier id'>update_parent_stats</span><span class='lparen token'>(</span><span class='log identifier id'>log</span><span class='rparen token'>)</span>
+<span class='end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="remake_stats-class_method">
+  
+    + (<tt>Object</tt>) <strong>remake_stats</strong>(log) 
+  
+
+  
+</p><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/voteable_mongoid/voteable/stats.rb', line 44</span>
+
+<span class='def def kw'>def</span> <span class='self self kw'>self</span><span class='dot token'>.</span><span class='remake_stats identifier id'>remake_stats</span><span class='lparen token'>(</span><span class='log identifier id'>log</span><span class='rparen token'>)</span>
+  <span class='Mongoid constant id'>Mongoid</span><span class='colon2 op'>::</span><span class='Voteable constant id'>Voteable</span><span class='colon2 op'>::</span><span class='VOTE_POINT constant id'>VOTE_POINT</span><span class='dot token'>.</span><span class='each identifier id'>each</span> <span class='do do kw'>do</span> <span class='bitor op'>|</span><span class='class_name identifier id'>class_name</span><span class='comma token'>,</span> <span class='value_point identifier id'>value_point</span><span class='bitor op'>|</span>
+    <span class='klass identifier id'>klass</span> <span class='assign token'>=</span> <span class='class_name identifier id'>class_name</span><span class='dot token'>.</span><span class='constantize identifier id'>constantize</span>
+    <span class='klass_value_point identifier id'>klass_value_point</span> <span class='assign token'>=</span> <span class='value_point identifier id'>value_point</span><span class='lbrack token'>[</span><span class='class_name identifier id'>class_name</span><span class='rbrack token'>]</span>
+    <span class='puts identifier id'>puts</span> <span class='dstring node'>&quot;Generating stats for #{class_name}&quot;</span> <span class='if if_mod kw'>if</span> <span class='log identifier id'>log</span>
+    <span class='klass identifier id'>klass</span><span class='dot token'>.</span><span class='voteable_related identifier id'>voteable_related</span><span class='dot token'>.</span><span class='each identifier id'>each</span><span class='lbrace token'>{</span> <span class='bitor op'>|</span><span class='doc identifier id'>doc</span><span class='bitor op'>|</span>
+      <span class='doc identifier id'>doc</span><span class='dot token'>.</span><span class='remake_stats identifier id'>remake_stats</span><span class='lparen token'>(</span><span class='klass_value_point identifier id'>klass_value_point</span><span class='rparen token'>)</span>
+    <span class='rbrace token'>}</span>
+  <span class='end end kw'>end</span>
+<span class='end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="update_parent_stats-class_method">
+  
+    + (<tt>Object</tt>) <strong>update_parent_stats</strong>(log) 
+  
+
+  
+</p><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/voteable_mongoid/voteable/stats.rb', line 67</span>
+
+<span class='def def kw'>def</span> <span class='self self kw'>self</span><span class='dot token'>.</span><span class='update_parent_stats identifier id'>update_parent_stats</span><span class='lparen token'>(</span><span class='log identifier id'>log</span><span class='rparen token'>)</span>
+  <span class='VOTE_POINT constant id'>VOTE_POINT</span><span class='dot token'>.</span><span class='each identifier id'>each</span> <span class='do do kw'>do</span> <span class='bitor op'>|</span><span class='class_name identifier id'>class_name</span><span class='comma token'>,</span> <span class='value_point identifier id'>value_point</span><span class='bitor op'>|</span>
+    <span class='klass identifier id'>klass</span> <span class='assign token'>=</span> <span class='class_name identifier id'>class_name</span><span class='dot token'>.</span><span class='constantize identifier id'>constantize</span>
+    <span class='value_point identifier id'>value_point</span><span class='dot token'>.</span><span class='each identifier id'>each</span> <span class='do do kw'>do</span> <span class='bitor op'>|</span><span class='parent_class_name identifier id'>parent_class_name</span><span class='comma token'>,</span> <span class='parent_value_point identifier id'>parent_value_point</span><span class='bitor op'>|</span>
+      <span class='relation_metadata identifier id'>relation_metadata</span> <span class='assign token'>=</span> <span class='klass identifier id'>klass</span><span class='dot token'>.</span><span class='relations identifier id'>relations</span><span class='lbrack token'>[</span><span class='parent_class_name identifier id'>parent_class_name</span><span class='dot token'>.</span><span class='underscore identifier id'>underscore</span><span class='rbrack token'>]</span>
+      <span class='if if kw'>if</span> <span class='relation_metadata identifier id'>relation_metadata</span>
+        <span class='parent_class identifier id'>parent_class</span> <span class='assign token'>=</span> <span class='parent_class_name identifier id'>parent_class_name</span><span class='dot token'>.</span><span class='constantize identifier id'>constantize</span>
+        <span class='foreign_key identifier id'>foreign_key</span> <span class='assign token'>=</span> <span class='relation_metadata identifier id'>relation_metadata</span><span class='dot token'>.</span><span class='foreign_key identifier id'>foreign_key</span>
+        <span class='puts identifier id'>puts</span> <span class='dstring node'>&quot;Updating stats for #{class_name} &gt; #{parent_class_name}&quot;</span> <span class='if if_mod kw'>if</span> <span class='log identifier id'>log</span>
+        <span class='klass identifier id'>klass</span><span class='dot token'>.</span><span class='voteable_related identifier id'>voteable_related</span><span class='dot token'>.</span><span class='each identifier id'>each</span><span class='lbrace token'>{</span> <span class='bitor op'>|</span><span class='doc identifier id'>doc</span><span class='bitor op'>|</span>
+          <span class='doc identifier id'>doc</span><span class='dot token'>.</span><span class='update_parent_stats identifier id'>update_parent_stats</span><span class='lparen token'>(</span><span class='parent_class identifier id'>parent_class</span><span class='comma token'>,</span> <span class='foreign_key identifier id'>foreign_key</span><span class='comma token'>,</span> <span class='parent_value_point identifier id'>parent_value_point</span><span class='rparen token'>)</span>
+        <span class='rbrace token'>}</span>
+      <span class='end end kw'>end</span>
+    <span class='end end kw'>end</span>
+  <span class='end end kw'>end</span>
+<span class='end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+    
+    
+      <div class="method_details first">
+  <p class="signature first" id="down_votes_count-instance_method">
+  
+    - (<tt>Object</tt>) <strong>down_votes_count</strong> 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    
+<p>Get the number of down votes</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+24
+25
+26</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/voteable_mongoid/voteable/stats.rb', line 24</span>
+
+<span class='def def kw'>def</span> <span class='down_votes_count identifier id'>down_votes_count</span>
+  <span class='voteable identifier id'>voteable</span><span class='dot token'>.</span><span class='try identifier id'>try</span><span class='lparen token'>(</span><span class='symbol val'>:[]</span><span class='comma token'>,</span> <span class='string val'>'down_votes_count'</span><span class='rparen token'>)</span> <span class='orop op'>||</span> <span class='integer val'>0</span>
+<span class='end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="remake_stats-instance_method">
+  
+    - (<tt>Object</tt>) <strong>remake_stats</strong>(value_point) 
+  
+
+  
+</p><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/voteable_mongoid/voteable/stats.rb', line 55</span>
+
+<span class='def def kw'>def</span> <span class='remake_stats identifier id'>remake_stats</span><span class='lparen token'>(</span><span class='value_point identifier id'>value_point</span><span class='rparen token'>)</span>
+  <span class='up_count identifier id'>up_count</span> <span class='assign token'>=</span> <span class='up_voter_ids identifier id'>up_voter_ids</span><span class='dot token'>.</span><span class='length identifier id'>length</span>
+  <span class='down_count identifier id'>down_count</span> <span class='assign token'>=</span> <span class='down_voter_ids identifier id'>down_voter_ids</span><span class='dot token'>.</span><span class='length identifier id'>length</span>
+
+  <span class='update_attributes identifier id'>update_attributes</span><span class='lparen token'>(</span>
+    <span class='string val'>'voteable.up_votes_count'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='up_count identifier id'>up_count</span><span class='comma token'>,</span>
+    <span class='string val'>'voteable.down_votes_count'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='down_count identifier id'>down_count</span><span class='comma token'>,</span>          
+    <span class='string val'>'voteable.votes_count'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='up_count identifier id'>up_count</span> <span class='plus op'>+</span> <span class='down_count identifier id'>down_count</span><span class='comma token'>,</span>
+    <span class='string val'>'voteable.votes_point'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='value_point identifier id'>value_point</span><span class='lbrack token'>[</span><span class='symbol val'>:up</span><span class='rbrack token'>]</span><span class='mult op'>*</span><span class='up_count identifier id'>up_count</span> <span class='plus op'>+</span> <span class='value_point identifier id'>value_point</span><span class='lbrack token'>[</span><span class='symbol val'>:down</span><span class='rbrack token'>]</span><span class='mult op'>*</span><span class='down_count identifier id'>down_count</span>
+  <span class='rparen token'>)</span>
+<span class='end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="up_votes_count-instance_method">
+  
+    - (<tt>Object</tt>) <strong>up_votes_count</strong> 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    
+<p>Get the number of up votes</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+19
+20
+21</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/voteable_mongoid/voteable/stats.rb', line 19</span>
+
+<span class='def def kw'>def</span> <span class='up_votes_count identifier id'>up_votes_count</span>
+  <span class='voteable identifier id'>voteable</span><span class='dot token'>.</span><span class='try identifier id'>try</span><span class='lparen token'>(</span><span class='symbol val'>:[]</span><span class='comma token'>,</span> <span class='string val'>'up_votes_count'</span><span class='rparen token'>)</span> <span class='orop op'>||</span> <span class='integer val'>0</span>
+<span class='end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="update_parent_stats-instance_method">
+  
+    - (<tt>Object</tt>) <strong>update_parent_stats</strong>(parent_class, foreign_key, value_point) 
+  
+
+  
+</p><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/voteable_mongoid/voteable/stats.rb', line 84</span>
+
+<span class='def def kw'>def</span> <span class='update_parent_stats identifier id'>update_parent_stats</span><span class='lparen token'>(</span><span class='parent_class identifier id'>parent_class</span><span class='comma token'>,</span> <span class='foreign_key identifier id'>foreign_key</span><span class='comma token'>,</span> <span class='value_point identifier id'>value_point</span><span class='rparen token'>)</span>
+  <span class='parent_id identifier id'>parent_id</span> <span class='assign token'>=</span> <span class='read_attribute identifier id'>read_attribute</span><span class='lparen token'>(</span><span class='foreign_key identifier id'>foreign_key</span><span class='dot token'>.</span><span class='to_sym identifier id'>to_sym</span><span class='rparen token'>)</span>
+  <span class='if if kw'>if</span> <span class='parent_id identifier id'>parent_id</span>
+    <span class='up_count identifier id'>up_count</span> <span class='assign token'>=</span> <span class='up_voter_ids identifier id'>up_voter_ids</span><span class='dot token'>.</span><span class='length identifier id'>length</span>
+    <span class='down_count identifier id'>down_count</span> <span class='assign token'>=</span> <span class='down_voter_ids identifier id'>down_voter_ids</span><span class='dot token'>.</span><span class='length identifier id'>length</span>
+  
+    <span class='return return kw'>return</span> <span class='if if_mod kw'>if</span> <span class='up_count identifier id'>up_count</span> <span class='eq op'>==</span> <span class='integer val'>0</span> <span class='andop op'>&amp;&amp;</span> <span class='down_count identifier id'>down_count</span> <span class='eq op'>==</span> <span class='integer val'>0</span>
+
+    <span class='inc_options identifier id'>inc_options</span> <span class='assign token'>=</span> <span class='lbrace token'>{</span>
+      <span class='string val'>'voteable.votes_point'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='value_point identifier id'>value_point</span><span class='lbrack token'>[</span><span class='symbol val'>:up</span><span class='rbrack token'>]</span><span class='mult op'>*</span><span class='up_count identifier id'>up_count</span> <span class='plus op'>+</span> <span class='value_point identifier id'>value_point</span><span class='lbrack token'>[</span><span class='symbol val'>:down</span><span class='rbrack token'>]</span><span class='mult op'>*</span><span class='down_count identifier id'>down_count</span>
+    <span class='rbrace token'>}</span>
+
+    <span class='unless unless kw'>unless</span> <span class='value_point identifier id'>value_point</span><span class='lbrack token'>[</span><span class='symbol val'>:update_counters</span><span class='rbrack token'>]</span> <span class='eq op'>==</span> <span class='false false kw'>false</span>
+      <span class='inc_options identifier id'>inc_options</span><span class='dot token'>.</span><span class='merge! fid id'>merge!</span><span class='lparen token'>(</span>
+        <span class='string val'>'voteable.votes_count'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='up_count identifier id'>up_count</span> <span class='plus op'>+</span> <span class='down_count identifier id'>down_count</span><span class='comma token'>,</span>
+        <span class='string val'>'voteable.up_votes_count'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='up_count identifier id'>up_count</span><span class='comma token'>,</span>
+        <span class='string val'>'voteable.down_votes_count'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='down_count identifier id'>down_count</span>
+      <span class='rparen token'>)</span>
+    <span class='end end kw'>end</span>
+  
+    <span class='parent_class identifier id'>parent_class</span><span class='dot token'>.</span><span class='collection identifier id'>collection</span><span class='dot token'>.</span><span class='update identifier id'>update</span><span class='lparen token'>(</span>
+      <span class='lbrace token'>{</span> <span class='symbol val'>:_id</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='parent_id identifier id'>parent_id</span> <span class='rbrace token'>}</span><span class='comma token'>,</span> 
+      <span class='lbrace token'>{</span> <span class='string val'>'$inc'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span>  <span class='inc_options identifier id'>inc_options</span> <span class='rbrace token'>}</span>
+    <span class='rparen token'>)</span>
+  <span class='end end kw'>end</span>
+<span class='end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="votes_count-instance_method">
+  
+    - (<tt>Object</tt>) <strong>votes_count</strong> 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    
+<p>Get the number of votes</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+29
+30
+31</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/voteable_mongoid/voteable/stats.rb', line 29</span>
+
+<span class='def def kw'>def</span> <span class='votes_count identifier id'>votes_count</span>
+  <span class='voteable identifier id'>voteable</span><span class='dot token'>.</span><span class='try identifier id'>try</span><span class='lparen token'>(</span><span class='symbol val'>:[]</span><span class='comma token'>,</span> <span class='string val'>'votes_count'</span><span class='rparen token'>)</span> <span class='orop op'>||</span> <span class='integer val'>0</span>
+<span class='end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="votes_point-instance_method">
+  
+    - (<tt>Object</tt>) <strong>votes_point</strong> 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    
+<p>Get the votes point</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+34
+35
+36</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/voteable_mongoid/voteable/stats.rb', line 34</span>
+
+<span class='def def kw'>def</span> <span class='votes_point identifier id'>votes_point</span>
+  <span class='voteable identifier id'>voteable</span><span class='dot token'>.</span><span class='try identifier id'>try</span><span class='lparen token'>(</span><span class='symbol val'>:[]</span><span class='comma token'>,</span> <span class='string val'>'votes_point'</span><span class='rparen token'>)</span> <span class='orop op'>||</span> <span class='integer val'>0</span>
+<span class='end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+    
+    <div id="footer">
+  Generated on Wed Mar 30 19:59:11 2011 by 
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.6.5 (ruby-1.8.7).
+</div>
+
+  </body>
+</html>

@@ -35,6 +35,7 @@ module Mongoid
         voteable.try(:[], 'votes_point') || 0
       end
 
+      # Re-generate vote counters and vote points
       def self.remake(log = false)
         remake_stats(log)
         update_parent_stats(log)

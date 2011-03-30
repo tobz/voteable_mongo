@@ -63,11 +63,23 @@
   
   
     <dt class="r2 last">Defined in:</dt>
-    <dd class="r2 last">lib/mongoid/voteable.rb</dd>
+    <dd class="r2 last">lib/voteable_mongoid/voteable.rb<span class="defines">,<br />
+  lib/voteable_mongoid/voteable/stats.rb</span>
+</dd>
   
 </dl>
 <div class="clear"></div>
 
+<h2>Defined Under Namespace</h2>
+<p class="children">
+   
+    
+      <strong class="modules">Modules:</strong> <span class='object_link'><a href="Voteable/Stats.html" title="Mongoid::Voteable::Stats (module)">Stats</a></span>
+    
+   
+    
+  
+</p>
 
   <h2>Constant Summary</h2>
   
@@ -78,7 +90,7 @@
   <div class="discussion">
     
 <p>How many points should be assigned for each up or down vote. This hash
-should be accessed and manipulated using Voteable.vote_point method</p>
+should manipulated using Voteable.vote_point method</p>
 
 
   </div>
@@ -130,29 +142,6 @@ should be accessed and manipulated using Voteable.vote_point method</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#down_votes_count-instance_method" title="#down_votes_count (instance method)">- (Object) <strong>down_votes_count</strong> </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'>
-<p>Get the number of down votes.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
       <a href="#up_voter_ids-instance_method" title="#up_voter_ids (instance method)">- (Object) <strong>up_voter_ids</strong> </a>
     
 
@@ -168,29 +157,6 @@ should be accessed and manipulated using Voteable.vote_point method</p>
   
     <span class="summary_desc"><div class='inline'>
 <p>Array of up voter ids.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#up_votes_count-instance_method" title="#up_votes_count (instance method)">- (Object) <strong>up_votes_count</strong> </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'>
-<p>Get the number of up votes.</p>
 </div></span>
   
 </li>
@@ -245,7 +211,7 @@ should be accessed and manipulated using Voteable.vote_point method</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#votes_count-instance_method" title="#votes_count (instance method)">- (Object) <strong>votes_count</strong> </a>
+      <a href="#voteable-instance_method" title="#voteable (instance method)">- (Object) <strong>voteable</strong> </a>
     
 
     
@@ -258,32 +224,7 @@ should be accessed and manipulated using Voteable.vote_point method</p>
   
 
   
-    <span class="summary_desc"><div class='inline'>
-<p>Get the number of votes count.</p>
-</div></span>
-  
-</li>
-
-      
-        <li class="public ">
-  <span class="summary_signature">
-    
-      <a href="#votes_point-instance_method" title="#votes_point (instance method)">- (Object) <strong>votes_point</strong> </a>
-    
-
-    
-  </span>
-  
-  
-  
-  
-  
-  
-
-  
-    <span class="summary_desc"><div class='inline'>
-<p>Get the votes point.</p>
-</div></span>
+    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
@@ -321,54 +262,15 @@ should be accessed and manipulated using Voteable.vote_point method</p>
       <pre class="lines">
 
 
-222
-223
-224</pre>
+238
+239
+240</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/mongoid/voteable.rb', line 222</span>
+      <pre class="code"><span class="info file"># File 'lib/voteable_mongoid/voteable.rb', line 238</span>
 
 <span class='def def kw'>def</span> <span class='down_voter_ids identifier id'>down_voter_ids</span>
   <span class='voteable identifier id'>voteable</span><span class='dot token'>.</span><span class='try identifier id'>try</span><span class='lparen token'>(</span><span class='symbol val'>:[]</span><span class='comma token'>,</span> <span class='string val'>'down_voter_ids'</span><span class='rparen token'>)</span> <span class='orop op'>||</span> <span class='lbrack token'>[</span><span class='rbrack token'>]</span>
-<span class='end end kw'>end</span>
-</pre>
-    </td>
-  </tr>
-</table>
-</div>
-    
-      <div class="method_details ">
-  <p class="signature " id="down_votes_count-instance_method">
-  
-    - (<tt>Object</tt>) <strong>down_votes_count</strong> 
-  
-
-  
-</p><div class="docstring">
-  <div class="discussion">
-    
-<p>Get the number of down votes</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-202
-203
-204</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/mongoid/voteable.rb', line 202</span>
-
-<span class='def def kw'>def</span> <span class='down_votes_count identifier id'>down_votes_count</span>
-  <span class='down_voter_ids identifier id'>down_voter_ids</span><span class='dot token'>.</span><span class='length identifier id'>length</span>
 <span class='end end kw'>end</span>
 </pre>
     </td>
@@ -399,54 +301,15 @@ should be accessed and manipulated using Voteable.vote_point method</p>
       <pre class="lines">
 
 
-217
-218
-219</pre>
+233
+234
+235</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/mongoid/voteable.rb', line 217</span>
+      <pre class="code"><span class="info file"># File 'lib/voteable_mongoid/voteable.rb', line 233</span>
 
 <span class='def def kw'>def</span> <span class='up_voter_ids identifier id'>up_voter_ids</span>
   <span class='voteable identifier id'>voteable</span><span class='dot token'>.</span><span class='try identifier id'>try</span><span class='lparen token'>(</span><span class='symbol val'>:[]</span><span class='comma token'>,</span> <span class='string val'>'up_voter_ids'</span><span class='rparen token'>)</span> <span class='orop op'>||</span> <span class='lbrack token'>[</span><span class='rbrack token'>]</span>
-<span class='end end kw'>end</span>
-</pre>
-    </td>
-  </tr>
-</table>
-</div>
-    
-      <div class="method_details ">
-  <p class="signature " id="up_votes_count-instance_method">
-  
-    - (<tt>Object</tt>) <strong>up_votes_count</strong> 
-  
-
-  
-</p><div class="docstring">
-  <div class="discussion">
-    
-<p>Get the number of up votes</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-197
-198
-199</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/mongoid/voteable.rb', line 197</span>
-
-<span class='def def kw'>def</span> <span class='up_votes_count identifier id'>up_votes_count</span>
-  <span class='up_voter_ids identifier id'>up_voter_ids</span><span class='dot token'>.</span><span class='length identifier id'>length</span>
 <span class='end end kw'>end</span>
 </pre>
     </td>
@@ -502,21 +365,21 @@ should be accessed and manipulated using Voteable.vote_point method</p>
       <pre class="lines">
 
 
-174
-175
-176
-177
-178
-179
-180
-181
-182
-183
-184
-185</pre>
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/mongoid/voteable.rb', line 174</span>
+      <pre class="code"><span class="info file"># File 'lib/voteable_mongoid/voteable.rb', line 210</span>
 
 <span class='def def kw'>def</span> <span class='vote identifier id'>vote</span><span class='lparen token'>(</span><span class='options identifier id'>options</span><span class='rparen token'>)</span>
   <span class='options identifier id'>options</span><span class='lbrack token'>[</span><span class='symbol val'>:votee_id</span><span class='rbrack token'>]</span> <span class='opasgn op'>||=</span> <span class='_id identifier id'>_id</span>
@@ -579,14 +442,14 @@ should be accessed and manipulated using Voteable.vote_point method</p>
       <pre class="lines">
 
 
-190
-191
-192
-193
-194</pre>
+226
+227
+228
+229
+230</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/mongoid/voteable.rb', line 190</span>
+      <pre class="code"><span class="info file"># File 'lib/voteable_mongoid/voteable.rb', line 226</span>
 
 <span class='def def kw'>def</span> <span class='vote_value identifier id'>vote_value</span><span class='lparen token'>(</span><span class='voter identifier id'>voter</span><span class='rparen token'>)</span>
   <span class='voter_id identifier id'>voter_id</span> <span class='assign token'>=</span> <span class='voter identifier id'>voter</span><span class='dot token'>.</span><span class='is_a? fid id'>is_a?</span><span class='lparen token'>(</span><span class='BSON constant id'>BSON</span><span class='colon2 op'>::</span><span class='ObjectId constant id'>ObjectId</span><span class='rparen token'>)</span> <span class='question op'>?</span> <span class='voter identifier id'>voter</span> <span class='colon op'>:</span> <span class='voter identifier id'>voter</span><span class='dot token'>.</span><span class='_id identifier id'>_id</span>
@@ -600,76 +463,27 @@ should be accessed and manipulated using Voteable.vote_point method</p>
 </div>
     
       <div class="method_details ">
-  <p class="signature " id="votes_count-instance_method">
+  <p class="signature " id="voteable-instance_method">
   
-    - (<tt>Object</tt>) <strong>votes_count</strong> 
+    - (<tt>Object</tt>) <strong>voteable</strong> 
   
 
   
-</p><div class="docstring">
-  <div class="discussion">
-    
-<p>Get the number of votes count</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-</div><table class="source_code">
+</p><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-207
-208
-209</pre>
+242
+243
+244</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/mongoid/voteable.rb', line 207</span>
+      <pre class="code"><span class="info file"># File 'lib/voteable_mongoid/voteable.rb', line 242</span>
 
-<span class='def def kw'>def</span> <span class='votes_count identifier id'>votes_count</span>
-  <span class='voteable identifier id'>voteable</span><span class='dot token'>.</span><span class='try identifier id'>try</span><span class='lparen token'>(</span><span class='symbol val'>:[]</span><span class='comma token'>,</span> <span class='string val'>'votes_count'</span><span class='rparen token'>)</span> <span class='orop op'>||</span> <span class='integer val'>0</span>
-<span class='end end kw'>end</span>
-</pre>
-    </td>
-  </tr>
-</table>
-</div>
-    
-      <div class="method_details ">
-  <p class="signature " id="votes_point-instance_method">
-  
-    - (<tt>Object</tt>) <strong>votes_point</strong> 
-  
-
-  
-</p><div class="docstring">
-  <div class="discussion">
-    
-<p>Get the votes point</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-</div><table class="source_code">
-  <tr>
-    <td>
-      <pre class="lines">
-
-
-212
-213
-214</pre>
-    </td>
-    <td>
-      <pre class="code"><span class="info file"># File 'lib/mongoid/voteable.rb', line 212</span>
-
-<span class='def def kw'>def</span> <span class='votes_point identifier id'>votes_point</span>
-  <span class='voteable identifier id'>voteable</span><span class='dot token'>.</span><span class='try identifier id'>try</span><span class='lparen token'>(</span><span class='symbol val'>:[]</span><span class='comma token'>,</span> <span class='string val'>'votes_point'</span><span class='rparen token'>)</span> <span class='orop op'>||</span> <span class='integer val'>0</span>
+<span class='def def kw'>def</span> <span class='voteable identifier id'>voteable</span>
+  <span class='read_attribute identifier id'>read_attribute</span><span class='lparen token'>(</span><span class='string val'>'voteable'</span><span class='rparen token'>)</span>
 <span class='end end kw'>end</span>
 </pre>
     </td>
@@ -682,7 +496,7 @@ should be accessed and manipulated using Voteable.vote_point method</p>
 </div>
     
     <div id="footer">
-  Generated on Wed Mar 30 11:06:27 2011 by 
+  Generated on Wed Mar 30 19:59:11 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.5 (ruby-1.8.7).
 </div>

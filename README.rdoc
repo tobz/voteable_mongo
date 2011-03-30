@@ -79,6 +79,16 @@ user.rb
 
     @user.unvote(@comment)
 
+=== Re-generate counters and vote points
+
+  Rails
+    rake db:mongoid:voteable:remake_statis
+  
+  Ruby
+    Mongoid::Voteable::Stats.remake
+    
+    
+
 == Credits
 
 * Alex N. - Author

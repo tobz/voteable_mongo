@@ -134,6 +134,15 @@ update-in-place operation per collection.</p>
 <pre class="code"><span class='@user ivar id'>@user</span><span class='dot token'>.</span><span class='unvote identifier id'>unvote</span><span class='lparen token'>(</span><span class='@comment ivar id'>@comment</span><span class='rparen token'>)</span>
 </pre>
 
+<h3>Re-generate counters and vote points</h3>
+
+<pre class="code"><span class='Rails constant id'>Rails</span>
+  <span class='rake identifier id'>rake</span> <span class='db identifier id'>db</span><span class='symbol val'>:mongoid</span><span class='symbol val'>:voteable</span><span class='symbol val'>:remake_statis</span>
+
+<span class='Ruby constant id'>Ruby</span>
+  <span class='Mongoid constant id'>Mongoid</span><span class='colon2 op'>::</span><span class='Voteable constant id'>Voteable</span><span class='colon2 op'>::</span><span class='Stats constant id'>Stats</span><span class='dot token'>.</span><span class='remake identifier id'>remake</span>
+</pre>
+
 <h2>Credits</h2>
 <ul><li>
 <p>Alex N. - Author</p>
@@ -148,7 +157,7 @@ href="http://vinova.sg">vinova.sg</a>)</p>
 </div></div>
     
     <div id="footer">
-  Generated on Wed Mar 30 11:06:26 2011 by 
+  Generated on Wed Mar 30 19:59:11 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.5 (ruby-1.8.7).
 </div>
