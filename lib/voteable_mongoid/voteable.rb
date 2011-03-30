@@ -3,13 +3,13 @@ module Mongoid
     extend ActiveSupport::Concern
 
     # How many points should be assigned for each up or down vote.
-    # This hash should manipulated using Voteable.vote_point method
-    VOTE_POINT = {}
+    # This hash should manipulated using voteable method
+    VOTEABLE = {}
 
     included do
       include Mongoid::Voteable::Stats
       
-      def self.voteable_related
+      def self.voteable_data_only
         foreign_keys = relations.values.map{ |meta| meta.try(:foreign_key) }.compact
         only(foreign_keys + %w[voteable])
       end
@@ -18,11 +18,11 @@ module Mongoid
       # 
       # @param [Hash] options a hash containings:
       # 
-      # vote_point self, :up => +1, :down => -3
-      # vote_point Post, :up => +2, :down => -1, :update_counters => false
-      def self.vote_point(klass = self, options = nil)
-        VOTE_POINT[self.name] ||= {}
-        VOTE_POINT[self.name][klass.name] ||= options
+      # voteable self, :up => +1, :down => -3
+      # voteable Post, :up => +2, :down => -1, :update_counters => false # skip counter update
+      def self.voteable(klass = self, options = nil)
+        VOTEABLE[self.name] ||= {}
+        VOTEABLE[self.name][klass.name] ||= options
       end
 
       # We usually need to show current_user his voting value on voteable object
@@ -49,8 +49,8 @@ module Mongoid
         voter_id = BSON::ObjectId(voter_id) if voter_id.is_a?(String)
 
         klass = options[:class]
-        klass ||= VOTE_POINT.keys.include?(name) ? name : collection.name.classify
-        value_point = VOTE_POINT[klass][klass]
+        klass ||= VOTEABLE.keys.include?(name) ? name : collection.name.classify
+        value_point = VOTEABLE[klass][klass]
         
         if options[:revote]
           if value == :up
@@ -146,10 +146,10 @@ module Mongoid
           update_result['n'] == 1 )
 
         if successed
-          VOTE_POINT[klass].each do |class_name, value_point|
-            # For other class in VOTE_POINT options, if is parent of current class
+          VOTEABLE[klass].each do |class_name, value_point|
+            # For other class in VOTEABLE options, if is parent of current class
             next unless relation_metadata = relations[class_name.underscore]
-            next unless votee ||= options[:votee] || voteable_related.where(:id => options[:votee_id]).first
+            next unless votee ||= options[:votee] || voteable_data_only.where(:id => options[:votee_id]).first
             # If can find current votee foreign_key value for that class
             next unless foreign_key_value = votee.read_attribute(relation_metadata.foreign_key)
           

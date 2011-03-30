@@ -42,11 +42,11 @@ module Mongoid
       end
       
       def self.remake_stats(log)
-        Mongoid::Voteable::VOTE_POINT.each do |class_name, value_point|
+        Mongoid::Voteable::VOTEABLE.each do |class_name, value_point|
           klass = class_name.constantize
           klass_value_point = value_point[class_name]
           puts "Generating stats for #{class_name}" if log
-          klass.voteable_related.each{ |doc|
+          klass.voteable_data_only.each{ |doc|
             doc.remake_stats(klass_value_point)
           }
         end
@@ -65,7 +65,7 @@ module Mongoid
       end
     
       def self.update_parent_stats(log)
-        VOTE_POINT.each do |class_name, value_point|
+        VOTEABLE.each do |class_name, value_point|
           klass = class_name.constantize
           value_point.each do |parent_class_name, parent_value_point|
             relation_metadata = klass.relations[parent_class_name.underscore]
@@ -73,7 +73,7 @@ module Mongoid
               parent_class = parent_class_name.constantize
               foreign_key = relation_metadata.foreign_key
               puts "Updating stats for #{class_name} > #{parent_class_name}" if log
-              klass.voteable_related.each{ |doc|
+              klass.voteable_data_only.each{ |doc|
                 doc.update_parent_stats(parent_class, foreign_key, parent_value_point)
               }
             end

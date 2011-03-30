@@ -367,11 +367,11 @@
       <pre class="code"><span class="info file"># File 'lib/voteable_mongoid/voteable/stats.rb', line 44</span>
 
 <span class='def def kw'>def</span> <span class='self self kw'>self</span><span class='dot token'>.</span><span class='remake_stats identifier id'>remake_stats</span><span class='lparen token'>(</span><span class='log identifier id'>log</span><span class='rparen token'>)</span>
-  <span class='Mongoid constant id'>Mongoid</span><span class='colon2 op'>::</span><span class='Voteable constant id'>Voteable</span><span class='colon2 op'>::</span><span class='VOTE_POINT constant id'>VOTE_POINT</span><span class='dot token'>.</span><span class='each identifier id'>each</span> <span class='do do kw'>do</span> <span class='bitor op'>|</span><span class='class_name identifier id'>class_name</span><span class='comma token'>,</span> <span class='value_point identifier id'>value_point</span><span class='bitor op'>|</span>
+  <span class='Mongoid constant id'>Mongoid</span><span class='colon2 op'>::</span><span class='Voteable constant id'>Voteable</span><span class='colon2 op'>::</span><span class='VOTEABLE constant id'>VOTEABLE</span><span class='dot token'>.</span><span class='each identifier id'>each</span> <span class='do do kw'>do</span> <span class='bitor op'>|</span><span class='class_name identifier id'>class_name</span><span class='comma token'>,</span> <span class='value_point identifier id'>value_point</span><span class='bitor op'>|</span>
     <span class='klass identifier id'>klass</span> <span class='assign token'>=</span> <span class='class_name identifier id'>class_name</span><span class='dot token'>.</span><span class='constantize identifier id'>constantize</span>
     <span class='klass_value_point identifier id'>klass_value_point</span> <span class='assign token'>=</span> <span class='value_point identifier id'>value_point</span><span class='lbrack token'>[</span><span class='class_name identifier id'>class_name</span><span class='rbrack token'>]</span>
     <span class='puts identifier id'>puts</span> <span class='dstring node'>&quot;Generating stats for #{class_name}&quot;</span> <span class='if if_mod kw'>if</span> <span class='log identifier id'>log</span>
-    <span class='klass identifier id'>klass</span><span class='dot token'>.</span><span class='voteable_related identifier id'>voteable_related</span><span class='dot token'>.</span><span class='each identifier id'>each</span><span class='lbrace token'>{</span> <span class='bitor op'>|</span><span class='doc identifier id'>doc</span><span class='bitor op'>|</span>
+    <span class='klass identifier id'>klass</span><span class='dot token'>.</span><span class='voteable_data_only identifier id'>voteable_data_only</span><span class='dot token'>.</span><span class='each identifier id'>each</span><span class='lbrace token'>{</span> <span class='bitor op'>|</span><span class='doc identifier id'>doc</span><span class='bitor op'>|</span>
       <span class='doc identifier id'>doc</span><span class='dot token'>.</span><span class='remake_stats identifier id'>remake_stats</span><span class='lparen token'>(</span><span class='klass_value_point identifier id'>klass_value_point</span><span class='rparen token'>)</span>
     <span class='rbrace token'>}</span>
   <span class='end end kw'>end</span>
@@ -416,7 +416,7 @@
       <pre class="code"><span class="info file"># File 'lib/voteable_mongoid/voteable/stats.rb', line 67</span>
 
 <span class='def def kw'>def</span> <span class='self self kw'>self</span><span class='dot token'>.</span><span class='update_parent_stats identifier id'>update_parent_stats</span><span class='lparen token'>(</span><span class='log identifier id'>log</span><span class='rparen token'>)</span>
-  <span class='VOTE_POINT constant id'>VOTE_POINT</span><span class='dot token'>.</span><span class='each identifier id'>each</span> <span class='do do kw'>do</span> <span class='bitor op'>|</span><span class='class_name identifier id'>class_name</span><span class='comma token'>,</span> <span class='value_point identifier id'>value_point</span><span class='bitor op'>|</span>
+  <span class='VOTEABLE constant id'>VOTEABLE</span><span class='dot token'>.</span><span class='each identifier id'>each</span> <span class='do do kw'>do</span> <span class='bitor op'>|</span><span class='class_name identifier id'>class_name</span><span class='comma token'>,</span> <span class='value_point identifier id'>value_point</span><span class='bitor op'>|</span>
     <span class='klass identifier id'>klass</span> <span class='assign token'>=</span> <span class='class_name identifier id'>class_name</span><span class='dot token'>.</span><span class='constantize identifier id'>constantize</span>
     <span class='value_point identifier id'>value_point</span><span class='dot token'>.</span><span class='each identifier id'>each</span> <span class='do do kw'>do</span> <span class='bitor op'>|</span><span class='parent_class_name identifier id'>parent_class_name</span><span class='comma token'>,</span> <span class='parent_value_point identifier id'>parent_value_point</span><span class='bitor op'>|</span>
       <span class='relation_metadata identifier id'>relation_metadata</span> <span class='assign token'>=</span> <span class='klass identifier id'>klass</span><span class='dot token'>.</span><span class='relations identifier id'>relations</span><span class='lbrack token'>[</span><span class='parent_class_name identifier id'>parent_class_name</span><span class='dot token'>.</span><span class='underscore identifier id'>underscore</span><span class='rbrack token'>]</span>
@@ -424,7 +424,7 @@
         <span class='parent_class identifier id'>parent_class</span> <span class='assign token'>=</span> <span class='parent_class_name identifier id'>parent_class_name</span><span class='dot token'>.</span><span class='constantize identifier id'>constantize</span>
         <span class='foreign_key identifier id'>foreign_key</span> <span class='assign token'>=</span> <span class='relation_metadata identifier id'>relation_metadata</span><span class='dot token'>.</span><span class='foreign_key identifier id'>foreign_key</span>
         <span class='puts identifier id'>puts</span> <span class='dstring node'>&quot;Updating stats for #{class_name} &gt; #{parent_class_name}&quot;</span> <span class='if if_mod kw'>if</span> <span class='log identifier id'>log</span>
-        <span class='klass identifier id'>klass</span><span class='dot token'>.</span><span class='voteable_related identifier id'>voteable_related</span><span class='dot token'>.</span><span class='each identifier id'>each</span><span class='lbrace token'>{</span> <span class='bitor op'>|</span><span class='doc identifier id'>doc</span><span class='bitor op'>|</span>
+        <span class='klass identifier id'>klass</span><span class='dot token'>.</span><span class='voteable_data_only identifier id'>voteable_data_only</span><span class='dot token'>.</span><span class='each identifier id'>each</span><span class='lbrace token'>{</span> <span class='bitor op'>|</span><span class='doc identifier id'>doc</span><span class='bitor op'>|</span>
           <span class='doc identifier id'>doc</span><span class='dot token'>.</span><span class='update_parent_stats identifier id'>update_parent_stats</span><span class='lparen token'>(</span><span class='parent_class identifier id'>parent_class</span><span class='comma token'>,</span> <span class='foreign_key identifier id'>foreign_key</span><span class='comma token'>,</span> <span class='parent_value_point identifier id'>parent_value_point</span><span class='rparen token'>)</span>
         <span class='rbrace token'>}</span>
       <span class='end end kw'>end</span>
@@ -724,7 +724,7 @@
 </div>
     
     <div id="footer">
-  Generated on Wed Mar 30 19:59:11 2011 by 
+  Generated on Wed Mar 30 22:06:28 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.5 (ruby-1.8.7).
 </div>

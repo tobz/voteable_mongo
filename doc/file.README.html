@@ -47,11 +47,14 @@
 <p>Voteable Mongoid allows you to make your Mongoid::Document objects voteable
 (up or down)</p>
 
-<p>For instance, in a Q&amp;A site, a user can vote up (or down) on a post or
-a comment.</p>
+<p>For instance, in a forum, a user can vote up (or down) on a post or a
+comment.</p>
 
 <p>When user provided enough information, voteable_mongoid will use only one
 update-in-place operation per collection.</p>
+
+<p>Sample app at <a
+href="https://github.com/vinova/simple_qa">github.com/vinova/simple_qa</a></p>
 
 <h2>Installation</h2>
 
@@ -75,7 +78,7 @@ update-in-place operation per collection.</p>
   <span class='include identifier id'>include</span> <span class='Mongoid constant id'>Mongoid</span><span class='colon2 op'>::</span><span class='Voteable constant id'>Voteable</span>
 
   <span class='comment val'># set points for each vote</span>
-  <span class='vote_point identifier id'>vote_point</span> <span class='self self kw'>self</span><span class='comma token'>,</span> <span class='symbol val'>:up</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='integer val'>+1</span><span class='comma token'>,</span> <span class='symbol val'>:down</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='integer val'>-1</span>
+  <span class='voteable identifier id'>voteable</span> <span class='self self kw'>self</span><span class='comma token'>,</span> <span class='symbol val'>:up</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='integer val'>+1</span><span class='comma token'>,</span> <span class='symbol val'>:down</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='integer val'>-1</span>
 
   <span class='references_many identifier id'>references_many</span> <span class='symbol val'>:comments</span>
 <span class='end end kw'>end</span>
@@ -91,10 +94,10 @@ update-in-place operation per collection.</p>
 
   <span class='referenced_in identifier id'>referenced_in</span> <span class='symbol val'>:post</span>
 
-  <span class='vote_point identifier id'>vote_point</span> <span class='self self kw'>self</span><span class='comma token'>,</span> <span class='symbol val'>:up</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='integer val'>+1</span><span class='comma token'>,</span> <span class='symbol val'>:down</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='integer val'>-3</span>
+  <span class='voteable identifier id'>voteable</span> <span class='self self kw'>self</span><span class='comma token'>,</span> <span class='symbol val'>:up</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='integer val'>+1</span><span class='comma token'>,</span> <span class='symbol val'>:down</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='integer val'>-3</span>
 
   <span class='comment val'># each vote on a comment can affect votes count and point of the related post as well</span>
-  <span class='vote_point identifier id'>vote_point</span> <span class='Post constant id'>Post</span><span class='comma token'>,</span> <span class='symbol val'>:up</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='integer val'>+2</span><span class='comma token'>,</span> <span class='symbol val'>:down</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='integer val'>-1</span>
+  <span class='voteable identifier id'>voteable</span> <span class='Post constant id'>Post</span><span class='comma token'>,</span> <span class='symbol val'>:up</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='integer val'>+2</span><span class='comma token'>,</span> <span class='symbol val'>:down</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='integer val'>-1</span>
 <span class='end end kw'>end</span>
 </pre>
 
@@ -136,11 +139,14 @@ update-in-place operation per collection.</p>
 
 <h3>Re-generate counters and vote points</h3>
 
-<pre class="code"><span class='Rails constant id'>Rails</span>
-  <span class='rake identifier id'>rake</span> <span class='db identifier id'>db</span><span class='symbol val'>:mongoid</span><span class='symbol val'>:voteable</span><span class='symbol val'>:remake_statis</span>
+<p>Rails</p>
 
-<span class='Ruby constant id'>Ruby</span>
-  <span class='Mongoid constant id'>Mongoid</span><span class='colon2 op'>::</span><span class='Voteable constant id'>Voteable</span><span class='colon2 op'>::</span><span class='Stats constant id'>Stats</span><span class='dot token'>.</span><span class='remake identifier id'>remake</span>
+<pre class="code"><span class='rake identifier id'>rake</span> <span class='db identifier id'>db</span><span class='symbol val'>:mongoid</span><span class='symbol val'>:voteable</span><span class='symbol val'>:remake_stats</span>
+</pre>
+
+<p>Ruby</p>
+
+<pre class="code"><span class='Mongoid constant id'>Mongoid</span><span class='colon2 op'>::</span><span class='Voteable constant id'>Voteable</span><span class='colon2 op'>::</span><span class='Stats constant id'>Stats</span><span class='dot token'>.</span><span class='remake identifier id'>remake</span>
 </pre>
 
 <h2>Credits</h2>
@@ -157,7 +163,7 @@ href="http://vinova.sg">vinova.sg</a>)</p>
 </div></div>
     
     <div id="footer">
-  Generated on Wed Mar 30 19:59:11 2011 by 
+  Generated on Wed Mar 30 22:06:27 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.5 (ruby-1.8.7).
 </div>
