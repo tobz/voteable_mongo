@@ -82,7 +82,7 @@ user.rb
 === Re-generate counters and vote points
 
   Rails
-    rake db:mongoid:voteable:remake_statis
+    rake db:mongoid:voteable:remake_stats
   
   Ruby
     Mongoid::Voteable::Stats.remake
