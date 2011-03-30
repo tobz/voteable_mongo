@@ -7,11 +7,15 @@ module Mongoid
     VOTE_POINT = {}
 
     included do
-      index "voteable.votes_count"
-      index "voteable.votes_point"
+      index 'voteable.up_votes_count'
+      index 'voteable.down_votes_count'
+      index 'voteable.votes_count'
+      index 'voteable.votes_point'
       
-      scope :most_voted, order_by(["voteable.votes_count", :desc])
-      scope :best_voted, order_by(["voteable.votes_point", :desc])
+      scope :most_up_voted, order_by(['voteable.up_votes_count', :desc])
+      scope :most_down_voted, order_by(['voteable.down_votes_count', :desc])
+      scope :most_voted, order_by(['voteable.votes_count', :desc])
+      scope :best_voted, order_by(['voteable.votes_point', :desc])
       
       # Set vote point for each up (down) vote on an object of this class
       def self.vote_point(klass = self, options = nil)
@@ -48,52 +52,61 @@ module Mongoid
         
         if options[:revote]
           if value == :up
-            positive_field = :up_voter_ids
-            negative_field = :down_voter_ids
+            positive_voter_ids = 'voteable.up_voter_ids'
+            negative_voter_ids = 'voteable.down_voter_ids'
+            positive_votes_count = 'voteable.up_votes_count'
+            negative_votes_count = 'voteable.down_votes_count'
             point_delta = value_point[:up] - value_point[:down]
           else
-            positive_field = :down_voter_ids
-            negative_field = :up_voter_ids
+            positive_voter_ids = 'voteable.down_voter_ids'
+            negative_voter_ids = 'voteable.up_voter_ids'
+            positive_votes_count = 'voteable.down_votes_count'
+            negative_votes_count = 'voteable.up_votes_count'
             point_delta = -value_point[:up] + value_point[:down]
           end
           
           update_result = collection.update({ 
             # Validate voter_id did a vote with value for votee_id
             :_id => votee_id,
-            "voteable.#{positive_field.to_s}" => { '$ne' => voter_id },
-            "voteable.#{negative_field.to_s}" => voter_id
+            positive_voter_ids => { '$ne' => voter_id },
+            negative_voter_ids => voter_id
           }, {
             # then update
-            '$pull' => { "voteable.#{negative_field.to_s}" => voter_id },
-            '$push' => { "voteable.#{positive_field.to_s}" => voter_id },
+            '$pull' => { negative_voter_ids => voter_id },
+            '$push' => { positive_voter_ids => voter_id },
             '$inc' => {
-              "voteable.votes_point" => point_delta
+              positive_votes_count => +1,
+              negative_votes_count => -1,
+              'voteable.votes_point' => point_delta
             }
           }, {
             :safe => true
           })
 
         elsif options[:unvote]
-          if value == :down
-            positive_field = :down_voter_ids
-            negative_field = :up_voter_ids
+          if value == :up
+            positive_voter_ids = 'voteable.up_voter_ids'
+            negative_voter_ids = 'voteable.down_voter_ids'
+            positive_votes_count = 'voteable.up_votes_count'
           else
-            positive_field = :up_voter_ids
-            negative_field = :down_voter_ids
+            positive_voter_ids = 'voteable.down_voter_ids'
+            negative_voter_ids = 'voteable.up_voter_ids'
+            positive_votes_count = 'voteable.down_votes_count'
           end
           
           # Check if voter_id did a vote with value for votee_id
           update_result = collection.update({ 
             # Validate voter_id did a vote with value for votee_id
             :_id => votee_id,
-            "voteable.#{negative_field.to_s}" => { '$ne' => voter_id },
-            "voteable.#{positive_field.to_s}" => voter_id
+            negative_voter_ids => { '$ne' => voter_id },
+            positive_voter_ids => voter_id
           }, {
             # then update
-            '$pull' => { "voteable.#{positive_field.to_s}" => voter_id },
+            '$pull' => { positive_voter_ids => voter_id },
             '$inc' => {
-              "voteable.votes_count" => -1,
-              "voteable.votes_point" => -value_point[value]
+              positive_votes_count => -1,
+              'voteable.votes_count' => -1,
+              'voteable.votes_point' => -value_point[value]
             }
           }, {
             :safe => true
@@ -101,22 +114,25 @@ module Mongoid
           
         else # new vote
           if value.to_sym == :up
-            positive_field = :up_voter_ids
+            positive_voter_ids = 'voteable.up_voter_ids'
+            positive_votes_count = 'voteable.up_votes_count'
           else
-            positive_field = :down_voter_ids
+            positive_voter_ids = 'voteable.down_voter_ids'
+            positive_votes_count = 'voteable.down_votes_count'
           end
 
           update_result = collection.update({ 
             # Validate voter_id did not vote for votee_id yet
             :_id => votee_id,
-            "voteable.up_voter_ids" => { '$ne' => voter_id },
-            "voteable.down_voter_ids" => { '$ne' => voter_id }
+            'voteable.up_voter_ids' => { '$ne' => voter_id },
+            'voteable.down_voter_ids' => { '$ne' => voter_id }
           }, {
             # then update
-            '$push' => { "voteable.#{positive_field.to_s}" => voter_id },
+            '$push' => { positive_voter_ids => voter_id },
             '$inc' => {  
-              "voteable.votes_count" => +1,
-              "voteable.votes_point" => value_point[value] }
+              'voteable.votes_count' => +1,
+              positive_votes_count => +1,
+              'voteable.votes_point' => value_point[value] }
           }, {
             :safe => true
           })
@@ -136,22 +152,41 @@ module Mongoid
             next unless foreign_key_value = votee.read_attribute(relation_metadata.foreign_key.to_sym)
           
             # Update that class / collection
-            inc_options = if options[:revote]
-              {
-                "voteable.votes_point" => ( value == :up ? 
-                   value_point[:up] - value_point[:down] : 
-                  -value_point[:up] + value_point[:down] )
-              }
+            inc_options = {}
+            if options[:revote]
+              if value == :up
+                inc_options['voteable.votes_point'] = value_point[:up] - value_point[:down]
+                unless value_point[:not_increase_votes_count]
+                  inc_options['voteable.up_votes_count'] = +1
+                  inc_options['voteable.down_votes_count'] = -1
+                end
+              else
+                inc_options['voteable.votes_point'] = -value_point[:up] + value_point[:down]
+                unless value_point[:not_increase_votes_count]
+                  inc_options['voteable.up_votes_count'] = -1
+                  inc_options['voteable.down_votes_count'] = +1
+                end
+              end
             elsif options[:unvote]
-              {
-                "voteable.votes_count" => value_point[:not_increase_votes_count] ? 0 : -1,
-                "voteable.votes_point" => -value_point[value]
-              }
-            else
-              {
-                "voteable.votes_count" => value_point[:not_increase_votes_count] ? 0 : 1,
-                "voteable.votes_point" => value_point[value]
-              }
+              inc_options['voteable.votes_point'] = -value_point[value]
+              unless value_point[:not_increase_votes_count]
+                inc_options['voteable.votes_count'] = -1
+                if value == :up
+                  inc_options['voteable.up_votes_count'] = -1
+                else
+                  inc_options['voteable.down_votes_count'] = -1
+                end
+              end
+            else # new vote
+              inc_options['voteable.votes_point'] = value_point[value]
+              unless value_point[:not_increase_votes_count]
+                inc_options['voteable.votes_count'] = 1
+                if value == :up
+                  inc_options['voteable.up_votes_count'] = 1
+                else
+                  inc_options['voteable.down_votes_count'] = 1
+                end
+              end
             end
                     
             class_name.constantize.collection.update(
@@ -161,7 +196,7 @@ module Mongoid
           end
         end
         
-        successed
+        true
       end
       
     end
@@ -195,15 +230,15 @@ module Mongoid
 
     # Get the number of up votes
     def up_votes_count
-      up_voter_ids.length
+      voteable.try(:[], 'up_votes_count') || 0
     end
     
     # Get the number of down votes
     def down_votes_count
-      down_voter_ids.length
+      voteable.try(:[], 'down_votes_count') || 0
     end
     
-    # Get the number of votes count
+    # Get the number of votes
     def votes_count
       voteable.try(:[], 'votes_count') || 0
     end
@@ -222,7 +257,7 @@ module Mongoid
     def down_voter_ids
       voteable.try(:[], 'down_voter_ids') || []
     end
-
+    
     private
       def voteable
         read_attribute('voteable')

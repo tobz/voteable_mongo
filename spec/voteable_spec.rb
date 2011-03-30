@@ -15,9 +15,13 @@ describe Mongoid::Voteable do
   
   context "just created" do
     it 'voteable votes_count, votes_point should be zero' do
+      @post1.up_votes_count.should == 0
+      @post1.down_votes_count.should == 0
       @post1.votes_count.should == 0
       @post1.votes_point.should == 0
 
+      @post2.up_votes_count.should == 0
+      @post2.down_votes_count.should == 0
       @post2.votes_count.should == 0
       @post2.votes_point.should == 0
     end
@@ -39,12 +43,16 @@ describe Mongoid::Voteable do
       Post.vote(:revote => true, :votee_id => @post1.id, :voter_id => @user1.id, :value => 'up')
       @post1.reload
 
+      @post1.up_votes_count.should == 0
+      @post1.down_votes_count.should == 0
       @post1.votes_count.should == 0
       @post1.votes_point.should == 0
       
       Post.vote(:revote => true, :votee_id => @post2.id, :voter_id => @user2.id, :value => :down)
       @post2.reload
       
+      @post2.up_votes_count.should == 0
+      @post2.down_votes_count.should == 0
       @post2.votes_count.should == 0
       @post2.votes_point.should == 0
     end
@@ -57,6 +65,8 @@ describe Mongoid::Voteable do
     end
     
     it '' do
+      @post1.up_votes_count.should == 1
+      @post1.down_votes_count.should == 0
       @post1.votes_count.should == 1
       @post1.votes_point.should == 1
 
@@ -71,6 +81,8 @@ describe Mongoid::Voteable do
       Post.vote(:revote => false, :votee_id => @post1.id, :voter_id => @user1.id, :value => :up)
       @post1.reload
       
+      @post1.up_votes_count.should == 1
+      @post1.down_votes_count.should == 0
       @post1.votes_count.should == 1
       @post1.votes_point.should == 1
       
@@ -85,6 +97,8 @@ describe Mongoid::Voteable do
     end
     
     it '' do
+      @post1.up_votes_count.should == 1
+      @post1.down_votes_count.should == 1
       @post1.votes_count.should == 2
       @post1.votes_point.should == 0
       
@@ -103,6 +117,8 @@ describe Mongoid::Voteable do
     end
     
     it '' do
+      @post1.up_votes_count.should == 0
+      @post1.down_votes_count.should == 2
       @post1.votes_count.should == 2
       @post1.votes_point.should == -2
 
@@ -121,6 +137,8 @@ describe Mongoid::Voteable do
     end
     
     it '' do
+      @post2.up_votes_count.should == 0
+      @post2.down_votes_count.should == 1
       @post2.votes_count.should == 1
       @post2.votes_point.should == -1
       
@@ -138,6 +156,8 @@ describe Mongoid::Voteable do
     end
     
     it '' do
+      @post2.up_votes_count.should == 1
+      @post2.down_votes_count.should == 0
       @post2.votes_count.should == 1
       @post2.votes_point.should == 1
       
@@ -157,9 +177,13 @@ describe Mongoid::Voteable do
     end
     
     it '' do
+      @post2.up_votes_count.should == 2
+      @post2.down_votes_count.should == 0
       @post2.votes_count.should == 2
       @post2.votes_point.should == 3
       
+      @comment.up_votes_count.should == 1
+      @comment.down_votes_count.should == 0
       @comment.votes_count.should == 1
       @comment.votes_point.should == 1
     end
@@ -174,9 +198,13 @@ describe Mongoid::Voteable do
     end
     
     it '' do
+      @post2.up_votes_count.should == 1
+      @post2.down_votes_count.should == 1
       @post2.votes_count.should == 2
       @post2.votes_point.should == 0
       
+      @comment.up_votes_count.should == 0
+      @comment.down_votes_count.should == 1
       @comment.votes_count.should == 1
       @comment.votes_point.should == -3
     end
@@ -184,9 +212,13 @@ describe Mongoid::Voteable do
     it 'revote with wrong value has no effect' do
       @user1.vote(:votee => @comment, :value => :down)
       
+      @post2.up_votes_count.should == 1
+      @post2.down_votes_count.should == 1
       @post2.votes_count.should == 2
       @post2.votes_point.should == 0
       
+      @comment.up_votes_count.should == 0
+      @comment.down_votes_count.should == 1
       @comment.votes_count.should == 1
       @comment.votes_point.should == -3
     end
@@ -199,6 +231,8 @@ describe Mongoid::Voteable do
     end
     
     it "" do
+      @post1.up_votes_count.should == 0
+      @post1.down_votes_count.should == 1
       @post1.votes_count.should == 1
       @post1.votes_point.should == -1
       
@@ -209,8 +243,24 @@ describe Mongoid::Voteable do
     end
   end
   
-  context "@post1 has 1 vote and -1 point, @post2 has 2 votes and 0 point" do
-    it "" do
+  context "@post1 has 1 down vote and -1 point, @post2 has 1 up vote, 1 down vote and 0 point" do
+    it "verify @post1 counters" do
+      @post1.up_votes_count.should == 0
+      @post1.down_votes_count.should == 1
+      @post1.votes_count.should == 1
+      @post1.votes_point.should == -1
+    end
+    
+    it "verify @post2 counters" do
+      @post2.up_votes_count.should == 1
+      @post2.down_votes_count.should == 1
+      @post2.votes_count.should == 2
+      @post2.votes_point.should == 0
+    end
+    
+    it "test scopes" do
+      Post.most_up_voted.first.should == @post2
+      Post.most_down_voted.first.should == @post1
       Post.most_voted.first.should == @post2
       Post.best_voted.first.should == @post2
     end
@@ -224,9 +274,13 @@ describe Mongoid::Voteable do
     end
     
     it "" do
+      @post2.up_votes_count.should == 1
+      @post2.down_votes_count.should == 0
       @post2.votes_count.should == 1
       @post2.votes_point.should == 1
       
+      @comment.up_votes_count.should == 0
+      @comment.down_votes_count.should == 0
       @comment.votes_count.should == 0
       @comment.votes_point.should == 0
     end
