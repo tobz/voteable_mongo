@@ -8,11 +8,11 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Alex Nguyen"]
   s.email       = ["alex@vinova.sg"]
-  s.homepage    = "http://vinova.sg"
+  s.homepage    = "http://vinova.sg/"
   s.summary     = %q{Add Up / Down Voting for Mongoid}
   s.description = %q{Add Up / Down Voting for Mongoid (built for speed by using one Mongodb update-in-place for each collection when provided enough information)}
 
-  s.add_dependency 'mongoid', '~> 2.0.0.rc'
+  s.add_dependency 'mongoid', '~> 2.0.0'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'bson_ext'
   s.add_development_dependency 'watchr'
