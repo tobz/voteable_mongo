@@ -19,6 +19,7 @@ module Mongoid
         Mongoid::Voteable::VOTE_POINT.each do |class_name, value_point|
           klass = class_name.constantize
           klass_value_point = value_point[class_name]
+          Logger.new($stdout).info("Generating stats for #{class_name}")
           klass.voteable_related.each{ |doc|
             doc.remake_stats(klass_value_point)
           }
@@ -31,6 +32,7 @@ module Mongoid
             if relation_metadata
               parent_class = parent_class_name.constantize
               foreign_key = relation_metadata.foreign_key
+              Logger.new($stdout).info("Updating stats for #{class_name} > #{parent_class_name}")
               klass.voteable_related.each{ |doc|
                 doc.update_parent_stats(parent_class, foreign_key, parent_value_point)
               }
