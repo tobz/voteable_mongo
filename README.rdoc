@@ -2,9 +2,11 @@
 
 Voteable Mongoid allows you to make your Mongoid::Document objects voteable (up or down)
 
-For instance, in a Q&A site, a user can vote up (or down) on a post or a comment.
+For instance, in a forum, a user can vote up (or down) on a post or a comment.
 
 When user provided enough information, voteable_mongoid will use only one update-in-place operation per collection.
+
+Sample app at https://github.com/vinova/simple_qa
 
 == Installation
 
@@ -87,9 +89,6 @@ Rails
 Ruby
     Mongoid::Voteable::Stats.remake
     
-=== Sample app
-
-  https://github.com/vinova/simple_qa    
 
 == Credits
 
