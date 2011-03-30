@@ -60,7 +60,7 @@ describe Mongoid::Voteable do
   context 'user1 vote up post1 the first time' do
     before :all do    
       Post.vote(:votee_id => @post1.id, :voter_id => @user1.id, :value => :up)
-      Mongoid::Voteable::Stats.remake_stats
+      Mongoid::Voteable::Stats.remake
       @post1.reload
     end
     
@@ -93,7 +93,7 @@ describe Mongoid::Voteable do
   context 'user2 vote down post1 the first time' do
     before :all do
       Post.vote(:votee_id => @post1.id, :voter_id => @user2.id, :value => :down)
-      Mongoid::Voteable::Stats.remake_stats
+      Mongoid::Voteable::Stats.remake
       @post1.reload
     end
     
@@ -114,7 +114,7 @@ describe Mongoid::Voteable do
   context 'user1 change vote on post1 from up to down' do
     before :all do
       Post.vote(:revote => true, :votee_id => @post1.id, :voter_id => @user1.id, :value => :down)
-      Mongoid::Voteable::Stats.remake_stats
+      Mongoid::Voteable::Stats.remake
       @post1.reload
     end
     
@@ -135,7 +135,7 @@ describe Mongoid::Voteable do
   context 'user1 vote down post2 the first time' do
     before :all do
       Post.vote(:votee_id => @post2.id, :voter_id => @user1.id, :value => :down)
-      Mongoid::Voteable::Stats.remake_stats
+      Mongoid::Voteable::Stats.remake
       @post2.reload
     end
     
@@ -155,7 +155,7 @@ describe Mongoid::Voteable do
   context 'user1 change vote on post2 from down to up' do
     before :all do
       Post.vote(:revote => true, :votee_id => @post2.id.to_s, :voter_id => @user1.id.to_s, :value => :up)
-      Mongoid::Voteable::Stats.remake_stats
+      Mongoid::Voteable::Stats.remake
       @post2.reload
     end
     
@@ -176,7 +176,7 @@ describe Mongoid::Voteable do
   context 'user1 vote up post2 comment the first time' do
     before :all do
       @comment.vote(:voter_id => @user1.id, :value => :up)
-      Mongoid::Voteable::Stats.remake_stats
+      Mongoid::Voteable::Stats.remake
       @comment.reload
       @post2.reload
     end
@@ -198,7 +198,7 @@ describe Mongoid::Voteable do
   context 'user1 revote post2 comment from up to down' do
     before :all do
       @user1.vote(:votee => @comment, :value => :down)
-      Mongoid::Voteable::Stats.remake_stats
+      Mongoid::Voteable::Stats.remake
       @comment.reload
       @post2.reload
     end
@@ -233,7 +233,7 @@ describe Mongoid::Voteable do
   context "user1 unvote on post1" do
     before(:all) do
       @post1.vote(:voter_id => @user1.id, :votee_id => @post1.id, :unvote => true)
-      Mongoid::Voteable::Stats.remake_stats
+      Mongoid::Voteable::Stats.remake
       @post1.reload
     end
     
@@ -276,7 +276,7 @@ describe Mongoid::Voteable do
   context "user1 unvote on comment" do
     before(:all) do
       @user1.unvote(@comment)
-      Mongoid::Voteable::Stats.remake_stats
+      Mongoid::Voteable::Stats.remake
       @comment.reload
       @post2.reload
     end
@@ -296,7 +296,7 @@ describe Mongoid::Voteable do
   
   context 'final' do
     it "test remake stats" do
-      Mongoid::Voteable::Stats.remake_stats
+      Mongoid::Voteable::Stats.remake
 
       @post1.up_votes_count.should == 0
       @post1.down_votes_count.should == 1
