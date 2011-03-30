@@ -2,7 +2,7 @@
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
-    <meta name="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Module: Mongoid::Voteable</title>
 <link rel="stylesheet" href="../css/style.css" type="text/css" media="screen" charset="utf-8" />
 <link rel="stylesheet" href="../css/common.css" type="text/css" media="screen" charset="utf-8" />
@@ -77,8 +77,8 @@
           <div class="docstring">
   <div class="discussion">
     
-<p>How many points should be assigned for each up or down vote. This array
-should be manipulated using Voteable.vote_point method</p>
+<p>How many points should be assigned for each up or down vote. This hash
+should be accessed and manipulated using Voteable.vote_point method</p>
 
 
   </div>
@@ -87,7 +87,8 @@ should be manipulated using Voteable.vote_point method</p>
   
 </div>
         </dt>
-        <dd><pre class="code"><span class='lbrace'>{</span><span class='rbrace'>}</span></pre></dd>
+        <dd><pre class="code"><span class='lbrace token'>{</span><span class='rbrace token'>}</span>
+</pre></dd>
       
     </dl>
   
@@ -102,6 +103,29 @@ should be manipulated using Voteable.vote_point method</p>
     </h2>
 
     <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#down_voter_ids-instance_method" title="#down_voter_ids (instance method)">- (Object) <strong>down_voter_ids</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Array of down voter ids.</p>
+</div></span>
+  
+</li>
+
       
         <li class="public ">
   <span class="summary_signature">
@@ -129,7 +153,7 @@ should be manipulated using Voteable.vote_point method</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#unvote-instance_method" title="#unvote (instance method)">- (Object) <strong>unvote</strong>(options) </a>
+      <a href="#up_voter_ids-instance_method" title="#up_voter_ids (instance method)">- (Object) <strong>up_voter_ids</strong> </a>
     
 
     
@@ -143,7 +167,7 @@ should be manipulated using Voteable.vote_point method</p>
 
   
     <span class="summary_desc"><div class='inline'>
-<p>Cancel a vote on this votee.</p>
+<p>Array of up voter ids.</p>
 </div></span>
   
 </li>
@@ -198,7 +222,7 @@ should be manipulated using Voteable.vote_point method</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#vote_value-instance_method" title="#vote_value (instance method)">- (Object) <strong>vote_value</strong>(x) </a>
+      <a href="#vote_value-instance_method" title="#vote_value (instance method)">- (Object) <strong>vote_value</strong>(voter) </a>
     
 
     
@@ -218,6 +242,52 @@ should be manipulated using Voteable.vote_point method</p>
 </li>
 
       
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#votes_count-instance_method" title="#votes_count (instance method)">- (Object) <strong>votes_count</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Get the number of votes count.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#votes_point-instance_method" title="#votes_point (instance method)">- (Object) <strong>votes_point</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Get the votes point.</p>
+</div></span>
+  
+</li>
+
+      
     </ul>
   
 
@@ -229,7 +299,46 @@ should be manipulated using Voteable.vote_point method</p>
     
     
       <div class="method_details first">
-  <p class="signature first" id="down_votes_count-instance_method">
+  <p class="signature first" id="down_voter_ids-instance_method">
+  
+    - (<tt>Object</tt>) <strong>down_voter_ids</strong> 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    
+<p>Array of down voter ids</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+222
+223
+224</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/mongoid/voteable.rb', line 222</span>
+
+<span class='def def kw'>def</span> <span class='down_voter_ids identifier id'>down_voter_ids</span>
+  <span class='voteable identifier id'>voteable</span><span class='dot token'>.</span><span class='try identifier id'>try</span><span class='lparen token'>(</span><span class='symbol val'>:[]</span><span class='comma token'>,</span> <span class='string val'>'down_voter_ids'</span><span class='rparen token'>)</span> <span class='orop op'>||</span> <span class='lbrack token'>[</span><span class='rbrack token'>]</span>
+<span class='end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="down_votes_count-instance_method">
   
     - (<tt>Object</tt>) <strong>down_votes_count</strong> 
   
@@ -251,93 +360,56 @@ should be manipulated using Voteable.vote_point method</p>
       <pre class="lines">
 
 
-221
-222
-223</pre>
+202
+203
+204</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/mongoid/voteable.rb', line 221</span>
+      <pre class="code"><span class="info file"># File 'lib/mongoid/voteable.rb', line 202</span>
 
-<span class='kw'>def</span> <span class='id down_votes_count'>down_votes_count</span>
-  <span class='id down_voter_ids'>down_voter_ids</span><span class='period'>.</span><span class='id length'>length</span>
-<span class='kw'>end</span></pre>
+<span class='def def kw'>def</span> <span class='down_votes_count identifier id'>down_votes_count</span>
+  <span class='down_voter_ids identifier id'>down_voter_ids</span><span class='dot token'>.</span><span class='length identifier id'>length</span>
+<span class='end end kw'>end</span>
+</pre>
     </td>
   </tr>
 </table>
 </div>
     
       <div class="method_details ">
-  <p class="signature " id="unvote-instance_method">
+  <p class="signature " id="up_voter_ids-instance_method">
   
-    - (<tt>Object</tt>) <strong>unvote</strong>(options) 
+    - (<tt>Object</tt>) <strong>up_voter_ids</strong> 
   
 
   
 </p><div class="docstring">
   <div class="discussion">
     
-<p>Cancel a vote on this votee</p>
+<p>Array of up voter ids</p>
 
 
   </div>
 </div>
 <div class="tags">
-  <h3>Parameters:</h3>
-<ul class="param">
   
-    <li>
-      
-        <span class='type'>(<tt>Hash</tt>)</span>
-      
-      
-        <span class='name'>options</span>
-      
-      
-      
-        &mdash;
-        <div class='inline'>
-<p>a hash containings:</p>
-<ul><li>
-<p>:voter_id: the voter document id</p>
-</li></ul>
-</div>
-      
-    </li>
-  
-</ul>
-
 </div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-186
-187
-188
-189
-190
-191
-192
-193
-194
-195
-196</pre>
+217
+218
+219</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/mongoid/voteable.rb', line 186</span>
+      <pre class="code"><span class="info file"># File 'lib/mongoid/voteable.rb', line 217</span>
 
-<span class='kw'>def</span> <span class='id unvote'>unvote</span><span class='lparen'>(</span><span class='id options'>options</span><span class='rparen'>)</span>
-  <span class='const'>VOTE_POINT</span><span class='lbracket'>[</span><span class='kw'>self</span><span class='period'>.</span><span class='id class'>class</span><span class='period'>.</span><span class='id name'>name</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id class_name'>class_name</span><span class='comma'>,</span> <span class='id value_point'>value_point</span><span class='op'>|</span>
-    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id relation_metadata'>relation_metadata</span> <span class='op'>=</span> <span class='id relations'>relations</span><span class='lbracket'>[</span><span class='id class_name'>class_name</span><span class='period'>.</span><span class='id underscore'>underscore</span><span class='rbracket'>]</span>
-    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id foreign_key'>foreign_key</span> <span class='op'>=</span> <span class='id relation_metadata'>relation_metadata</span><span class='period'>.</span><span class='id foreign_key'>foreign_key</span>
-    <span class='id options'>options</span><span class='lbracket'>[</span><span class='id foreign_key'>foreign_key</span><span class='period'>.</span><span class='id to_sym'>to_sym</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id read_attribute'>read_attribute</span><span class='lparen'>(</span><span class='id foreign_key'>foreign_key</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
-  
-  <span class='id options'>options</span><span class='lbracket'>[</span><span class='symbol'>:votee_id</span><span class='rbracket'>]</span> <span class='op'>||=</span> <span class='id _id'>_id</span>
-  <span class='id options'>options</span><span class='lbracket'>[</span><span class='symbol'>:value</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id vote_value'>vote_value</span><span class='lparen'>(</span><span class='id options'>options</span><span class='lbracket'>[</span><span class='symbol'>:voter_id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
-  <span class='kw'>self</span><span class='period'>.</span><span class='id class'>class</span><span class='period'>.</span><span class='id unvote'>unvote</span><span class='lparen'>(</span><span class='id options'>options</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
+<span class='def def kw'>def</span> <span class='up_voter_ids identifier id'>up_voter_ids</span>
+  <span class='voteable identifier id'>voteable</span><span class='dot token'>.</span><span class='try identifier id'>try</span><span class='lparen token'>(</span><span class='symbol val'>:[]</span><span class='comma token'>,</span> <span class='string val'>'up_voter_ids'</span><span class='rparen token'>)</span> <span class='orop op'>||</span> <span class='lbrack token'>[</span><span class='rbrack token'>]</span>
+<span class='end end kw'>end</span>
+</pre>
     </td>
   </tr>
 </table>
@@ -366,16 +438,17 @@ should be manipulated using Voteable.vote_point method</p>
       <pre class="lines">
 
 
-216
-217
-218</pre>
+197
+198
+199</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/mongoid/voteable.rb', line 216</span>
+      <pre class="code"><span class="info file"># File 'lib/mongoid/voteable.rb', line 197</span>
 
-<span class='kw'>def</span> <span class='id up_votes_count'>up_votes_count</span>
-  <span class='id up_voter_ids'>up_voter_ids</span><span class='period'>.</span><span class='id length'>length</span>
-<span class='kw'>end</span></pre>
+<span class='def def kw'>def</span> <span class='up_votes_count identifier id'>up_votes_count</span>
+  <span class='up_voter_ids identifier id'>up_voter_ids</span><span class='dot token'>.</span><span class='length identifier id'>length</span>
+<span class='end end kw'>end</span>
+</pre>
     </td>
   </tr>
 </table>
@@ -429,34 +502,35 @@ should be manipulated using Voteable.vote_point method</p>
       <pre class="lines">
 
 
-169
-170
-171
-172
-173
 174
 175
 176
 177
 178
 179
-180</pre>
+180
+181
+182
+183
+184
+185</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/mongoid/voteable.rb', line 169</span>
+      <pre class="code"><span class="info file"># File 'lib/mongoid/voteable.rb', line 174</span>
 
-<span class='kw'>def</span> <span class='id vote'>vote</span><span class='lparen'>(</span><span class='id options'>options</span><span class='rparen'>)</span>
-  <span class='const'>VOTE_POINT</span><span class='lbracket'>[</span><span class='kw'>self</span><span class='period'>.</span><span class='id class'>class</span><span class='period'>.</span><span class='id name'>name</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id class_name'>class_name</span><span class='comma'>,</span> <span class='id value_point'>value_point</span><span class='op'>|</span>
-    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id relation_metadata'>relation_metadata</span> <span class='op'>=</span> <span class='id relations'>relations</span><span class='lbracket'>[</span><span class='id class_name'>class_name</span><span class='period'>.</span><span class='id underscore'>underscore</span><span class='rbracket'>]</span>
-    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id foreign_key'>foreign_key</span> <span class='op'>=</span> <span class='id relation_metadata'>relation_metadata</span><span class='period'>.</span><span class='id foreign_key'>foreign_key</span>
-    <span class='id options'>options</span><span class='lbracket'>[</span><span class='id foreign_key'>foreign_key</span><span class='period'>.</span><span class='id to_sym'>to_sym</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id read_attribute'>read_attribute</span><span class='lparen'>(</span><span class='id foreign_key'>foreign_key</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
-  
-  <span class='id options'>options</span><span class='lbracket'>[</span><span class='symbol'>:votee_id</span><span class='rbracket'>]</span> <span class='op'>||=</span> <span class='id _id'>_id</span>
-  <span class='id options'>options</span><span class='lbracket'>[</span><span class='symbol'>:revote</span><span class='rbracket'>]</span> <span class='op'>||=</span> <span class='op'>!</span><span class='id vote_value'>vote_value</span><span class='lparen'>(</span><span class='id options'>options</span><span class='lbracket'>[</span><span class='symbol'>:voter_id</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id nil?'>nil?</span>
+<span class='def def kw'>def</span> <span class='vote identifier id'>vote</span><span class='lparen token'>(</span><span class='options identifier id'>options</span><span class='rparen token'>)</span>
+  <span class='options identifier id'>options</span><span class='lbrack token'>[</span><span class='symbol val'>:votee_id</span><span class='rbrack token'>]</span> <span class='opasgn op'>||=</span> <span class='_id identifier id'>_id</span>
+  <span class='options identifier id'>options</span><span class='lbrack token'>[</span><span class='symbol val'>:votee</span><span class='rbrack token'>]</span> <span class='opasgn op'>||=</span> <span class='self self kw'>self</span>
 
-  <span class='kw'>self</span><span class='period'>.</span><span class='id class'>class</span><span class='period'>.</span><span class='id vote'>vote</span><span class='lparen'>(</span><span class='id options'>options</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
+  <span class='if if kw'>if</span> <span class='options identifier id'>options</span><span class='lbrack token'>[</span><span class='symbol val'>:unvote</span><span class='rbrack token'>]</span>
+    <span class='options identifier id'>options</span><span class='lbrack token'>[</span><span class='symbol val'>:value</span><span class='rbrack token'>]</span> <span class='opasgn op'>||=</span> <span class='vote_value identifier id'>vote_value</span><span class='lparen token'>(</span><span class='options identifier id'>options</span><span class='lbrack token'>[</span><span class='symbol val'>:voter_id</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='else else kw'>else</span>
+    <span class='options identifier id'>options</span><span class='lbrack token'>[</span><span class='symbol val'>:revote</span><span class='rbrack token'>]</span> <span class='opasgn op'>||=</span> <span class='notop op'>!</span><span class='vote_value identifier id'>vote_value</span><span class='lparen token'>(</span><span class='options identifier id'>options</span><span class='lbrack token'>[</span><span class='symbol val'>:voter_id</span><span class='rbrack token'>]</span><span class='rparen token'>)</span><span class='dot token'>.</span><span class='nil? fid id'>nil?</span>
+  <span class='end end kw'>end</span>
+
+  <span class='self self kw'>self</span><span class='dot token'>.</span><span class='class identifier id'>class</span><span class='dot token'>.</span><span class='vote identifier id'>vote</span><span class='lparen token'>(</span><span class='options identifier id'>options</span><span class='rparen token'>)</span>
+<span class='end end kw'>end</span>
+</pre>
     </td>
   </tr>
 </table>
@@ -465,7 +539,7 @@ should be manipulated using Voteable.vote_point method</p>
       <div class="method_details ">
   <p class="signature " id="vote_value-instance_method">
   
-    - (<tt>Object</tt>) <strong>vote_value</strong>(x) 
+    - (<tt>Object</tt>) <strong>vote_value</strong>(voter) 
   
 
   
@@ -483,16 +557,16 @@ should be manipulated using Voteable.vote_point method</p>
   
     <li>
       
-        <span class='type'>(<tt>String</tt>, <tt>BSON::ObjectId</tt>)</span>
+        <span class='type'>(<tt><span class='object_link'><a href="../Mongoid.html" title="Mongoid (module)">Mongoid</a></span> Object</tt>, <tt>BSON::ObjectId</tt>)</span>
       
       
-        <span class='name'>x</span>
+        <span class='name'>voter</span>
       
       
       
         &mdash;
         <div class='inline'>
-<p>the id of the voter who made the vote</p>
+<p>is Mongoid object the id of the voter who made the vote</p>
 </div>
       
     </li>
@@ -505,36 +579,99 @@ should be manipulated using Voteable.vote_point method</p>
       <pre class="lines">
 
 
-201
-202
-203
-204
-205
-206
-207
-208
-209
-210
-211
-212
-213</pre>
+190
+191
+192
+193
+194</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/mongoid/voteable.rb', line 201</span>
+      <pre class="code"><span class="info file"># File 'lib/mongoid/voteable.rb', line 190</span>
 
-<span class='kw'>def</span> <span class='id vote_value'>vote_value</span><span class='lparen'>(</span><span class='id x'>x</span><span class='rparen'>)</span>
-  <span class='id voter_id'>voter_id</span> <span class='op'>=</span> <span class='kw'>case</span> <span class='id x'>x</span>
-  <span class='kw'>when</span> <span class='const'>String</span>
-    <span class='const'>BSON</span><span class='op'>::</span><span class='const'>ObjectId</span><span class='lparen'>(</span><span class='id x'>x</span><span class='rparen'>)</span>
-  <span class='kw'>when</span> <span class='const'>BSON</span><span class='op'>::</span><span class='const'>ObjectId</span>
-    <span class='id x'>x</span>
-  <span class='kw'>else</span>
-    <span class='id x'>x</span><span class='period'>.</span><span class='id id'>id</span>
-  <span class='kw'>end</span>
+<span class='def def kw'>def</span> <span class='vote_value identifier id'>vote_value</span><span class='lparen token'>(</span><span class='voter identifier id'>voter</span><span class='rparen token'>)</span>
+  <span class='voter_id identifier id'>voter_id</span> <span class='assign token'>=</span> <span class='voter identifier id'>voter</span><span class='dot token'>.</span><span class='is_a? fid id'>is_a?</span><span class='lparen token'>(</span><span class='BSON constant id'>BSON</span><span class='colon2 op'>::</span><span class='ObjectId constant id'>ObjectId</span><span class='rparen token'>)</span> <span class='question op'>?</span> <span class='voter identifier id'>voter</span> <span class='colon op'>:</span> <span class='voter identifier id'>voter</span><span class='dot token'>.</span><span class='_id identifier id'>_id</span>
+  <span class='return return kw'>return</span> <span class='symbol val'>:up</span> <span class='if if_mod kw'>if</span> <span class='up_voter_ids identifier id'>up_voter_ids</span><span class='dot token'>.</span><span class='include? fid id'>include?</span><span class='lparen token'>(</span><span class='voter_id identifier id'>voter_id</span><span class='rparen token'>)</span>
+  <span class='return return kw'>return</span> <span class='symbol val'>:down</span> <span class='if if_mod kw'>if</span> <span class='down_voter_ids identifier id'>down_voter_ids</span><span class='dot token'>.</span><span class='include? fid id'>include?</span><span class='lparen token'>(</span><span class='voter_id identifier id'>voter_id</span><span class='rparen token'>)</span>
+<span class='end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="votes_count-instance_method">
+  
+    - (<tt>Object</tt>) <strong>votes_count</strong> 
+  
 
-  <span class='kw'>return</span> <span class='symbol'>:up</span> <span class='kw'>if</span> <span class='id up_voter_ids'>up_voter_ids</span><span class='period'>.</span><span class='id try'>try</span><span class='lparen'>(</span><span class='symbol'>:include?</span><span class='comma'>,</span> <span class='id voter_id'>voter_id</span><span class='rparen'>)</span>
-  <span class='kw'>return</span> <span class='symbol'>:down</span> <span class='kw'>if</span> <span class='id down_voter_ids'>down_voter_ids</span><span class='period'>.</span><span class='id try'>try</span><span class='lparen'>(</span><span class='symbol'>:include?</span><span class='comma'>,</span> <span class='id voter_id'>voter_id</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
+  
+</p><div class="docstring">
+  <div class="discussion">
+    
+<p>Get the number of votes count</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+207
+208
+209</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/mongoid/voteable.rb', line 207</span>
+
+<span class='def def kw'>def</span> <span class='votes_count identifier id'>votes_count</span>
+  <span class='voteable identifier id'>voteable</span><span class='dot token'>.</span><span class='try identifier id'>try</span><span class='lparen token'>(</span><span class='symbol val'>:[]</span><span class='comma token'>,</span> <span class='string val'>'votes_count'</span><span class='rparen token'>)</span> <span class='orop op'>||</span> <span class='integer val'>0</span>
+<span class='end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="votes_point-instance_method">
+  
+    - (<tt>Object</tt>) <strong>votes_point</strong> 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    
+<p>Get the votes point</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+212
+213
+214</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/mongoid/voteable.rb', line 212</span>
+
+<span class='def def kw'>def</span> <span class='votes_point identifier id'>votes_point</span>
+  <span class='voteable identifier id'>voteable</span><span class='dot token'>.</span><span class='try identifier id'>try</span><span class='lparen token'>(</span><span class='symbol val'>:[]</span><span class='comma token'>,</span> <span class='string val'>'votes_point'</span><span class='rparen token'>)</span> <span class='orop op'>||</span> <span class='integer val'>0</span>
+<span class='end end kw'>end</span>
+</pre>
     </td>
   </tr>
 </table>
@@ -545,9 +682,9 @@ should be manipulated using Voteable.vote_point method</p>
 </div>
     
     <div id="footer">
-  Generated on Wed Feb 23 14:45:19 2011 by 
+  Generated on Wed Mar 30 11:06:27 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.6.4 (ruby-1.9.2).
+  0.6.5 (ruby-1.8.7).
 </div>
 
   </body>

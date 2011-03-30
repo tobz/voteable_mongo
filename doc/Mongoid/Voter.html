@@ -2,7 +2,7 @@
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
-    <meta name="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Module: Mongoid::Voter</title>
 <link rel="stylesheet" href="../css/style.css" type="text/css" media="screen" charset="utf-8" />
 <link rel="stylesheet" href="../css/common.css" type="text/css" media="screen" charset="utf-8" />
@@ -83,7 +83,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#unvote-instance_method" title="#unvote (instance method)">- (Object) <strong>unvote</strong>(votee) </a>
+      <a href="#unvote-instance_method" title="#unvote (instance method)">- (Object) <strong>unvote</strong>(options) </a>
     
 
     
@@ -106,7 +106,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#vote-instance_method" title="#vote (instance method)">- (Object) <strong>vote</strong>(options, vote_value = nil) </a>
+      <a href="#vote-instance_method" title="#vote (instance method)">- (Object) <strong>vote</strong>(options, value = nil) </a>
     
 
     
@@ -208,7 +208,7 @@
       <div class="method_details first">
   <p class="signature first" id="unvote-instance_method">
   
-    - (<tt>Object</tt>) <strong>unvote</strong>(votee) 
+    - (<tt>Object</tt>) <strong>unvote</strong>(options) 
   
 
   
@@ -248,16 +248,27 @@
       <pre class="lines">
 
 
-38
-39
-40</pre>
+53
+54
+55
+56
+57
+58
+59
+60</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/mongoid/voter.rb', line 38</span>
+      <pre class="code"><span class="info file"># File 'lib/mongoid/voter.rb', line 53</span>
 
-<span class='kw'>def</span> <span class='id unvote'>unvote</span><span class='lparen'>(</span><span class='id votee'>votee</span><span class='rparen'>)</span>
-  <span class='id votee'>votee</span><span class='period'>.</span><span class='id unvote'>unvote</span><span class='lparen'>(</span><span class='symbol'>:voter_id</span> <span class='op'>=&gt;</span> <span class='id _id'>_id</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
+<span class='def def kw'>def</span> <span class='unvote identifier id'>unvote</span><span class='lparen token'>(</span><span class='options identifier id'>options</span><span class='rparen token'>)</span>
+  <span class='unless unless kw'>unless</span> <span class='options identifier id'>options</span><span class='dot token'>.</span><span class='is_a? fid id'>is_a?</span><span class='lparen token'>(</span><span class='Hash constant id'>Hash</span><span class='rparen token'>)</span>
+    <span class='options identifier id'>options</span> <span class='assign token'>=</span> <span class='lbrace token'>{</span> <span class='symbol val'>:votee</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='options identifier id'>options</span> <span class='rbrace token'>}</span>
+  <span class='end end kw'>end</span>
+  <span class='options identifier id'>options</span><span class='lbrack token'>[</span><span class='symbol val'>:unvote</span><span class='rbrack token'>]</span> <span class='assign token'>=</span> <span class='true true kw'>true</span>
+  <span class='options identifier id'>options</span><span class='lbrack token'>[</span><span class='symbol val'>:revote</span><span class='rbrack token'>]</span> <span class='assign token'>=</span> <span class='false false kw'>false</span>
+  <span class='vote identifier id'>vote</span><span class='lparen token'>(</span><span class='options identifier id'>options</span><span class='rparen token'>)</span>
+<span class='end end kw'>end</span>
+</pre>
     </td>
   </tr>
 </table>
@@ -266,7 +277,7 @@
       <div class="method_details ">
   <p class="signature " id="vote-instance_method">
   
-    - (<tt>Object</tt>) <strong>vote</strong>(options, vote_value = nil) 
+    - (<tt>Object</tt>) <strong>vote</strong>(options, value = nil) 
   
 
   
@@ -290,12 +301,10 @@
         <span class='name'>vote_value</span>
       
       
-        <em class="default">(defaults to: <tt>nil</tt>)</em>
-      
       
         &mdash;
         <div class='inline'>
-<p>vote up or vote down</p>
+<p>vote up or vote down, nil to unvote</p>
 </div>
       
     </li>
@@ -324,11 +333,6 @@
       <pre class="lines">
 
 
-61
-62
-63
-64
-65
 66
 67
 68
@@ -350,38 +354,42 @@
 84
 85
 86
-87</pre>
+87
+88
+89
+90
+91</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/mongoid/voter.rb', line 61</span>
+      <pre class="code"><span class="info file"># File 'lib/mongoid/voter.rb', line 66</span>
 
-<span class='kw'>def</span> <span class='id vote'>vote</span><span class='lparen'>(</span><span class='id options'>options</span><span class='comma'>,</span> <span class='id vote_value'>vote_value</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
-  <span class='id options'>options</span><span class='period'>.</span><span class='id symbolize_keys!'>symbolize_keys!</span>
+<span class='def def kw'>def</span> <span class='vote identifier id'>vote</span><span class='lparen token'>(</span><span class='options identifier id'>options</span><span class='comma token'>,</span> <span class='value identifier id'>value</span> <span class='assign token'>=</span> <span class='nil nil kw'>nil</span><span class='rparen token'>)</span>
+  <span class='if if kw'>if</span> <span class='options identifier id'>options</span><span class='dot token'>.</span><span class='is_a? fid id'>is_a?</span><span class='lparen token'>(</span><span class='Hash constant id'>Hash</span><span class='rparen token'>)</span>
+    <span class='votee identifier id'>votee</span> <span class='assign token'>=</span> <span class='options identifier id'>options</span><span class='lbrack token'>[</span><span class='symbol val'>:votee</span><span class='rbrack token'>]</span>
+  <span class='else else kw'>else</span>
+    <span class='votee identifier id'>votee</span> <span class='assign token'>=</span> <span class='options identifier id'>options</span>
+    <span class='options identifier id'>options</span> <span class='assign token'>=</span> <span class='lbrace token'>{</span> <span class='symbol val'>:votee</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='votee identifier id'>votee</span><span class='comma token'>,</span> <span class='symbol val'>:value</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='value identifier id'>value</span> <span class='rbrace token'>}</span>
+  <span class='end end kw'>end</span>
 
-  <span class='kw'>if</span> <span class='id options'>options</span><span class='period'>.</span><span class='id is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span> 
-    <span class='id votee'>votee</span> <span class='op'>=</span> <span class='id options'>options</span><span class='lbracket'>[</span><span class='symbol'>:votee</span><span class='rbracket'>]</span>
-  <span class='kw'>else</span>
-    <span class='id votee'>votee</span> <span class='op'>=</span> <span class='id options'>options</span>
-    <span class='id options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span> <span class='symbol'>:votee</span> <span class='op'>=&gt;</span> <span class='id votee'>votee</span><span class='comma'>,</span> <span class='symbol'>:value</span> <span class='op'>=&gt;</span> <span class='id vote_value'>vote_value</span> <span class='rbrace'>}</span>
-  <span class='kw'>end</span>
-
-  <span class='kw'>if</span> <span class='id votee'>votee</span>
-    <span class='id options'>options</span><span class='lbracket'>[</span><span class='symbol'>:votee_id</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id votee'>votee</span><span class='period'>.</span><span class='id id'>id</span>
-    <span class='id votee_class'>votee_class</span> <span class='op'>=</span> <span class='id votee'>votee</span><span class='period'>.</span><span class='id class'>class</span>
-  <span class='kw'>else</span>
-    <span class='id votee_class'>votee_class</span> <span class='op'>=</span> <span class='id options'>options</span><span class='lbracket'>[</span><span class='symbol'>:votee_type</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id classify'>classify</span><span class='period'>.</span><span class='id constantize'>constantize</span>
-  <span class='kw'>end</span>
+  <span class='if if kw'>if</span> <span class='votee identifier id'>votee</span>
+    <span class='options identifier id'>options</span><span class='lbrack token'>[</span><span class='symbol val'>:votee_id</span><span class='rbrack token'>]</span> <span class='assign token'>=</span> <span class='votee identifier id'>votee</span><span class='dot token'>.</span><span class='_id identifier id'>_id</span>
+    <span class='votee_class identifier id'>votee_class</span> <span class='assign token'>=</span> <span class='votee identifier id'>votee</span><span class='dot token'>.</span><span class='class identifier id'>class</span>
+  <span class='else else kw'>else</span>
+    <span class='votee_class identifier id'>votee_class</span> <span class='assign token'>=</span> <span class='options identifier id'>options</span><span class='lbrack token'>[</span><span class='symbol val'>:votee_type</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='classify identifier id'>classify</span><span class='dot token'>.</span><span class='constantize identifier id'>constantize</span>
+  <span class='end end kw'>end</span>
   
-  <span class='id options'>options</span><span class='lbracket'>[</span><span class='symbol'>:revote</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id options'>options</span><span class='period'>.</span><span class='id has_key?'>has_key?</span><span class='lparen'>(</span><span class='symbol'>:revote</span><span class='rparen'>)</span>
-    <span class='op'>!</span><span class='id options'>options</span><span class='lbracket'>[</span><span class='symbol'>:revote</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id blank?'>blank?</span>
-  <span class='kw'>else</span>
-    <span class='id options'>options</span><span class='period'>.</span><span class='id has_key?'>has_key?</span><span class='lparen'>(</span><span class='symbol'>:new</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id options'>options</span><span class='lbracket'>[</span><span class='symbol'>:new</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id blank?'>blank?</span> <span class='op'>:</span> <span class='id voted?'>voted?</span><span class='lparen'>(</span><span class='id options'>options</span><span class='rparen'>)</span>
-  <span class='kw'>end</span>
+  <span class='if if kw'>if</span> <span class='options identifier id'>options</span><span class='lbrack token'>[</span><span class='symbol val'>:value</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='nil? fid id'>nil?</span>
+    <span class='options identifier id'>options</span><span class='lbrack token'>[</span><span class='symbol val'>:unvote</span><span class='rbrack token'>]</span> <span class='assign token'>=</span> <span class='true true kw'>true</span>
+    <span class='options identifier id'>options</span><span class='lbrack token'>[</span><span class='symbol val'>:value</span><span class='rbrack token'>]</span> <span class='assign token'>=</span> <span class='vote_value identifier id'>vote_value</span><span class='lparen token'>(</span><span class='options identifier id'>options</span><span class='rparen token'>)</span>
+  <span class='else else kw'>else</span>
+    <span class='options identifier id'>options</span><span class='lbrack token'>[</span><span class='symbol val'>:revote</span><span class='rbrack token'>]</span> <span class='assign token'>=</span> <span class='options identifier id'>options</span><span class='dot token'>.</span><span class='has_key? fid id'>has_key?</span><span class='lparen token'>(</span><span class='symbol val'>:revote</span><span class='rparen token'>)</span> <span class='question op'>?</span> <span class='notop op'>!</span><span class='options identifier id'>options</span><span class='lbrack token'>[</span><span class='symbol val'>:revote</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='blank? fid id'>blank?</span> <span class='colon op'>:</span> <span class='voted? fid id'>voted?</span><span class='lparen token'>(</span><span class='options identifier id'>options</span><span class='rparen token'>)</span>
+  <span class='end end kw'>end</span>
   
-  <span class='id options'>options</span><span class='lbracket'>[</span><span class='symbol'>:voter_id</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id _id'>_id</span>
+  <span class='options identifier id'>options</span><span class='lbrack token'>[</span><span class='symbol val'>:voter_id</span><span class='rbrack token'>]</span> <span class='assign token'>=</span> <span class='_id identifier id'>_id</span>
 
-  <span class='lparen'>(</span> <span class='id votee'>votee</span> <span class='op'>||</span> <span class='id votee_class'>votee_class</span> <span class='rparen'>)</span><span class='period'>.</span><span class='id vote'>vote</span><span class='lparen'>(</span><span class='id options'>options</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
+  <span class='lparen token'>(</span> <span class='votee identifier id'>votee</span> <span class='orop op'>||</span> <span class='votee_class identifier id'>votee_class</span> <span class='rparen token'>)</span><span class='dot token'>.</span><span class='vote identifier id'>vote</span><span class='lparen token'>(</span><span class='options identifier id'>options</span><span class='rparen token'>)</span>
+<span class='end end kw'>end</span>
+</pre>
     </td>
   </tr>
 </table>
@@ -448,30 +456,31 @@
       <pre class="lines">
 
 
+39
+40
+41
+42
+43
+44
+45
 46
 47
-48
-49
-50
-51
-52
-53
-54
-55</pre>
+48</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/mongoid/voter.rb', line 46</span>
+      <pre class="code"><span class="info file"># File 'lib/mongoid/voter.rb', line 39</span>
 
-<span class='kw'>def</span> <span class='id vote_value'>vote_value</span><span class='lparen'>(</span><span class='id options'>options</span><span class='rparen'>)</span>
-  <span class='id votee'>votee</span> <span class='op'>=</span> <span class='kw'>unless</span> <span class='id options'>options</span><span class='period'>.</span><span class='id is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span>
-    <span class='id options'>options</span>
-  <span class='kw'>else</span>
-    <span class='id options'>options</span><span class='lbracket'>[</span><span class='symbol'>:votee_type</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id classify'>classify</span><span class='period'>.</span><span class='id constantize'>constantize</span><span class='period'>.</span><span class='id only'>only</span><span class='lparen'>(</span><span class='symbol'>:up_vote_ids</span><span class='comma'>,</span> <span class='symbol'>:down_vote_ids</span><span class='rparen'>)</span><span class='period'>.</span><span class='id where'>where</span><span class='lparen'>(</span>
-      <span class='symbol'>:_id</span> <span class='op'>=&gt;</span> <span class='id options'>options</span><span class='lbracket'>[</span><span class='symbol'>:votee_id</span><span class='rbracket'>]</span>
-    <span class='rparen'>)</span><span class='period'>.</span><span class='id first'>first</span>
-  <span class='kw'>end</span>
-  <span class='id votee'>votee</span><span class='period'>.</span><span class='id vote_value'>vote_value</span><span class='lparen'>(</span><span class='id _id'>_id</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
+<span class='def def kw'>def</span> <span class='vote_value identifier id'>vote_value</span><span class='lparen token'>(</span><span class='options identifier id'>options</span><span class='rparen token'>)</span>
+  <span class='votee identifier id'>votee</span> <span class='assign token'>=</span> <span class='unless unless kw'>unless</span> <span class='options identifier id'>options</span><span class='dot token'>.</span><span class='is_a? fid id'>is_a?</span><span class='lparen token'>(</span><span class='Hash constant id'>Hash</span><span class='rparen token'>)</span>
+    <span class='options identifier id'>options</span>
+  <span class='else else kw'>else</span>
+    <span class='options identifier id'>options</span><span class='lbrack token'>[</span><span class='symbol val'>:votee</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='options identifier id'>options</span><span class='lbrack token'>[</span><span class='symbol val'>:votee_type</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='classify identifier id'>classify</span><span class='dot token'>.</span><span class='constantize identifier id'>constantize</span><span class='dot token'>.</span><span class='only identifier id'>only</span><span class='lparen token'>(</span><span class='symbol val'>:up_vote_ids</span><span class='comma token'>,</span> <span class='symbol val'>:down_vote_ids</span><span class='rparen token'>)</span><span class='dot token'>.</span><span class='where identifier id'>where</span><span class='lparen token'>(</span>
+      <span class='symbol val'>:_id</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='options identifier id'>options</span><span class='lbrack token'>[</span><span class='symbol val'>:votee_id</span><span class='rbrack token'>]</span>
+    <span class='rparen token'>)</span><span class='dot token'>.</span><span class='first identifier id'>first</span>
+  <span class='end end kw'>end</span>
+  <span class='votee identifier id'>votee</span><span class='dot token'>.</span><span class='vote_value identifier id'>vote_value</span><span class='lparen token'>(</span><span class='_id identifier id'>_id</span><span class='rparen token'>)</span>
+<span class='end end kw'>end</span>
+</pre>
     </td>
   </tr>
 </table>
@@ -559,23 +568,24 @@
     <td>
       <pre class="code"><span class="info file"># File 'lib/mongoid/voter.rb', line 17</span>
 
-<span class='kw'>def</span> <span class='id voted?'>voted?</span><span class='lparen'>(</span><span class='id options'>options</span><span class='rparen'>)</span>
-  <span class='kw'>unless</span> <span class='id options'>options</span><span class='period'>.</span><span class='id is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span>
-    <span class='id votee_class'>votee_class</span> <span class='op'>=</span> <span class='id options'>options</span><span class='period'>.</span><span class='id class'>class</span>
-    <span class='id votee_id'>votee_id</span> <span class='op'>=</span> <span class='id options'>options</span><span class='period'>.</span><span class='id _id'>_id</span>
-  <span class='kw'>else</span>
-    <span class='id votee'>votee</span> <span class='op'>=</span> <span class='id options'>options</span><span class='lbracket'>[</span><span class='symbol'>:votee</span><span class='rbracket'>]</span>
-    <span class='kw'>if</span> <span class='id votee'>votee</span>
-      <span class='id votee_class'>votee_class</span> <span class='op'>=</span> <span class='id votee'>votee</span><span class='period'>.</span><span class='id class'>class</span>
-      <span class='id votee_id'>votee_id</span> <span class='op'>=</span> <span class='id votee'>votee</span><span class='period'>.</span><span class='id id'>id</span>
-    <span class='kw'>else</span>
-      <span class='id votee_class'>votee_class</span> <span class='op'>=</span> <span class='id options'>options</span><span class='lbracket'>[</span><span class='symbol'>:votee_type</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id classify'>classify</span><span class='period'>.</span><span class='id constantize'>constantize</span>
-      <span class='id votee_id'>votee_id</span> <span class='op'>=</span> <span class='id options'>options</span><span class='lbracket'>[</span><span class='symbol'>:votee_id</span><span class='rbracket'>]</span>
-    <span class='kw'>end</span>
-  <span class='kw'>end</span>
+<span class='def def kw'>def</span> <span class='voted? fid id'>voted?</span><span class='lparen token'>(</span><span class='options identifier id'>options</span><span class='rparen token'>)</span>
+  <span class='unless unless kw'>unless</span> <span class='options identifier id'>options</span><span class='dot token'>.</span><span class='is_a? fid id'>is_a?</span><span class='lparen token'>(</span><span class='Hash constant id'>Hash</span><span class='rparen token'>)</span>
+    <span class='votee_class identifier id'>votee_class</span> <span class='assign token'>=</span> <span class='options identifier id'>options</span><span class='dot token'>.</span><span class='class identifier id'>class</span>
+    <span class='votee_id identifier id'>votee_id</span> <span class='assign token'>=</span> <span class='options identifier id'>options</span><span class='dot token'>.</span><span class='_id identifier id'>_id</span>
+  <span class='else else kw'>else</span>
+    <span class='votee identifier id'>votee</span> <span class='assign token'>=</span> <span class='options identifier id'>options</span><span class='lbrack token'>[</span><span class='symbol val'>:votee</span><span class='rbrack token'>]</span>
+    <span class='if if kw'>if</span> <span class='votee identifier id'>votee</span>
+      <span class='votee_class identifier id'>votee_class</span> <span class='assign token'>=</span> <span class='votee identifier id'>votee</span><span class='dot token'>.</span><span class='class identifier id'>class</span>
+      <span class='votee_id identifier id'>votee_id</span> <span class='assign token'>=</span> <span class='votee identifier id'>votee</span><span class='dot token'>.</span><span class='_id identifier id'>_id</span>
+    <span class='else else kw'>else</span>
+      <span class='votee_class identifier id'>votee_class</span> <span class='assign token'>=</span> <span class='options identifier id'>options</span><span class='lbrack token'>[</span><span class='symbol val'>:votee_type</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='classify identifier id'>classify</span><span class='dot token'>.</span><span class='constantize identifier id'>constantize</span>
+      <span class='votee_id identifier id'>votee_id</span> <span class='assign token'>=</span> <span class='options identifier id'>options</span><span class='lbrack token'>[</span><span class='symbol val'>:votee_id</span><span class='rbrack token'>]</span>
+    <span class='end end kw'>end</span>
+  <span class='end end kw'>end</span>
   
-  <span class='id votees'>votees</span><span class='lparen'>(</span><span class='id votee_class'>votee_class</span><span class='rparen'>)</span><span class='period'>.</span><span class='id where'>where</span><span class='lparen'>(</span><span class='symbol'>:_id</span> <span class='op'>=&gt;</span> <span class='id votee_id'>votee_id</span><span class='rparen'>)</span><span class='period'>.</span><span class='id count'>count</span> <span class='op'>==</span> <span class='int'>1</span>
-<span class='kw'>end</span></pre>
+  <span class='votees identifier id'>votees</span><span class='lparen token'>(</span><span class='votee_class identifier id'>votee_class</span><span class='rparen token'>)</span><span class='dot token'>.</span><span class='where identifier id'>where</span><span class='lparen token'>(</span><span class='symbol val'>:_id</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='votee_id identifier id'>votee_id</span><span class='rparen token'>)</span><span class='dot token'>.</span><span class='count identifier id'>count</span> <span class='eq op'>==</span> <span class='integer val'>1</span>
+<span class='end end kw'>end</span>
+</pre>
     </td>
   </tr>
 </table>
@@ -649,9 +659,10 @@
     <td>
       <pre class="code"><span class="info file"># File 'lib/mongoid/voter.rb', line 9</span>
 
-<span class='kw'>def</span> <span class='id votees'>votees</span><span class='lparen'>(</span><span class='id klass'>klass</span><span class='rparen'>)</span>
-  <span class='id klass'>klass</span><span class='period'>.</span><span class='id any_of'>any_of</span><span class='lparen'>(</span><span class='lbrace'>{</span> <span class='symbol'>:up_voter_ids</span> <span class='op'>=&gt;</span> <span class='id _id'>_id</span> <span class='rbrace'>}</span><span class='comma'>,</span> <span class='lbrace'>{</span> <span class='symbol'>:down_voter_ids</span> <span class='op'>=&gt;</span> <span class='id _id'>_id</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
-<span class='kw'>end</span></pre>
+<span class='def def kw'>def</span> <span class='votees identifier id'>votees</span><span class='lparen token'>(</span><span class='klass identifier id'>klass</span><span class='rparen token'>)</span>
+  <span class='klass identifier id'>klass</span><span class='dot token'>.</span><span class='any_of identifier id'>any_of</span><span class='lparen token'>(</span><span class='lbrace token'>{</span> <span class='string val'>&quot;voteable.up_voter_ids&quot;</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='_id identifier id'>_id</span> <span class='rbrace token'>}</span><span class='comma token'>,</span> <span class='lbrace token'>{</span> <span class='string val'>&quot;voteable.down_voter_ids&quot;</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='_id identifier id'>_id</span> <span class='rbrace token'>}</span><span class='rparen token'>)</span>
+<span class='end end kw'>end</span>
+</pre>
     </td>
   </tr>
 </table>
@@ -662,9 +673,9 @@
 </div>
     
     <div id="footer">
-  Generated on Wed Feb 23 14:45:18 2011 by 
+  Generated on Wed Mar 30 11:06:27 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.6.4 (ruby-1.9.2).
+  0.6.5 (ruby-1.8.7).
 </div>
 
   </body>
