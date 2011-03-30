@@ -3,7 +3,7 @@ module Mongoid
     extend ActiveSupport::Concern
 
     # How many points should be assigned for each up or down vote.
-    # This array should be manipulated using Voteable.vote_point method
+    # This hash should be accessed and manipulated using Voteable.vote_point method
     VOTE_POINT = {}
 
     included do
@@ -17,7 +17,7 @@ module Mongoid
       def self.vote_point(klass = self, options = nil)
         VOTE_POINT[self.name] ||= {}
         VOTE_POINT[self.name][klass.name] ||= options
-      end          
+      end
 
       # We usually need to show current_user his voting value on voteable object
       # voting value can be nil (not voted yet), :up or :down
@@ -189,8 +189,8 @@ module Mongoid
     # @param [Mongoid Object, BSON::ObjectId] voter is Mongoid object the id of the voter who made the vote
     def vote_value(voter)
       voter_id = voter.is_a?(BSON::ObjectId) ? voter : voter._id
-      return :up if up_voter_ids.try(:include?, voter_id)
-      return :down if down_voter_ids.try(:include?, voter_id)
+      return :up if up_voter_ids.include?(voter_id)
+      return :down if down_voter_ids.include?(voter_id)
     end
 
     # Get the number of up votes
@@ -205,38 +205,27 @@ module Mongoid
     
     # Get the number of votes count
     def votes_count
-      if self["voteable"]
-        self["voteable"]["votes_count"]
-      else 
-        0
-      end
+      voteable.try(:[], 'votes_count') || 0
     end
     
     # Get the votes point
     def votes_point
-      if self["voteable"]
-        self["voteable"]["votes_point"]
-      else 
-        0
-      end
+      voteable.try(:[], 'votes_point') || 0
     end
     
     # Array of up voter ids
     def up_voter_ids
-      if self["voteable"]
-        self["voteable"]["up_voter_ids"]
-      else 
-        []
-      end
+      voteable.try(:[], 'up_voter_ids') || []
     end
     
     # Array of down voter ids
     def down_voter_ids
-      if self["voteable"]
-        self["voteable"]["down_voter_ids"]
-      else 
-        []
-      end
+      voteable.try(:[], 'down_voter_ids') || []
     end
+
+    private
+      def voteable
+        read_attribute('voteable')
+      end
   end
 end
