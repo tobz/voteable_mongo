@@ -81,13 +81,15 @@ user.rb
 
 === Re-generate counters and vote points
 
-  Rails
+Rails
     rake db:mongoid:voteable:remake_stats
   
-  Ruby
+Ruby
     Mongoid::Voteable::Stats.remake
     
-    
+=== Sample app
+
+  https://github.com/vinova/simple_qa    
 
 == Credits
 
