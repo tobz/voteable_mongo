@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.name        = "voteable_mongoid"
   s.version     = VoteableMongoid::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.authors     = ["Alex Nguyen", "Stefan Nguyen"]
+  s.authors     = ["Alex Nguyen"]
   s.email       = ["alex@vinova.sg"]
   s.homepage    = "http://vinova.sg"
   s.summary     = %q{Add Up / Down Voting for Mongoid}
