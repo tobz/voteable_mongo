@@ -1,31 +1,12 @@
-## MAC OS
+*.gem
+Gemfile.lock
+.bundle
+
 .DS_Store
 
-## TEXTMATE
-*.tmproj
-tmtags
-
-## EMACS
-*~
-\#*
-.\#*
-
-## VIM
-*.swp
-
-## BUNDLER
-Gemfile.lock
-.bundle/
-
-## PROJECT::GENERAL
 coverage
 rdoc
 pkg
 
-## PROJECT::SPECIFIC
-
-# RUBYMINE
 .idea/
-
-# YARD
 .yardoc/
