@@ -1,0 +1,19 @@
+== 0.6.0
+  * Minimize vote data store (using short field names votes.u, votes.d, votes.c ...)
+  * Add Voter#up_votees, Voter#down_votees
+  * Remove index and scope from statistic module. User have to add indexes and scopes manually (see https://github.com/vinova/simple_qa/blob/master/app/models/question.rb)
+  * Bug fixes
+
+== 0.5.0
+  * Rename vote_point to voteable
+  
+== 0.4.5
+  * Can use rake db:mongoid:voteable:remake_stats in Rails apps
+  * Use mongoid 2.0.0
+  
+== 0.4.4
+  * Add up_votes_count, down_votes_count
+  * Re-generate vote statistic data (counters and point)
+ 
+== 0.4.3
+  * Wrap vote data in voteable namespace (voteable.up_voters_id, voteable.down_voters_ids, voteable.votes_count ...)
