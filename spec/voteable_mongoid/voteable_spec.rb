@@ -60,7 +60,6 @@ describe Mongoid::Voteable do
   context 'user1 vote up post1 the first time' do
     before :all do    
       Post.vote(:votee_id => @post1.id, :voter_id => @user1.id, :value => :up)
-      Mongoid::Voteable::Stats.remake
       @post1.reload
     end
     
@@ -93,7 +92,6 @@ describe Mongoid::Voteable do
   context 'user2 vote down post1 the first time' do
     before :all do
       Post.vote(:votee_id => @post1.id, :voter_id => @user2.id, :value => :down)
-      Mongoid::Voteable::Stats.remake
       @post1.reload
     end
     
@@ -135,7 +133,6 @@ describe Mongoid::Voteable do
   context 'user1 vote down post2 the first time' do
     before :all do
       Post.vote(:votee_id => @post2.id, :voter_id => @user1.id, :value => :down)
-      Mongoid::Voteable::Stats.remake
       @post2.reload
     end
     
@@ -176,7 +173,6 @@ describe Mongoid::Voteable do
   context 'user1 vote up post2 comment the first time' do
     before :all do
       @comment.vote(:voter_id => @user1.id, :value => :up)
-      Mongoid::Voteable::Stats.remake
       @comment.reload
       @post2.reload
     end
@@ -198,7 +194,6 @@ describe Mongoid::Voteable do
   context 'user1 revote post2 comment from up to down' do
     before :all do
       @user1.vote(:votee => @comment, :value => :down)
-      Mongoid::Voteable::Stats.remake
       @comment.reload
       @post2.reload
     end
@@ -263,14 +258,7 @@ describe Mongoid::Voteable do
       @post2.down_votes_count.should == 1
       @post2.votes_count.should == 2
       @post2.votes_point.should == 0
-    end
-    
-    it "test scopes" do
-      Post.most_up_voted.first.should == @post2
-      Post.most_down_voted.first.should == @post1
-      Post.most_voted.first.should == @post2
-      Post.best_voted.first.should == @post2
-    end
+    end    
   end
   
   context "user1 unvote on comment" do
@@ -282,15 +270,15 @@ describe Mongoid::Voteable do
     end
     
     it "" do      
-      @post2.up_votes_count.should == 1
-      @post2.down_votes_count.should == 0
-      @post2.votes_count.should == 1
-      @post2.votes_point.should == 1
-      
       @comment.up_votes_count.should == 0
       @comment.down_votes_count.should == 0
       @comment.votes_count.should == 0
       @comment.votes_point.should == 0
+
+      @post2.up_votes_count.should == 1
+      @post2.down_votes_count.should == 0
+      @post2.votes_count.should == 1
+      @post2.votes_point.should == 1      
     end
   end
   

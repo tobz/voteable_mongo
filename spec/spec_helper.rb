@@ -20,6 +20,7 @@ Mongoid.configure do |config|
   name = "voteable_mongoid_test"
   host = "localhost"
   config.master = Mongo::Connection.new.db(name)
+  config.embedded_object_id = false
 end
 
 

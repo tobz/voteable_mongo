@@ -3,36 +3,24 @@ module Mongoid
     module Stats
       extend ActiveSupport::Concern
 
-      included do
-        index 'voteable.up_votes_count'
-        index 'voteable.down_votes_count'
-        index 'voteable.votes_count'
-        index 'voteable.votes_point'
-      
-        scope :most_up_voted, order_by(['voteable.up_votes_count', :desc])
-        scope :most_down_voted, order_by(['voteable.down_votes_count', :desc])
-        scope :most_voted, order_by(['voteable.votes_count', :desc])
-        scope :best_voted, order_by(['voteable.votes_point', :desc])
-      end
-    
       # Get the number of up votes
       def up_votes_count
-        voteable.try(:[], 'up_votes_count') || 0
+        votes.try(:[], 'uc') || 0
       end
     
       # Get the number of down votes
       def down_votes_count
-        voteable.try(:[], 'down_votes_count') || 0
+        votes.try(:[], 'dc') || 0
       end
     
       # Get the number of votes
       def votes_count
-        voteable.try(:[], 'votes_count') || 0
+        votes.try(:[], 'c') || 0
       end
     
       # Get the votes point
       def votes_point
-        voteable.try(:[], 'votes_point') || 0
+        votes.try(:[], 'p') || 0
       end
 
       # Re-generate vote counters and vote points
@@ -42,11 +30,11 @@ module Mongoid
       end
       
       def self.remake_stats(log)
-        Mongoid::Voteable::VOTEABLE.each do |class_name, value_point|
+        VOTEABLE.each do |class_name, value_point|
           klass = class_name.constantize
           klass_value_point = value_point[class_name]
           puts "Generating stats for #{class_name}" if log
-          klass.voteable_data_only.each{ |doc|
+          klass.all.each{ |doc|
             doc.remake_stats(klass_value_point)
           }
         end
@@ -55,12 +43,14 @@ module Mongoid
       def remake_stats(value_point)
         up_count = up_voter_ids.length
         down_count = down_voter_ids.length
-
+        
+        # puts self, votes.inspect # DEBUG
+        
         update_attributes(
-          'voteable.up_votes_count' => up_count,
-          'voteable.down_votes_count' => down_count,          
-          'voteable.votes_count' => up_count + down_count,
-          'voteable.votes_point' => value_point[:up]*up_count + value_point[:down]*down_count
+          UP_VOTES_COUNT => up_count,
+          DOWN_VOTES_COUNT => down_count,          
+          VOTES_COUNT => up_count + down_count,
+          VOTES_POINT => value_point[:up]*up_count + value_point[:down]*down_count
         )
       end
     
@@ -73,7 +63,7 @@ module Mongoid
               parent_class = parent_class_name.constantize
               foreign_key = relation_metadata.foreign_key
               puts "Updating stats for #{class_name} > #{parent_class_name}" if log
-              klass.voteable_data_only.each{ |doc|
+              klass.all.each{ |doc|
                 doc.update_parent_stats(parent_class, foreign_key, parent_value_point)
               }
             end
@@ -90,17 +80,19 @@ module Mongoid
           return if up_count == 0 && down_count == 0
 
           inc_options = {
-            'voteable.votes_point' => value_point[:up]*up_count + value_point[:down]*down_count
+            VOTES_POINT => value_point[:up]*up_count + value_point[:down]*down_count
           }
-      
+          
           unless value_point[:update_counters] == false
             inc_options.merge!(
-              'voteable.votes_count' => up_count + down_count,
-              'voteable.up_votes_count' => up_count,
-              'voteable.down_votes_count' => down_count
+              VOTES_COUNT => up_count + down_count,
+              UP_VOTES_COUNT => up_count,
+              DOWN_VOTES_COUNT => down_count
             )
           end
         
+          # puts parent_id, inc_options.inspect # DEBUG
+      
           parent_class.collection.update(
             { :_id => parent_id }, 
             { '$inc' =>  inc_options }
