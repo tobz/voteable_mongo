@@ -1,1 +1,2 @@
-* Input options hash validations
+* Option hash validations
+* Refactor Voteable#vote function
