@@ -11,6 +11,11 @@ module Mongoid
       include Mongoid::Voteable::Stats
       field :votes, :type => Mongoid::Voteable::Votes
       
+      before_create do
+        # Init votes so that counters and point have numeric values (0)
+        self.votes = { :p => 0, :c => 0, :uc => 0, :dc => 0 }
+      end
+      
       # Set vote point for each up (down) vote on an object of this class
       # 
       # @param [Hash] options a hash containings:
