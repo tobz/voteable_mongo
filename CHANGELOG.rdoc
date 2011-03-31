@@ -1,3 +1,6 @@
+== 0.6.1
+  * Set counters and point to 0 for uninitialized voteable objects in order sort and query
+  
 == 0.6.0
   * Minimize vote data store (using short field names votes.u, votes.d, votes.c ...)
   * Add Voter#up_votees, Voter#down_votees
