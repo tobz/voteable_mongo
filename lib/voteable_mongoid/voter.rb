@@ -15,7 +15,7 @@ module Mongoid
     # @param [Class] klass the voteable class, e.g. `Post` or `Comment`
     # @return [Array, nil] an array of voteable objects up voted by this voter
     def up_votees(klass)
-      klass.any_of(Voteable::UP_VOTER_IDS => _id)
+      klass.where(Voteable::UP_VOTER_IDS => _id)
     end
 
     # Get list of down voted votees
@@ -23,7 +23,7 @@ module Mongoid
     # @param [Class] klass the voteable class, e.g. `Post` or `Comment`
     # @return [Array, nil] an array of voteable objects down voted by this voter
     def down_votees(klass)
-      klass.any_of(Voteable::DOWN_VOTER_IDS => _id)
+      klass.where(Voteable::DOWN_VOTER_IDS => _id)
     end
 
     # Check to see if this voter voted on the votee or not
