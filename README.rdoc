@@ -88,7 +88,14 @@ Rails
   
 Ruby
     Mongoid::Voteable::Stats.remake
-    
+
+=== Set counters and point to 0 for uninitialized voteable objects in order sort and query
+
+Rails
+    rake db:mongoid:voteable:init_stats
+  
+Ruby
+    Mongoid::Voteable::Stats.init
 
 == Credits
 
