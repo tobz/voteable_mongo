@@ -40,7 +40,7 @@ module Mongoid
       votee = unless options.is_a?(Hash)
         options
       else
-        options[:votee] || options[:votee_type].classify.constantize.only(:up_vote_ids, :down_vote_ids).where(
+        options[:votee] || options[:votee_type].classify.constantize.only(:votes).where(
           :_id => options[:votee_id]
         ).first
       end
