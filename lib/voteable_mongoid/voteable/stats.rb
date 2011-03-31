@@ -22,7 +22,21 @@ module Mongoid
       def votes_point
         votes.try(:[], 'p') || 0
       end
-
+      
+      def self.init(log = false)
+        VOTEABLE.each do |class_name, value_point|
+          klass = class_name.constantize
+          klass_value_point = value_point[class_name]
+          puts "Init stats for #{class_name}" if log
+          klass.collection.update({:votes => nil}, {
+            '$set' => { :votes => VOTES_DEFAULT_ATTRIBUTES }
+          }, {
+            :safe => true,
+            :multi => true
+          })
+        end
+      end
+      
       # Re-generate vote counters and vote points
       def self.remake(log = false)
         remake_stats(log)

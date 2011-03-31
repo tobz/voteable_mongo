@@ -38,6 +38,25 @@ describe Mongoid::Voteable do
       @user2.votees(Post).should be_empty
     end
     
+    it 'test Stats.init' do
+      @post1.votes.should == Mongoid::Voteable::VOTES_DEFAULT_ATTRIBUTES
+      @post2.votes.should == Mongoid::Voteable::VOTES_DEFAULT_ATTRIBUTES
+      
+      @post1.votes = nil
+      @post1.save
+
+      @post2.votes = nil
+      @post2.save
+      
+      Mongoid::Voteable::Stats.init
+
+      @post1.reload
+      @post2.reload
+      
+      @post1.votes.should == Mongoid::Voteable::VOTES_DEFAULT_ATTRIBUTES
+      @post2.votes.should == Mongoid::Voteable::VOTES_DEFAULT_ATTRIBUTES
+    end
+    
     it 'revote has no effect' do
       Post.vote(:revote => true, :votee_id => @post1.id, :voter_id => @user1.id, :value => 'up')
       @post1.reload

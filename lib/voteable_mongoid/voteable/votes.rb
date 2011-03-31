@@ -23,5 +23,6 @@ module Mongoid
     end
     
     VOTES_DEFAULT_ATTRIBUTES = Votes.new.attributes
+    VOTES_DEFAULT_ATTRIBUTES.delete('_id')
   end
 end
