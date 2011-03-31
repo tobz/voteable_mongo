@@ -17,3 +17,12 @@
  
 == 0.4.3
   * Wrap vote data in voteable namespace (voteable.up_voters_id, voteable.down_voters_ids, voteable.votes_count ...)
+
+== 0.4.2
+  * Bug fixes
+
+== 0.4.0
+  * Can unvote
+
+== 0.3.5
+  * Use mongoid 2.0.0.rc
