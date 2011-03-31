@@ -44,8 +44,6 @@ module Mongoid
         up_count = up_voter_ids.length
         down_count = down_voter_ids.length
         
-        # puts self, votes.inspect # DEBUG
-        
         update_attributes(
           UP_VOTES_COUNT => up_count,
           DOWN_VOTES_COUNT => down_count,          
@@ -91,8 +89,6 @@ module Mongoid
             )
           end
         
-          # puts parent_id, inc_options.inspect # DEBUG
-      
           parent_class.collection.update(
             { :_id => parent_id }, 
             { '$inc' =>  inc_options }
