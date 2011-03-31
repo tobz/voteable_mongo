@@ -14,10 +14,14 @@ describe Mongoid::Voter do
   context "just created" do
     it '' do
       @user1.votees(Post).should be_empty
+      @user1.up_votees(Post).should be_empty
+      @user1.down_votees(Post).should be_empty
       @user1.voted?(@post1).should be_false
       @user1.voted?(@post2).should be_false
       
       @user2.votees(Post).should be_empty
+      @user2.up_votees(Post).should be_empty
+      @user2.down_votees(Post).should be_empty
       @user2.voted?(@post1).should be_false
       @user2.voted?(@post2).should be_false
     end
@@ -48,6 +52,8 @@ describe Mongoid::Voter do
       @user2.should_not be_voted(:votee_type => 'Post', :votee_id => @post1.id)
       
       @user1.votees(Post).to_a.should == [ @post1 ]
+      @user1.up_votees(Post).to_a.should == [ @post1 ]
+      @user1.down_votees(Post).to_a.should be_empty
       @user2.votees(Post).to_a.should be_empty
     end
     
@@ -77,6 +83,8 @@ describe Mongoid::Voter do
 
       @user1.votees(Post).to_a.should == [ @post1 ]
       @user2.votees(Post).to_a.should == [ @post1 ]
+      @user2.up_votees(Post).to_a.should be_empty
+      @user2.down_votees(Post).to_a.should == [ @post1 ]
     end
   end
   
