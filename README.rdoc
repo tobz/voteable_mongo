@@ -81,6 +81,8 @@ user.rb
 
     @user.unvote(@comment)
 
+== Utilities
+
 === Re-generate counters and vote points in case you change :up / :down vote points
 Rails
     rake db:mongoid:voteable:remake_stats
@@ -93,7 +95,7 @@ Rails
 Ruby
     Mongoid::Voteable::Stats.init
 
-== Migrate from version < 0.6.0
+=== Migrate from version < 0.6.0
 Rails
     rake db:mongoid:voteable:migrate_old_votes
 Ruby
