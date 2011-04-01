@@ -13,15 +13,15 @@ describe Mongoid::Voter do
   
   context "just created" do
     it '' do
-      @user1.votees(Post).should be_empty
-      @user1.up_votees(Post).should be_empty
-      @user1.down_votees(Post).should be_empty
+      Post.voted_by(@user1).should be_empty
+      Post.up_voted_by(@user1).should be_empty
+      Post.down_voted_by(@user1).should be_empty
       @user1.voted?(@post1).should be_false
       @user1.voted?(@post2).should be_false
       
-      @user2.votees(Post).should be_empty
-      @user2.up_votees(Post).should be_empty
-      @user2.down_votees(Post).should be_empty
+      Post.voted_by(@user2).should be_empty
+      Post.up_voted_by(@user2).should be_empty
+      Post.down_voted_by(@user2).should be_empty
       @user2.voted?(@post1).should be_false
       @user2.voted?(@post2).should be_false
     end
@@ -51,10 +51,10 @@ describe Mongoid::Voter do
       @user1.should be_voted(@post1)
       @user2.should_not be_voted(:votee_type => 'Post', :votee_id => @post1.id)
       
-      @user1.votees(Post).to_a.should == [ @post1 ]
-      @user1.up_votees(Post).to_a.should == [ @post1 ]
-      @user1.down_votees(Post).to_a.should be_empty
-      @user2.votees(Post).to_a.should be_empty
+      Post.voted_by(@user1).to_a.should == [ @post1 ]
+      Post.up_voted_by(@user1).to_a.should == [ @post1 ]
+      Post.down_voted_by(@user1).to_a.should be_empty
+      Post.voted_by(@user2).to_a.should be_empty
     end
     
     it 'user1 vote post1 has no effect' do
@@ -81,10 +81,10 @@ describe Mongoid::Voter do
       @user1.vote_value(@post1).should == :up
       @user2.vote_value(@post1).should == :down
 
-      @user1.votees(Post).to_a.should == [ @post1 ]
-      @user2.votees(Post).to_a.should == [ @post1 ]
-      @user2.up_votees(Post).to_a.should be_empty
-      @user2.down_votees(Post).to_a.should == [ @post1 ]
+      Post.voted_by(@user1).to_a.should == [ @post1 ]
+      Post.voted_by(@user2).to_a.should == [ @post1 ]
+      Post.up_voted_by(@user2).to_a.should be_empty
+      Post.down_voted_by(@user2).to_a.should == [ @post1 ]
     end
   end
   
@@ -101,8 +101,8 @@ describe Mongoid::Voter do
       @user1.vote_value(@post1).should == :down
       @user2.vote_value(@post1).should == :down
 
-      @user1.votees(Post).to_a.should == [ @post1 ]
-      @user2.votees(Post).to_a.should == [ @post1 ]
+      Post.voted_by(@user1).to_a.should == [ @post1 ]
+      Post.voted_by(@user2).to_a.should == [ @post1 ]
     end
   end
   
@@ -119,7 +119,7 @@ describe Mongoid::Voter do
       @user1.vote_value(@post2).should == :down
       @user2.vote_value(@post2).should be_nil
 
-      @user1.votees(Post).to_a.should == [ @post1, @post2 ]
+      Post.voted_by(@user1).to_a.should == [ @post1, @post2 ]
     end
   end
   
@@ -136,7 +136,7 @@ describe Mongoid::Voter do
       @user1.vote_value(@post2).should == :up
       @user2.vote_value(@post2).should be_nil
 
-      @user1.votees(Post).to_a.should == [ @post1, @post2 ]
+      Post.voted_by(@user1).to_a.should == [ @post1, @post2 ]
     end
   end  
 end

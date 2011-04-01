@@ -11,6 +11,21 @@ module Mongoid
       include Mongoid::Voteable::Stats
       field :votes, :type => Mongoid::Voteable::Votes
       
+      scope :voted_by, lambda { |voter|
+        voter_id = voter.is_a?(BSON::ObjectId) ? voter : voter._id
+        any_of({ UP_VOTER_IDS => voter_id }, { DOWN_VOTER_IDS => voter_id })
+      }
+      
+      scope :up_voted_by, lambda { |voter|
+        voter_id = voter.is_a?(BSON::ObjectId) ? voter : voter._id
+        where( UP_VOTER_IDS => voter_id )
+      }
+      
+      scope :down_voted_by, lambda { |voter|
+        voter_id = voter.is_a?(BSON::ObjectId) ? voter : voter._id
+        where( DOWN_VOTER_IDS => voter_id )
+      }
+      
       before_create do
         # Init votes so that counters and point have numeric values (0)
         self.votes = VOTES_DEFAULT_ATTRIBUTES
@@ -201,7 +216,6 @@ module Mongoid
         end
         true
       end
-      
     end
   
     # Make a vote on this votee
@@ -224,7 +238,7 @@ module Mongoid
 
     # Get a voted value on this votee
     #
-    # @param [Mongoid Object, BSON::ObjectId] voter is Mongoid object the id of the voter who made the vote
+    # @param [Mongoid Object, BSON::ObjectId] voter is Mongoid object or the id of the voter who made the vote
     def vote_value(voter)
       voter_id = voter.is_a?(BSON::ObjectId) ? voter : voter._id
       return :up if up_voter_ids.include?(voter_id)

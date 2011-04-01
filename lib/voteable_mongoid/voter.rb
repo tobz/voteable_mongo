@@ -2,30 +2,6 @@ module Mongoid
   module Voter
     extend ActiveSupport::Concern
 
-    # Get list of voted votees
-    #
-    # @param [Class] klass the voteable class, e.g. `Post` or `Comment`
-    # @return [Array, nil] an array of voteable objects voted by this voter
-    def votees(klass)
-      klass.any_of({ Voteable::UP_VOTER_IDS => _id }, { Voteable::DOWN_VOTER_IDS => _id })
-    end
-
-    # Get list of up voted votees
-    #
-    # @param [Class] klass the voteable class, e.g. `Post` or `Comment`
-    # @return [Array, nil] an array of voteable objects up voted by this voter
-    def up_votees(klass)
-      klass.where(Voteable::UP_VOTER_IDS => _id)
-    end
-
-    # Get list of down voted votees
-    #
-    # @param [Class] klass the voteable class, e.g. `Post` or `Comment`
-    # @return [Array, nil] an array of voteable objects down voted by this voter
-    def down_votees(klass)
-      klass.where(Voteable::DOWN_VOTER_IDS => _id)
-    end
-
     # Check to see if this voter voted on the votee or not
     #
     # @param [Hash, Object] options the hash containing the votee, or the votee itself
@@ -45,7 +21,7 @@ module Mongoid
         end
       end
       
-      votees(votee_class).where(:_id => votee_id).count == 1
+      votee_class.voted_by(self).where(:_id => votee_id).count == 1
     end
 
     # Get the voted value on a votee

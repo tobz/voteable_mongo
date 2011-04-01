@@ -33,9 +33,9 @@ describe Mongoid::Voteable do
       @post2.down_voter_ids.should be_empty
     end
     
-    it 'voter votees should be empty' do
-      @user1.votees(Post).should be_empty
-      @user2.votees(Post).should be_empty
+    it 'posts voted voter should be empty' do
+      Post.voted_by(@user1).should be_empty
+      Post.voted_by(@user2).should be_empty
     end
     
     it 'test Stats.init' do
@@ -91,8 +91,8 @@ describe Mongoid::Voteable do
       @post1.vote_value(@user1).should == :up
       @post1.vote_value(@user2.id).should be_nil
 
-      @user1.votees(Post).to_a.should == [ @post1 ]
-      @user2.votees(Post).to_a.should be_empty
+      Post.voted_by(@user1).to_a.should == [ @post1 ]
+      Post.voted_by(@user2).to_a.should be_empty
     end
     
     it 'user1 vote post1 has no effect' do
@@ -123,8 +123,8 @@ describe Mongoid::Voteable do
       @post1.vote_value(@user1.id).should == :up
       @post1.vote_value(@user2.id).should == :down
 
-      @user1.votees(Post).to_a.should == [ @post1 ]
-      @user2.votees(Post).to_a.should == [ @post1 ]
+      Post.voted_by(@user1).to_a.should == [ @post1 ]
+      Post.voted_by(@user2).to_a.should == [ @post1 ]
     end
   end
   
@@ -144,8 +144,8 @@ describe Mongoid::Voteable do
       @post1.vote_value(@user1.id).should == :down
       @post1.vote_value(@user2.id).should == :down
 
-      @user1.votees(Post).to_a.should == [ @post1 ]
-      @user2.votees(Post).to_a.should == [ @post1 ]
+      Post.voted_by(@user1).to_a.should == [ @post1 ]
+      Post.voted_by(@user2).to_a.should == [ @post1 ]
     end
   end
   
@@ -164,7 +164,7 @@ describe Mongoid::Voteable do
       @post2.vote_value(@user1.id).should == :down
       @post2.vote_value(@user2.id).should be_nil
 
-      @user1.votees(Post).to_a.should == [ @post1, @post2 ]
+      Post.voted_by(@user1).to_a.should == [ @post1, @post2 ]
     end
   end
   
@@ -184,7 +184,7 @@ describe Mongoid::Voteable do
       @post2.vote_value(@user1.id).should == :up
       @post2.vote_value(@user2.id).should be_nil
 
-      @user1.votees(Post).to_a.should == [ @post1, @post2 ]
+      Post.voted_by(@user1).to_a.should == [ @post1, @post2 ]
     end
   end
   
@@ -260,7 +260,7 @@ describe Mongoid::Voteable do
       @post1.vote_value(@user1.id).should be_nil
       @post1.vote_value(@user2.id).should == :down
       
-      @user1.votees(Post).to_a.should_not include(@post1)
+      Post.voted_by(@user1).to_a.should_not include(@post1)
     end
   end
   
