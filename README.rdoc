@@ -1,9 +1,10 @@
 = Voteable Mongoid
 
-Voteable Mongoid allows you to make your Mongoid::Document objects voteable (up or down)
+Voteable Mongoid allows you to make your Mongoid::Document objects voteable (up or down).
 For instance, in a forum, a user can vote up (or down) on a post or a comment.
 
-Voteable Mongoid is built for speed. It minimizes vote data storage and uses only one database request per collection to do both data validation and data update.
+Voteable Mongoid is built for speed. It minimizes vote data storage and uses 
+only one database request per collection to do both data validation and data update.
 
 Sample app at https://github.com/vinova/simple_qa
 
@@ -80,21 +81,23 @@ user.rb
 
     @user.unvote(@comment)
 
-=== Re-generate counters and vote points
-
+=== Re-generate counters and vote points in case you change :up / :down vote points
 Rails
     rake db:mongoid:voteable:remake_stats
-  
 Ruby
     Mongoid::Voteable::Stats.remake
 
 === Set counters and point to 0 for uninitialized voteable objects in order sort and query
-
 Rails
     rake db:mongoid:voteable:init_stats
-  
 Ruby
     Mongoid::Voteable::Stats.init
+
+== Migrate from version < 0.6.0
+Rails
+    rake db:mongoid:voteable:migrate_old_votes
+Ruby
+    Mongoid::Voteable.migrate_old_votes
 
 == Credits
 
