@@ -73,9 +73,11 @@ user.rb
     puts @post.up_votes_count
     puts @post.down_votes_count
 
-=== Getting the list of voted objects (votees) of a class
+=== Getting the list of voted objects of a class
 
-    @user.votees(Post)
+    Post.voted_by(@user)
+    Post.up_voted_by(@user)
+    Post.down_voted_by(@user)
 
 === Undo a vote
 
