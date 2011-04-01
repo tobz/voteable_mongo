@@ -1,3 +1,6 @@
+== 0.6.2
+  * Fix bug: use before_create instead of after_after_initialize
+  
 == 0.6.1
   * Set counters and point to 0 for uninitialized voteable objects in order sort and query
   
