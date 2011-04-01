@@ -11,7 +11,7 @@ module Mongoid
       include Mongoid::Voteable::Stats
       field :votes, :type => Mongoid::Voteable::Votes
       
-      after_initialize do
+      before_create do
         # Init votes so that counters and point have numeric values (0)
         self.votes = VOTES_DEFAULT_ATTRIBUTES
       end
