@@ -1,10 +1,9 @@
 = Voteable Mongoid
 
 Voteable Mongoid allows you to make your Mongoid::Document objects voteable (up or down)
-
 For instance, in a forum, a user can vote up (or down) on a post or a comment.
 
-When user provided enough information, voteable_mongoid will use only one update-in-place operation per collection.
+Voteable Mongoid is built for speed. It minimizes vote data storage and uses only one database request per collection to do both data validation and data update.
 
 Sample app at https://github.com/vinova/simple_qa
 
