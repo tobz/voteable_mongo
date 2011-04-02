@@ -67,7 +67,7 @@ module Mongoid
 
         klass = options[:class]
         klass ||= VOTEABLE.keys.include?(name) ? name : collection.name.classify
-        value_point = VOTEABLE[klass][klass]
+        voteable = VOTEABLE[klass][klass]
         
         if options[:revote]
           if value == :up
@@ -75,13 +75,13 @@ module Mongoid
             negative_voter_ids = 'votes.down'
             positive_votes_count = 'votes.up_count'
             negative_votes_count = 'votes.down_count'
-            point_delta = value_point[:up] - value_point[:down]
+            point_delta = voteable[:up] - voteable[:down]
           else
             positive_voter_ids = 'votes.down'
             negative_voter_ids = 'votes.up'
             positive_votes_count = 'votes.down_count'
             negative_votes_count = 'votes.up_count'
-            point_delta = -value_point[:up] + value_point[:down]
+            point_delta = -voteable[:up] + voteable[:down]
           end
           
           update_result = collection.update({ 
@@ -125,7 +125,7 @@ module Mongoid
             '$inc' => {
               positive_votes_count => -1,
               'votes.count' => -1,
-              'votes.point' => -value_point[value]
+              'votes.point' => -voteable[value]
             }
           }, {
             :safe => true
@@ -151,7 +151,7 @@ module Mongoid
             '$inc' => {  
               'votes.count' => +1,
               positive_votes_count => +1,
-              'votes.point' => value_point[value] }
+              'votes.point' => voteable[value] }
           }, {
             :safe => true
           })
@@ -163,7 +163,7 @@ module Mongoid
           update_result['n'] == 1 )
 
         if successed
-          VOTEABLE[klass].each do |class_name, value_point|
+          VOTEABLE[klass].each do |class_name, voteable|
             # For other class in VOTEABLE options, if is parent of current class
             next unless relation_metadata = relations[class_name.underscore]
             next unless votee ||= options[:votee] || find(options[:votee_id])
@@ -174,21 +174,21 @@ module Mongoid
             
             if options[:revote]
               if value == :up
-                inc_options['votes.point'] = value_point[:up] - value_point[:down]
-                unless value_point[:update_counters] == false
+                inc_options['votes.point'] = voteable[:up] - voteable[:down]
+                unless voteable[:update_counters] == false
                   inc_options['votes.up_count'] = +1
                   inc_options['votes.down_count'] = -1
                 end
               else
-                inc_options['votes.point'] = -value_point[:up] + value_point[:down]
-                unless value_point[:update_counters] == false
+                inc_options['votes.point'] = -voteable[:up] + voteable[:down]
+                unless voteable[:update_counters] == false
                   inc_options['votes.up_count'] = -1
                   inc_options['votes.down_count'] = +1
                 end
               end
             elsif options[:unvote]
-              inc_options['votes.point'] = -value_point[value]
-              unless value_point[:update_counters] == false
+              inc_options['votes.point'] = -voteable[value]
+              unless voteable[:update_counters] == false
                 inc_options['votes.count'] = -1
                 if value == :up
                   inc_options['votes.up_count'] = -1
@@ -197,13 +197,13 @@ module Mongoid
                 end
               end
             else # new vote
-              inc_options['votes.point'] = value_point[value]
-              unless value_point[:update_counters] == false
-                inc_options['votes.count'] = 1
+              inc_options['votes.point'] = voteable[value]
+              unless voteable[:update_counters] == false
+                inc_options['votes.count'] = +1
                 if value == :up
-                  inc_options['votes.up_count'] = 1
+                  inc_options['votes.up_count'] = +1
                 else
-                  inc_options['votes.down_count'] = 1
+                  inc_options['votes.down_count'] = +1
                 end
               end
             end

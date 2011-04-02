@@ -15,9 +15,9 @@ module Mongoid
     VOTES_DEFAULT_ATTRIBUTES.delete('_id')
     
     def self.migrate_old_votes(log = false)
-      VOTEABLE.each do |class_name, value_point|
+      VOTEABLE.each do |class_name, voteable|
         klass = class_name.constantize
-        klass_value_point = value_point[class_name]
+        klass_voteable = voteable[class_name]
         puts "* Migrating old vote data for #{class_name} ..." if log
 
         klass.all.each do |doc|
@@ -40,7 +40,7 @@ module Mongoid
                   'up_count' => up_count,
                   'down_count' => down_count,
                   'count' => up_count + down_count,
-                  'point' => klass_value_point[:up]*up_count + klass_value_point[:down]*down_count
+                  'point' => klass_voteable[:up]*up_count + klass_voteable[:down]*down_count
                 }
             },
             '$unset' => {
