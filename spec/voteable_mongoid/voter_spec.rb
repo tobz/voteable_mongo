@@ -2,7 +2,9 @@ require "spec_helper"
 
 describe Mongoid::Voter do
   before :all do
-    Mongoid::database.connection.drop_database(Mongoid::database.name)
+    User.collection.drop
+    Post.collection.drop
+    Comment.collection.drop
 
     @post1 = Post.create!
     @post2 = Post.create!
