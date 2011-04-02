@@ -1,15 +1,18 @@
+== 0.7.0
+  * Use readable field names (up, down, up_count, down_count, count, point) instead of very short field names (u, d, uc, dc, c, p)
+
 == 0.6.4
   * Drop Voter#votees, Voter#up_votees, Voter#down_votees in favor of Voteable#voted_by(voter), Voteable#up_voted_by(voter), Voteable#down_voted_by(voter) scopes
-  
+
 == 0.6.3
   * Add rake db:mongoid:voteable:migrate_old_votes to migrate vote data created by version < 0.6.0 to new vote data storage
 
 == 0.6.2
   * Fix bug: use before_create instead of after_after_initialize
-  
+
 == 0.6.1
   * Set counters and point to 0 for uninitialized voteable objects in order sort and query
-  
+
 == 0.6.0
   * Minimize vote data store (using short field names votes.u, votes.d, votes.c ...)
   * Add Voter#up_votees, Voter#down_votees
@@ -18,15 +21,15 @@
 
 == 0.5.0
   * Rename vote_point to voteable
-  
+
 == 0.4.5
   * Can use rake db:mongoid:voteable:remake_stats in Rails apps
   * Use mongoid 2.0.0
-  
+
 == 0.4.4
   * Add up_votes_count, down_votes_count
   * Re-generate vote statistic data (counters and point)
- 
+
 == 0.4.3
   * Wrap vote data in voteable namespace (voteable.up_voters_id, voteable.down_voters_ids, voteable.votes_count ...)
 
