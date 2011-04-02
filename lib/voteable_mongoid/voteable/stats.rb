@@ -5,22 +5,22 @@ module Mongoid
 
       # Get the number of up votes
       def up_votes_count
-        votes.try(:[], 'uc') || 0
+        votes.try(:[], 'up_count') || 0
       end
     
       # Get the number of down votes
       def down_votes_count
-        votes.try(:[], 'dc') || 0
+        votes.try(:[], 'down_count') || 0
       end
     
       # Get the number of votes
       def votes_count
-        votes.try(:[], 'c') || 0
+        votes.try(:[], 'count') || 0
       end
     
       # Get the votes point
       def votes_point
-        votes.try(:[], 'p') || 0
+        votes.try(:[], 'point') || 0
       end
       
       def self.init(log = false)
@@ -59,10 +59,10 @@ module Mongoid
         down_count = down_voter_ids.length
         
         update_attributes(
-          UP_VOTES_COUNT => up_count,
-          DOWN_VOTES_COUNT => down_count,          
-          VOTES_COUNT => up_count + down_count,
-          VOTES_POINT => value_point[:up]*up_count + value_point[:down]*down_count
+          'votes.up_count' => up_count,
+          'votes.down_count' => down_count,
+          'votes.count' => up_count + down_count,
+          'votes.point' => value_point[:up]*up_count + value_point[:down]*down_count
         )
       end
     
@@ -92,19 +92,19 @@ module Mongoid
           return if up_count == 0 && down_count == 0
 
           inc_options = {
-            VOTES_POINT => value_point[:up]*up_count + value_point[:down]*down_count
+            'votes.point' => value_point[:up]*up_count + value_point[:down]*down_count
           }
           
           unless value_point[:update_counters] == false
             inc_options.merge!(
-              VOTES_COUNT => up_count + down_count,
-              UP_VOTES_COUNT => up_count,
-              DOWN_VOTES_COUNT => down_count
+              'votes.count' => up_count + down_count,
+              'votes.up_count' => up_count,
+              'votes.down_count' => down_count
             )
           end
         
           parent_class.collection.update(
-            { :_id => parent_id }, 
+            { '_id' => parent_id }, 
             { '$inc' =>  inc_options }
           )
         end
