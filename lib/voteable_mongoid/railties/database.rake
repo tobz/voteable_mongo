@@ -11,7 +11,7 @@ namespace :db do
         Mongoid::Voteable::Stats.init(:log)
       end
       
-      desc 'Migrate vote data created by version < 0.6.0 to new vote data storage'
+      desc 'Migrate vote data created by version < 0.7.0 to new vote data storage'
       task :migrate_old_votes => :environment do
         Mongoid::Voteable.migrate_old_votes(:log)
       end
