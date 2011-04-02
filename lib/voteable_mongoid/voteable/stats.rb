@@ -105,7 +105,8 @@ module Mongoid
         
           parent_class.collection.update(
             { '_id' => parent_id }, 
-            { '$inc' =>  inc_options }
+            { '$inc' =>  inc_options },
+            { :safe => true }
           )
         end
       end

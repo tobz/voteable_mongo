@@ -26,8 +26,12 @@ module Mongoid
           # Version >= 0.7.0 use readable field names (up, down, up_count, down_count,
           # count, point)
           votes = doc['votes'] || doc['voteable'] || {}
-          up_voter_ids = votes['u'] || votes['up'] || votes['up_voter_ids'] || doc['up_voter_ids'] || []
-          down_voter_ids = votes['d'] || votes['down'] || votes['down_voter_ids'] || doc['down_voter_ids'] || []
+
+          up_voter_ids = votes['u'] || votes['up'] || 
+            votes['up_voter_ids'] || doc['up_voter_ids'] || []
+
+          down_voter_ids = votes['d'] || votes['down'] || 
+            votes['down_voter_ids'] || doc['down_voter_ids'] || []
           
           up_count = up_voter_ids.size
           down_count = down_voter_ids.size
@@ -50,7 +54,7 @@ module Mongoid
               'votes_point' => true,
               'voteable' => true
             }
-          })
+          }, { :safe => true })
         end
       end
     end

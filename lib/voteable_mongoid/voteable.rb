@@ -209,8 +209,8 @@ module Mongoid
             end
                     
             class_name.constantize.collection.update(
-              { :_id => foreign_key_value }, 
-              { '$inc' =>  inc_options }
+              { '_id' => foreign_key_value }, 
+              { '$inc' => inc_options }
             )
           end
         end
