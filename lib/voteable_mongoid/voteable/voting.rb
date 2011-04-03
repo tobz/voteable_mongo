@@ -26,11 +26,11 @@ module Mongoid
 
           if options[:voteable]
              query, update = if options[:revote]
-              revote(options)
+              revote_query_n_update(options)
             elsif options[:unvote]
-              unvote(options)
+              unvote_query_n_update(options)
             else
-              new_vote(options)
+              new_vote_query_n_update(options)
             end
 
             if update_parents || options[:votee] || options[:return_votes]
@@ -60,7 +60,7 @@ module Mongoid
 
         
         private
-          def new_vote(options)
+          def new_vote_query_n_update(options)
             if options[:value] == :up
               positive_voter_ids = 'votes.up'
               positive_votes_count = 'votes.up_count'
@@ -85,7 +85,7 @@ module Mongoid
           end
 
           
-          def revote(options)
+          def revote_query_n_update(options)
             if options[:value] == :up
               positive_voter_ids = 'votes.up'
               negative_voter_ids = 'votes.down'
@@ -118,7 +118,7 @@ module Mongoid
           end
           
 
-          def unvote(options)
+          def unvote_query_n_update(options)
             if options[:value] == :up
               positive_voter_ids = 'votes.up'
               negative_voter_ids = 'votes.down'
