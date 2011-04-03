@@ -76,7 +76,15 @@ describe Mongoid::Voteable do
   
   context 'user1 vote up post1 the first time' do
     before :all do    
-      @post1.vote(:voter_id => @user1.id, :value => :up)
+      votes = @post1.vote(:voter_id => @user1.id, :value => :up, :return_votes => true)
+      votes.should == {
+        'up' => [@user1.id],
+        'down' => [],
+        'up_count' => 1,
+        'down_count' => 0,
+        'count' => 1,
+        'point' => 1
+      }
     end
     
     it '' do
