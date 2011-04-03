@@ -9,9 +9,10 @@ module Mongoid
       field :down_count, :type => Integer, :default => 0
       field :count, :type => Integer, :default => 0
       field :point, :type => Integer, :default => 0
+
+      DEFAULT_ATTRIBUTES = Votes.new.attributes
+      DEFAULT_ATTRIBUTES.delete('_id')
     end
     
-    VOTES_DEFAULT_ATTRIBUTES = Votes.new.attributes
-    VOTES_DEFAULT_ATTRIBUTES.delete('_id')
   end
 end
