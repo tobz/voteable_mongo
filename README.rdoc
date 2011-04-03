@@ -88,19 +88,19 @@ user.rb
 Rails
     rake db:mongoid:voteable:remake_stats
 Ruby
-    Mongoid::Voteable::Stats.remake
+    Mongoid::Voteable::Tasks.remake_stats
 
 === Set counters and point to 0 for uninitialized voteable objects in order sort and query
 Rails
     rake db:mongoid:voteable:init_stats
 Ruby
-    Mongoid::Voteable::Stats.init
+    Mongoid::Voteable::Tasks::init_stats
 
 === Migrate from version < 0.7.0
 Rails
     rake db:mongoid:voteable:migrate_old_votes
 Ruby
-    Mongoid::Voteable.migrate_old_votes
+    Mongoid::Voteable::Tasks.migrate_old_votes
 
 == Credits
 
