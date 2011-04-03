@@ -1,3 +1,8 @@
+== 0.7.1
+  * Refactor & cleanup source code
+  * Better doc
+  * Add votee#voted_by?(voter or voter_id)
+
 == 0.7.0
   * Use readable field names (up, down, up_count, down_count, count, point) instead of very short field names (u, d, uc, dc, c, p)
 
