@@ -61,11 +61,12 @@ user.rb
 === Making a vote
 
     @user.vote(@post, :up)
-    # is equivalent to
+
+Is equivalent to
     @user.vote(:votee => @post, :value => :up)
     @post.vote(:voter => @user, :value => :up)
 
-    # In case you don't need to init voter and / or votee objects you can    
+In case you don't need to init voter and / or votee objects you can
     @user.vote(:votee_type => 'Post', :votee_id => post_id, :value => :down)
     @post.vote(:voter_id => user_id, :value => :up)
     Post.vote(:voter_id => user_id, :votee_id => post_id, :value => :up)
@@ -74,10 +75,25 @@ user.rb
 
     @user.unvote(@comment)
 
-=== If have full information you do not need to init voter and votee object
+=== If have voter_id, votee_id and vote value you don't need to init voter and votee objects (suitable for API calls)
 
+New vote
+    Post.vote(:voter_id => user_id, :votee_id => post_id, :value => :up)
+
+Re-vote
     Post.vote(:voter_id => user_id, :votee_id => post_id, :value => :up, :revote => true)
+
+Un-vote
     Post.vote(:voter_id => user_id, :votee_id => post_id, :value => :up, :unvote => true)
+    
+In-case you need updated votes data, add :return_votes => true
+    votes = Post.vote(:voter_id => user_id, :votee_id => post_id, :value => :up, :return_votes => true)
+    votes['up']         # => up_voter_ids who voted up
+    votes['down']       # => down_voter_ids who voted down
+    votes['up_count']   # => number of up votes (votes_voter_ids.length)
+    votes['down_count'] # => number of down votes (down_voter_ids.length)
+    votes['count']      # => number of votes (up_count + down_count)
+    votes['point']      # => total vote points
 
 === Getting vote_value
     
