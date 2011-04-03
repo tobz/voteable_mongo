@@ -1,3 +1,6 @@
+== edge
+  * Add :return_votes => true / false option to vote function
+  
 == 0.7.2
   * Use Collection#find_and_modify to retrieve updated votes data and parent_ids (don't need an extra query to get parent_ids)
 
