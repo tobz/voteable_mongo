@@ -76,8 +76,7 @@ describe Mongoid::Voteable do
   
   context 'user1 vote up post1 the first time' do
     before :all do    
-      Post.vote(:votee_id => @post1.id, :voter_id => @user1.id, :value => :up)
-      @post1.reload
+      Post.vote(:votee => @post1, :voter_id => @user1.id, :value => :up)
     end
     
     it '' do
@@ -151,8 +150,7 @@ describe Mongoid::Voteable do
   
   context 'user1 vote down post2 the first time' do
     before :all do
-      Post.vote(:votee_id => @post2.id, :voter_id => @user1.id, :value => :down)
-      @post2.reload
+      @post2.vote(:voter_id => @user1.id, :value => :down)
     end
     
     it '' do
