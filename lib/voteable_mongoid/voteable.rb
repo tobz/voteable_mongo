@@ -78,6 +78,10 @@ module Mongoid
       return :up if up_voter_ids.include?(voter_id)
       return :down if down_voter_ids.include?(voter_id)
     end
+    
+    def voted_by?(voter)
+      !!vote_value(voter)
+    end
 
     # Array of up voter ids
     def up_voter_ids

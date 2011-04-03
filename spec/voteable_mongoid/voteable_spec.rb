@@ -87,7 +87,9 @@ describe Mongoid::Voteable do
       @post1.votes_point.should == 1
 
       @post1.vote_value(@user1).should == :up
+      @post1.should be_voted_by(@user1)
       @post1.vote_value(@user2.id).should be_nil
+      @post1.should_not be_voted_by(@user2.id)
 
       Post.voted_by(@user1).to_a.should == [ @post1 ]
       Post.voted_by(@user2).to_a.should be_empty

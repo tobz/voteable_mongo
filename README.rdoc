@@ -72,10 +72,24 @@ user.rb
 
     @user.unvote(@comment)
 
-== If have full information you do not need to init voter and votee object
+=== If have full information you do not need to init voter and votee object
 
     Post.vote(:voter_id => user_id, :votee_id => post_id, :value => :up, :revote => true)
     Post.vote(:voter_id => user_id, :votee_id => post_id, :value => :up, :unvote => true)
+
+=== Getting vote_value
+    
+    @user.vote_value(@post)
+    @user.vote_value(:class_type => 'Post', :votee_id => post_id)
+    @post.vote_value(@user)
+    @post.vote_value(user_id)
+
+=== Check if voted?
+
+    @user.voted?(@post)
+    @user.voted?(:class_type => 'Post', :votee_id => post_id)
+    @post.voted_by?(@user)
+    @post.voted_by?(user_id)
 
 === Getting votes counts and points
 
