@@ -14,7 +14,6 @@ module Mongoid
         #   - :unvote: unvote the vote value (:up or :down)
         def vote(options)
           options.symbolize_keys!
-          options[:votee_id] ||= options[:votee].id
           options[:votee_id] = BSON::ObjectId(options[:votee_id]) if options[:votee_id].is_a?(String)
           options[:voter_id] = BSON::ObjectId(options[:voter_id]) if options[:voter_id].is_a?(String)
           options[:value] = options[:value].to_sym

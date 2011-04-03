@@ -76,7 +76,7 @@ describe Mongoid::Voteable do
   
   context 'user1 vote up post1 the first time' do
     before :all do    
-      Post.vote(:votee => @post1, :voter_id => @user1.id, :value => :up)
+      @post1.vote(:voter_id => @user1.id, :value => :up)
     end
     
     it '' do
