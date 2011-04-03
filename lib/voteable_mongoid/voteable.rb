@@ -2,10 +2,6 @@ module Mongoid
   module Voteable
     extend ActiveSupport::Concern
 
-    # How many points should be assigned for each up or down vote.
-    # This hash should manipulated using voteable method
-    VOTEABLE = {}
-
     included do
       include Mongoid::Document
       field :votes, :type => Mongoid::Voteable::Votes
@@ -28,15 +24,21 @@ module Mongoid
       before_create do
         # Init votes so that counters and point have numeric values (0)
         self.votes = VOTES_DEFAULT_ATTRIBUTES
-      end
-      
+      end      
+    end # include
+    
+    # How many points should be assigned for each up or down vote and other options
+    # This hash should manipulated using voteable method
+    VOTEABLE = {}
+
+    module ClassMethods
       # Set vote point for each up (down) vote on an object of this class
       # 
       # @param [Hash] options a hash containings:
       # 
       # voteable self, :up => +1, :down => -3
       # voteable Post, :up => +2, :down => -1, :update_counters => false # skip counter update
-      def self.voteable(klass = self, options = nil)
+      def voteable(klass = self, options = nil)
         VOTEABLE[self.name] ||= {}
         VOTEABLE[self.name][klass.name] ||= options
       end
@@ -49,7 +51,7 @@ module Mongoid
       #   - :value: :up or :down
       #   - :revote: change from vote up to vote down
       #   - :unvote: unvote the vote value (:up or :down)
-      def self.vote(options)
+      def vote(options)
         options.symbolize_keys!
         value = options[:value].to_sym
         
@@ -163,7 +165,7 @@ module Mongoid
         
         successed
       end
-    end # include
+    end
     
     # Make a vote on this votee
     #
