@@ -13,7 +13,6 @@ module Mongoid
         #   - :revote: change from vote up to vote down
         #   - :unvote: unvote the vote value (:up or :down)
         def vote(options)
-
           options.symbolize_keys!
           options[:votee_id] = BSON::ObjectId(options[:votee_id]) if options[:votee_id].is_a?(String)
           options[:voter_id] = BSON::ObjectId(options[:voter_id]) if options[:voter_id].is_a?(String)
@@ -30,7 +29,6 @@ module Mongoid
             else
               new_vote(options)
             end
-
             # Only update parent votes if votee is updated successfully
             update_parents = ( update_result['err'] == nil and 
               update_result['updatedExisting'] == true and
@@ -171,6 +169,7 @@ module Mongoid
                   inc_options['votes.down_count'] = +1
                 end
               end
+
             elsif options[:unvote]
               inc_options['votes.point'] = -voteable[value]
               unless voteable[:update_counters] == false
@@ -181,6 +180,7 @@ module Mongoid
                   inc_options['votes.down_count'] = -1
                 end
               end
+
             else # new vote
               inc_options['votes.point'] = voteable[value]
               unless voteable[:update_counters] == false
@@ -192,6 +192,7 @@ module Mongoid
                 end
               end
             end
+
             inc_options
           end
       end
