@@ -26,6 +26,6 @@ end
 
 Dir[ File.join(MODELS, "*.rb") ].sort.each { |file| require File.basename(file) }
 
-
-RSpec.configure do |config|
-end
+User.collection.drop
+Post.collection.drop
+Comment.collection.drop
