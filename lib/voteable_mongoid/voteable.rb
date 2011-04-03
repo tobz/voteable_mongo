@@ -1,3 +1,6 @@
+require 'voteable_mongoid/voteable/votes'
+require 'voteable_mongoid/voteable/voting'
+
 module Mongoid
   module Voteable
     extend ActiveSupport::Concern

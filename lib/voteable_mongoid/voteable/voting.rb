@@ -2,6 +2,61 @@ module Mongoid
   module Voteable
     module Voting
       extend ActiveSupport::Concern
+
+      def update_parent_votes(votee, options)
+        value = options[:value].to_sym
+        klass = votee.class
+
+        VOTEABLE[klass.name].each do |class_name, voteable|
+          # For other class in VOTEABLE options, if is parent of current class
+          next unless relation_metadata = klass.relations[class_name.underscore]
+          # If can find current votee foreign_key value for that class
+          next unless foreign_key_value = votee.read_attribute(relation_metadata.foreign_key)
+
+          inc_options = {}
+
+          if options[:revote]
+            if value == :up
+              inc_options['votes.point'] = voteable[:up] - voteable[:down]
+              unless voteable[:update_counters] == false
+                inc_options['votes.up_count'] = +1
+                inc_options['votes.down_count'] = -1
+              end
+            else
+              inc_options['votes.point'] = -voteable[:up] + voteable[:down]
+              unless voteable[:update_counters] == false
+                inc_options['votes.up_count'] = -1
+                inc_options['votes.down_count'] = +1
+              end
+            end
+          elsif options[:unvote]
+            inc_options['votes.point'] = -voteable[value]
+            unless voteable[:update_counters] == false
+              inc_options['votes.count'] = -1
+              if value == :up
+                inc_options['votes.up_count'] = -1
+              else
+                inc_options['votes.down_count'] = -1
+              end
+            end
+          else # new vote
+            inc_options['votes.point'] = voteable[value]
+            unless voteable[:update_counters] == false
+              inc_options['votes.count'] = +1
+              if value == :up
+                inc_options['votes.up_count'] = +1
+              else
+                inc_options['votes.down_count'] = +1
+              end
+            end
+          end
+
+          class_name.constantize.collection.update(
+            { '_id' => foreign_key_value }, 
+            { '$inc' => inc_options }
+          )
+        end
+      end
       
       module ClassMethods
         # Make a vote on an object of this class
@@ -121,68 +176,13 @@ module Mongoid
           # Only update parent class if votee is updated successfully
           if successed
             votee ||= options[:votee] || find(options[:votee_id])
-            Voting.update_parent_votes(votee, options)
+            update_parent_votes(votee, options)
           end
 
           successed
         end
       end
 
-      private
-        def self.update_parent_votes(votee, options)
-          value = options[:value].to_sym
-          klass = votee.class
-
-          VOTEABLE[klass.name].each do |class_name, voteable|
-            # For other class in VOTEABLE options, if is parent of current class
-            next unless relation_metadata = klass.relations[class_name.underscore]
-            # If can find current votee foreign_key value for that class
-            next unless foreign_key_value = votee.read_attribute(relation_metadata.foreign_key)
-
-            inc_options = {}
-
-            if options[:revote]
-              if value == :up
-                inc_options['votes.point'] = voteable[:up] - voteable[:down]
-                unless voteable[:update_counters] == false
-                  inc_options['votes.up_count'] = +1
-                  inc_options['votes.down_count'] = -1
-                end
-              else
-                inc_options['votes.point'] = -voteable[:up] + voteable[:down]
-                unless voteable[:update_counters] == false
-                  inc_options['votes.up_count'] = -1
-                  inc_options['votes.down_count'] = +1
-                end
-              end
-            elsif options[:unvote]
-              inc_options['votes.point'] = -voteable[value]
-              unless voteable[:update_counters] == false
-                inc_options['votes.count'] = -1
-                if value == :up
-                  inc_options['votes.up_count'] = -1
-                else
-                  inc_options['votes.down_count'] = -1
-                end
-              end
-            else # new vote
-              inc_options['votes.point'] = voteable[value]
-              unless voteable[:update_counters] == false
-                inc_options['votes.count'] = +1
-                if value == :up
-                  inc_options['votes.up_count'] = +1
-                else
-                  inc_options['votes.down_count'] = +1
-                end
-              end
-            end
-
-            class_name.constantize.collection.update(
-              { '_id' => foreign_key_value }, 
-              { '$inc' => inc_options }
-            )
-          end
-        end
       
     end
   end

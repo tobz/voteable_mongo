@@ -33,7 +33,7 @@ module Mongoid
           migrate_old_votes_for(klass, klass_voteable)
         end
       end
-          
+
       def self.migrate_old_votes_for(klass, voteable)
         klass.all.each do |doc|
           # Version 0.6.x use very short field names (u, d, uc, dc, c, p) to minimize 
@@ -144,6 +144,12 @@ module Mongoid
           )
         end
       end
+
+      private_class_method  :migrate_old_votes_for, 
+                            :remake_stats_for,
+                            :remake_stats_for_all_voteable_classes,
+                            :update_parent_stats,
+                            :update_parent_stats_for                            
       
     end
   end
