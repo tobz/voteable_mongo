@@ -12,6 +12,8 @@ module Mongoid
         #   - :value: :up or :down
         #   - :revote: change from vote up to vote down
         #   - :unvote: unvote the vote value (:up or :down)
+        # 
+        # @return [votes, false, nil]
         def vote(options)
           options.symbolize_keys!
           options[:votee_id] = BSON::ObjectId(options[:votee_id]) if options[:votee_id].is_a?(String)
@@ -40,10 +42,13 @@ module Mongoid
                   :new => true
                 )
                 # Update new votes data
-                options[:votee].write_attribute('votes', doc['votes']) if options[:votee]
+                votes = doc['votes']
+                options[:votee].write_attribute('votes', votes) if options[:votee]
                 update_parent_votes(doc, options) if update_parents
+                return votes
               rescue
                 # Don't update parents if operation fail or no matching object found
+                return false
               end
             else
               # Just update and don't care the result
