@@ -44,8 +44,11 @@ module Mongoid
       # voteable self, :up => +1, :down => -3
       # voteable Post, :up => +2, :down => -1, :update_counters => false # skip counter update
       def voteable(klass = self, options = nil)
-        VOTEABLE[self.name] ||= {}
-        VOTEABLE[self.name][klass.name] ||= options
+        VOTEABLE[name] ||= {}
+        VOTEABLE[name][klass.name] ||= options
+        if klass != self
+          VOTEABLE[name][name][:update_parents] = true
+        end
       end
     end
     

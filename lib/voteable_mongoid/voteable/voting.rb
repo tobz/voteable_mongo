@@ -14,28 +14,43 @@ module Mongoid
         #   - :unvote: unvote the vote value (:up or :down)
         def vote(options)
           options.symbolize_keys!
+          options[:votee_id] ||= options[:votee].id
           options[:votee_id] = BSON::ObjectId(options[:votee_id]) if options[:votee_id].is_a?(String)
           options[:voter_id] = BSON::ObjectId(options[:voter_id]) if options[:voter_id].is_a?(String)
           options[:value] = options[:value].to_sym
           options[:voteable] = VOTEABLE[name][name]
           
-          update_parents = true
+          update_parents = options[:voteable][:update_parents]
 
           if options[:voteable]
-            update_result = if options[:revote]
+             query, update = if options[:revote]
               revote(options)
             elsif options[:unvote]
               unvote(options)
             else
               new_vote(options)
             end
-            # Only update parent votes if votee is updated successfully
-            update_parents = ( update_result['err'] == nil and 
-              update_result['updatedExisting'] == true and
-              update_result['n'] == 1 )
-          end
 
-          update_parent_votes(options) if update_parents
+            if options[:votee] || update_parents
+              # If votee exits or need to update parent
+              # use Collection#find_and_modify to retrieve updated votes data and parent_ids
+              begin
+                doc = collection.master.collection.find_and_modify(
+                  :query => query,
+                  :update => update,
+                  :new => true
+                )
+                # Update new votes data
+                options[:votee].write_attribute('votes', doc['votes']) if options[:votee]
+                update_parent_votes(doc, options) if update_parents
+              rescue
+                # Don't update parents if operation fail or no matching object found
+              end
+            else
+              # Just update and don't care the result
+              collection.update(query, update)
+            end
+          end
         end
 
         
@@ -49,7 +64,7 @@ module Mongoid
               positive_votes_count = 'votes.down_count'
             end
 
-            collection.update({ 
+            return {
               # Validate voter_id did not vote for votee_id yet
               :_id => options[:votee_id],
               'votes.up' => { '$ne' => options[:voter_id] },
@@ -61,9 +76,7 @@ module Mongoid
                 'votes.count' => +1,
                 positive_votes_count => +1,
                 'votes.point' => options[:voteable][options[:value]] }
-            }, {
-              :safe => true
-            })
+            }
           end
 
           
@@ -82,7 +95,7 @@ module Mongoid
               point_delta = -options[:voteable][:up] + options[:voteable][:down]
             end
 
-            collection.update({ 
+            return {
               # Validate voter_id did a vote with value for votee_id
               :_id => options[:votee_id],
               positive_voter_ids => { '$ne' => options[:voter_id] },
@@ -96,9 +109,7 @@ module Mongoid
                 negative_votes_count => -1,
                 'votes.point' => point_delta
               }
-            }, {
-              :safe => true
-            })
+            }
           end
           
 
@@ -113,10 +124,9 @@ module Mongoid
               positive_votes_count = 'votes.down_count'
             end
 
-            # Check if voter_id did a vote with value for votee_id
-            update_result = collection.update({ 
-              # Validate voter_id did a vote with value for votee_id
+            return {
               :_id => options[:votee_id],
+              # Validate if voter_id did a vote with value for votee_id
               negative_voter_ids => { '$ne' => options[:voter_id] },
               positive_voter_ids => options[:voter_id]
             }, {
@@ -127,22 +137,19 @@ module Mongoid
                 'votes.count' => -1,
                 'votes.point' => -options[:voteable][options[:value]]
               }
-            }, {
-              :safe => true
-            })
+            }
           end
           
 
-          def update_parent_votes(options)
+          def update_parent_votes(doc, options)
             value = options[:value]
             votee ||= options[:votee]
             
             VOTEABLE[name].each do |class_name, voteable|
               # For other class in VOTEABLE options, if is parent of current class
               next unless relation_metadata = relations[class_name.underscore]
-              votee ||= find(options[:votee_id])
               # If can find current votee foreign_key value for that class
-              next unless foreign_key_value = votee.read_attribute(relation_metadata.foreign_key)
+              next unless foreign_key_value = doc[relation_metadata.foreign_key.to_s]
 
               class_name.constantize.collection.update(
                 { '_id' => foreign_key_value }, 
