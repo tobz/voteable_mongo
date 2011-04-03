@@ -3,6 +3,7 @@ module Mongoid
     
     class Votes
       include Mongoid::Document
+
       field :up, :type => Array, :default => []
       field :down, :type => Array, :default => []
       field :up_count, :type => Integer, :default => 0
@@ -10,7 +11,7 @@ module Mongoid
       field :count, :type => Integer, :default => 0
       field :point, :type => Integer, :default => 0
 
-      DEFAULT_ATTRIBUTES = Votes.new.attributes
+      DEFAULT_ATTRIBUTES = new.attributes
       DEFAULT_ATTRIBUTES.delete('_id')
     end
     

@@ -10,26 +10,26 @@ module Mongoid
       include Voting
       
       field :votes, :type => Votes
+
+      before_create do
+        # Init votes so that counters and point have numeric values (0)
+        self.votes = Votes::DEFAULT_ATTRIBUTES
+      end
       
       scope :voted_by, lambda { |voter|
-        voter_id = voter.is_a?(BSON::ObjectId) ? voter : voter._id
+        voter_id = voter.is_a?(BSON::ObjectId) ? voter : voter.id
         any_of({ 'votes.up' => voter_id }, { 'votes.down' => voter_id })
       }
       
       scope :up_voted_by, lambda { |voter|
-        voter_id = voter.is_a?(BSON::ObjectId) ? voter : voter._id
+        voter_id = voter.is_a?(BSON::ObjectId) ? voter : voter.id
         where( 'votes.up' => voter_id )
       }
       
       scope :down_voted_by, lambda { |voter|
-        voter_id = voter.is_a?(BSON::ObjectId) ? voter : voter._id
+        voter_id = voter.is_a?(BSON::ObjectId) ? voter : voter.id
         where( 'votes.down' => voter_id )
       }
-      
-      before_create do
-        # Init votes so that counters and point have numeric values (0)
-        self.votes = Votes::DEFAULT_ATTRIBUTES
-      end      
     end # include
     
     # How many points should be assigned for each up or down vote and other options
@@ -57,8 +57,9 @@ module Mongoid
     #   - :revote: change from vote up to vote down
     #   - :unvote: unvote the vote value (:up or :down)
     def vote(options)
-      options[:votee_id] = _id
+      options[:votee_id] = id
       options[:votee] = self
+      options[:voter_id] ||= options[:voter].id
 
       if options[:unvote]
         options[:value] ||= vote_value(options[:voter_id])
@@ -73,7 +74,7 @@ module Mongoid
     #
     # @param [Mongoid Object, BSON::ObjectId] voter is Mongoid object or the id of the voter who made the vote
     def vote_value(voter)
-      voter_id = voter.is_a?(BSON::ObjectId) ? voter : voter._id
+      voter_id = voter.is_a?(BSON::ObjectId) ? voter : voter.id
       return :up if up_voter_ids.include?(voter_id)
       return :down if down_voter_ids.include?(voter_id)
     end

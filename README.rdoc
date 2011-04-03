@@ -60,12 +60,24 @@ user.rb
 
     @user.vote(@post, :up)
     # is equivalent to
-    @post.vote(:voter_id => @user.id, :value => :up)
+    @user.vote(:votee => @post, :value => :up)
+    @post.vote(:voter => @user, :value => :up)
 
-    # this will affect @post.votes_count and @post.votes_point as well
-    @user.vote(@comment, :down)
+    # In case you don't need to init voter and / or votee objects you can    
+    @user.vote(:votee_type => 'Post', :votee_id => post_id, :value => :down)
+    @post.vote(:voter_id => user_id, :value => :up)
+    Post.vote(:voter_id => user_id, :votee_id => post_id, :value => :up)
 
-=== Getting votes count and points
+=== Undo a vote
+
+    @user.unvote(@comment)
+
+== If have full information you do not need to init voter and votee object
+
+    Post.vote(:voter_id => user_id, :votee_id => post_id, :value => :up, :revote => true)
+    Post.vote(:voter_id => user_id, :votee_id => post_id, :value => :up, :unvote => true)
+
+=== Getting votes counts and points
 
     puts @post.votes_point
     puts @post.votes_count
@@ -77,10 +89,6 @@ user.rb
     Post.voted_by(@user)
     Post.up_voted_by(@user)
     Post.down_voted_by(@user)
-
-=== Undo a vote
-
-    @user.unvote(@comment)
 
 == Utilities
 

@@ -9,12 +9,12 @@ module Mongoid
     def voted?(options)
       unless options.is_a?(Hash)
         votee_class = options.class
-        votee_id = options._id
+        votee_id = options.id
       else
         votee = options[:votee]
         if votee
           votee_class = votee.class
-          votee_id = votee._id
+          votee_id = votee.id
         else
           votee_class = options[:votee_type].classify.constantize
           votee_id = options[:votee_id]
@@ -64,7 +64,7 @@ module Mongoid
       end
 
       if votee
-        options[:votee_id] = votee._id
+        options[:votee_id] = votee.id
         votee_class = votee.class
       else
         votee_class = options[:votee_type].classify.constantize
@@ -77,7 +77,8 @@ module Mongoid
         options[:revote] = options.has_key?(:revote) ? !options[:revote].blank? : voted?(options)
       end
       
-      options[:voter_id] = _id
+      options[:voter] = self
+      options[:voter_id] = id
 
       ( votee || votee_class ).vote(options)
     end
