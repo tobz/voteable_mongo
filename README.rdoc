@@ -3,7 +3,7 @@
 Voteable Mongoid allows you to make your Mongoid::Document objects voteable (up or down).
 For instance, in a forum, a user can vote up (or down) on a post or a comment.
 
-Initial idea is based on http://cookbook.mongodb.org/patterns/votes/
+Initial idea is based on http://cookbook.mongodb.org/patterns/votes
 
 Voteable Mongoid is built for speed. It uses only one database request per collection to validate data, update data, and get updated data.
 
@@ -144,8 +144,8 @@ Ruby
 
 == Credits
 
-* Alex N. - Author
-* Stefan N. - Unvoting
+* Alex Nguyen (alex@vinova.sg) - Author
+* Stefan Nguyen (stefan@vinova.sg) - Unvoting
 
 Copyright (c) 2010-2011 Vinova Pte Ltd (http://vinova.sg)
 
