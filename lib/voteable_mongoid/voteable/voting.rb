@@ -16,10 +16,7 @@ module Mongoid
         # 
         # @return [votes, false, nil]
         def vote(options)
-          options.symbolize_keys!
-          options[:votee_id] = BSON::ObjectId(options[:votee_id]) if options[:votee_id].is_a?(String)
-          options[:voter_id] = BSON::ObjectId(options[:voter_id]) if options[:voter_id].is_a?(String)
-          options[:value] = options[:value].to_sym
+          validate_n_normalize_vote_options(options)
           options[:voteable] = VOTEABLE[name][name]
           
           update_parents = options[:voteable][:update_parents]
@@ -60,6 +57,13 @@ module Mongoid
 
         
         private
+          def validate_n_normalize_vote_options(options)
+            options.symbolize_keys!
+            options[:votee_id] = BSON::ObjectId(options[:votee_id]) if options[:votee_id].is_a?(String)
+            options[:voter_id] = BSON::ObjectId(options[:voter_id]) if options[:voter_id].is_a?(String)
+            options[:value] &&= options[:value].to_sym
+          end
+        
           def new_vote_query_n_update(options)
             if options[:value] == :up
               positive_voter_ids = 'votes.up'
