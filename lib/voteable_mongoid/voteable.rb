@@ -59,13 +59,32 @@ module Mongoid
       # 
       # @return [true, false]
       def voted?(options)
-        votee_id = options[:votee_id]
-        votee_id = BSON::ObjectId(votee_id) if votee_id.is_a?(String)
-
-        voter_id = options[:voter_id] 
-        voter_id = BSON::ObjectId(voter_id) if voter_id.is_a?(String)
-
-        voted_by(voter_id).where(:_id => votee_id).count == 1
+        validate_n_normalize_vote_options(options)
+        up_voted?(options) || down_voted?(options)
+      end
+      
+      # Check if voter_id do an up vote on votee_id
+      #
+      # @param [Hash] options a hash containings:
+      #   - :votee_id: the votee document id
+      #   - :voter_id: the voter document id
+      # 
+      # @return [true, false]
+      def up_voted?(options)
+        validate_n_normalize_vote_options(options)
+        up_voted_by(options[:voter_id]).where(:_id => options[:votee_id]).count == 1
+      end
+      
+      # Check if voter_id do a down vote on votee_id
+      #
+      # @param [Hash] options a hash containings:
+      #   - :votee_id: the votee document id
+      #   - :voter_id: the voter document id
+      # 
+      # @return [true, false]
+      def down_voted?(options)
+        validate_n_normalize_vote_options(options)
+        down_voted_by(options[:voter_id]).where(:_id => options[:votee_id]).count == 1
       end
     end
     
