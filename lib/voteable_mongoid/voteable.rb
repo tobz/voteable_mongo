@@ -50,6 +50,23 @@ module Mongoid
           VOTEABLE[name][name][:update_parents] = true
         end
       end
+      
+      # Check if voter_id do a vote on votee_id
+      #
+      # @param [Hash] options a hash containings:
+      #   - :votee_id: the votee document id
+      #   - :voter_id: the voter document id
+      # 
+      # @return [true, false]
+      def voted?(options)
+        votee_id = options[:votee_id]
+        votee_id = BSON::ObjectId(votee_id) if votee_id.is_a?(String)
+
+        voter_id = options[:voter_id] 
+        voter_id = BSON::ObjectId(voter_id) if voter_id.is_a?(String)
+
+        voted_by(voter_id).where(:_id => votee_id).count == 1
+      end
     end
     
     # Make a vote on this votee
@@ -72,7 +89,7 @@ module Mongoid
 
       self.class.vote(options)
     end
-
+    
     # Get a voted value on this votee
     #
     # @param [Mongoid Object, BSON::ObjectId] voter is Mongoid object or the id of the voter who made the vote

@@ -21,7 +21,7 @@ module Mongoid
         end
       end
       
-      votee_class.voted_by(self).where(:_id => votee_id).count == 1
+      votee_class.voted?(:voter_id => id, :votee_id => votee_id)
     end
 
     # Get the voted value on a votee
