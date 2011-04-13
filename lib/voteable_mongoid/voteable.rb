@@ -59,7 +59,7 @@ module Mongoid
       # 
       # @return [true, false]
       def voted?(options)
-        validate_n_normalize_vote_options(options)
+        validate_and_normalize_vote_options(options)
         up_voted?(options) || down_voted?(options)
       end
       
@@ -71,7 +71,7 @@ module Mongoid
       # 
       # @return [true, false]
       def up_voted?(options)
-        validate_n_normalize_vote_options(options)
+        validate_and_normalize_vote_options(options)
         up_voted_by(options[:voter_id]).where(:_id => options[:votee_id]).count == 1
       end
       
@@ -83,7 +83,7 @@ module Mongoid
       # 
       # @return [true, false]
       def down_voted?(options)
-        validate_n_normalize_vote_options(options)
+        validate_and_normalize_vote_options(options)
         down_voted_by(options[:voter_id]).where(:_id => options[:votee_id]).count == 1
       end
     end

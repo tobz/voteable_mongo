@@ -16,18 +16,18 @@ module Mongoid
         # 
         # @return [votes, false, nil]
         def vote(options)
-          validate_n_normalize_vote_options(options)
+          validate_and_normalize_vote_options(options)
           options[:voteable] = VOTEABLE[name][name]
           
           update_parents = options[:voteable][:update_parents]
 
           if options[:voteable]
              query, update = if options[:revote]
-              revote_query_n_update(options)
+              revote_query_and_update(options)
             elsif options[:unvote]
-              unvote_query_n_update(options)
+              unvote_query_and_update(options)
             else
-              new_vote_query_n_update(options)
+              new_vote_query_and_update(options)
             end
 
             if update_parents || options[:votee] || options[:return_votes]
@@ -57,14 +57,14 @@ module Mongoid
 
         
         private
-          def validate_n_normalize_vote_options(options)
+          def validate_and_normalize_vote_options(options)
             options.symbolize_keys!
             options[:votee_id] = BSON::ObjectId(options[:votee_id]) if options[:votee_id].is_a?(String)
             options[:voter_id] = BSON::ObjectId(options[:voter_id]) if options[:voter_id].is_a?(String)
             options[:value] &&= options[:value].to_sym
           end
         
-          def new_vote_query_n_update(options)
+          def new_vote_query_and_update(options)
             if options[:value] == :up
               positive_voter_ids = 'votes.up'
               positive_votes_count = 'votes.up_count'
@@ -89,7 +89,7 @@ module Mongoid
           end
 
           
-          def revote_query_n_update(options)
+          def revote_query_and_update(options)
             if options[:value] == :up
               positive_voter_ids = 'votes.up'
               negative_voter_ids = 'votes.down'
@@ -122,7 +122,7 @@ module Mongoid
           end
           
 
-          def unvote_query_n_update(options)
+          def unvote_query_and_update(options)
             if options[:value] == :up
               positive_voter_ids = 'votes.up'
               negative_voter_ids = 'votes.down'
