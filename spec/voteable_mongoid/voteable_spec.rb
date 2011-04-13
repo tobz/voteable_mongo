@@ -1,4 +1,4 @@
-require "spec_helper"
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe Mongoid::Voteable do
   before :all do
@@ -6,12 +6,13 @@ describe Mongoid::Voteable do
     @post2 = Post.create!
     
     @comment = @post2.comments.create!
+    
     @user1 = User.create!
     @user2 = User.create!
   end
   
   context "just created" do
-    it 'voteable votes_count, votes_point should be zero' do
+    it 'votes_count, up_votes_count, down_votes_count, votes_point should be zero' do
       @post1.up_votes_count.should == 0
       @post1.down_votes_count.should == 0
       @post1.votes_count.should == 0
@@ -21,49 +22,42 @@ describe Mongoid::Voteable do
       @post2.down_votes_count.should == 0
       @post2.votes_count.should == 0
       @post2.votes_point.should == 0
+
+      @comment.up_votes_count.should == 0
+      @comment.down_votes_count.should == 0
+      @comment.votes_count.should == 0
+      @comment.votes_point.should == 0
     end
     
-    it 'voteable up_voter_ids, down_voter_ids should be empty' do
+    it 'up_voter_ids, down_voter_ids should be empty' do
       @post1.up_voter_ids.should be_empty
       @post1.down_voter_ids.should be_empty
 
       @post2.up_voter_ids.should be_empty
       @post2.down_voter_ids.should be_empty
+
+      @comment.up_voter_ids.should be_empty
+      @comment.down_voter_ids.should be_empty
     end
     
-    it 'posts voted voter should be empty' do
+    it 'voted by voter should be empty' do
       Post.voted_by(@user1).should be_empty
       Post.voted_by(@user2).should be_empty
+      
+      Comment.voted_by(@user1).should be_empty
+      Comment.voted_by(@user2).should be_empty
     end
-    
-    it 'test init stats' do
-      @post1.votes.should == Mongoid::Voteable::Votes::DEFAULT_ATTRIBUTES
-      @post2.votes.should == Mongoid::Voteable::Votes::DEFAULT_ATTRIBUTES
-      
-      @post1.votes = nil
-      @post1.save
-
-      @post2.votes = nil
-      @post2.save
-      
-      Mongoid::Voteable::Tasks.init_stats
-
-      @post1.reload
-      @post2.reload
-      
-      @post1.votes.should == Mongoid::Voteable::Votes::DEFAULT_ATTRIBUTES
-      @post2.votes.should == Mongoid::Voteable::Votes::DEFAULT_ATTRIBUTES
-    end
-    
-    it 'revote has no effect' do
+        
+    it 'revote post1 has no effect' do
       @post1.vote(:revote => true, :voter => @user1, :value => 'up')
-      @post1.reload
 
       @post1.up_votes_count.should == 0
       @post1.down_votes_count.should == 0
       @post1.votes_count.should == 0
       @post1.votes_point.should == 0
-      
+    end
+    
+    it 'revote post2 has no effect' do
       Post.vote(:revote => true, :votee_id => @post2.id, :voter_id => @user2.id, :value => :down)
       @post2.reload
       
@@ -121,15 +115,22 @@ describe Mongoid::Voteable do
       @post1.reload
     end
     
-    it '' do
+    it 'post1 up_votes_count is the same' do
       @post1.up_votes_count.should == 1
+    end
+    
+    it 'post1 vote_value on user1 is the same' do
+      @post1.vote_value(@user1.id).should == :up
+    end
+    
+    it 'down_votes_count, votes_count, and votes_point changed' do
       @post1.down_votes_count.should == 1
       @post1.votes_count.should == 2
       @post1.votes_point.should == 0
-      
-      @post1.vote_value(@user1.id).should == :up
       @post1.vote_value(@user2.id).should == :down
-
+    end
+    
+    it 'posts voted_by user1, user2 is post1 only' do
       Post.voted_by(@user1).to_a.should == [ @post1 ]
       Post.voted_by(@user2).to_a.should == [ @post1 ]
     end
@@ -142,7 +143,7 @@ describe Mongoid::Voteable do
       @post1.reload
     end
     
-    it '' do
+    it 'validates' do
       @post1.up_votes_count.should == 0
       @post1.down_votes_count.should == 2
       @post1.votes_count.should == 2
@@ -161,7 +162,7 @@ describe Mongoid::Voteable do
       @post2.vote(:voter_id => @user1.id, :value => :down)
     end
     
-    it '' do
+    it 'validates' do
       @post2.up_votes_count.should == 0
       @post2.down_votes_count.should == 1
       @post2.votes_count.should == 1
@@ -181,7 +182,7 @@ describe Mongoid::Voteable do
       @post2.reload
     end
     
-    it '' do
+    it 'validates' do
       @post2.up_votes_count.should == 1
       @post2.down_votes_count.should == 0
       @post2.votes_count.should == 1
@@ -202,7 +203,7 @@ describe Mongoid::Voteable do
       @post2.reload
     end
     
-    it '' do
+    it 'validates' do
       @post2.up_votes_count.should == 2
       @post2.down_votes_count.should == 0
       @post2.votes_count.should == 2
@@ -223,7 +224,7 @@ describe Mongoid::Voteable do
       @post2.reload
     end
     
-    it '' do
+    it 'validates' do
       @post2.up_votes_count.should == 1
       @post2.down_votes_count.should == 1
       @post2.votes_count.should == 2
@@ -257,7 +258,7 @@ describe Mongoid::Voteable do
       @post1.reload
     end
     
-    it "" do
+    it 'validates' do
       @post1.up_votes_count.should == 0
       @post1.down_votes_count.should == 1
       @post1.votes_count.should == 1

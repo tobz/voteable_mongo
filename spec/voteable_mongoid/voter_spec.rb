@@ -1,4 +1,4 @@
-require "spec_helper"
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe Mongoid::Voter do
   before :all do
@@ -10,7 +10,7 @@ describe Mongoid::Voter do
   end
   
   context "just created" do
-    it '' do
+    it 'validates' do
       Post.voted_by(@user1).should be_empty
       Post.up_voted_by(@user1).should be_empty
       Post.down_voted_by(@user1).should be_empty
@@ -39,7 +39,7 @@ describe Mongoid::Voter do
       @post1.reload
     end
     
-    it '' do
+    it 'validates' do
       @post1.votes_count.should == 1
       @post1.votes_point.should == 1
 
@@ -72,7 +72,7 @@ describe Mongoid::Voter do
       @post1.reload
     end
     
-    it '' do
+    it 'validates' do
       @post1.votes_count.should == 2
       @post1.votes_point.should == 0
       
@@ -92,7 +92,7 @@ describe Mongoid::Voter do
       @post1.reload
     end
     
-    it '' do
+    it 'validates' do
       @post1.votes_count.should == 2
       @post1.votes_point.should == -2
 
@@ -110,7 +110,7 @@ describe Mongoid::Voter do
       @post2.reload
     end
     
-    it '' do
+    it 'validates' do
       @post2.votes_count.should == 1
       @post2.votes_point.should == -1
       
@@ -127,7 +127,7 @@ describe Mongoid::Voter do
       @post2.reload
     end
     
-    it '' do
+    it 'validates' do
       @post2.votes_count.should == 1
       @post2.votes_point.should == 1
       
