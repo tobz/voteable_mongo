@@ -2,8 +2,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe Mongoid::Voteable do
   before :all do
+    @category1 = Category.create!(:name => 'xyz')
+    @category2 = Category.create!(:name => 'abc')
+    
     @post1 = Post.create!
     @post2 = Post.create!
+    
+    @post1.categories << @category1
+    @category2.posts << @post1
     
     @comment = @post2.comments.create!
     
@@ -13,6 +19,16 @@ describe Mongoid::Voteable do
   
   context "just created" do
     it 'votes_count, up_votes_count, down_votes_count, votes_point should be zero' do
+      @category1.up_votes_count.should == 0
+      @category1.down_votes_count.should == 0
+      @category1.votes_count.should == 0
+      @category1.votes_point.should == 0
+
+      @category2.up_votes_count.should == 0
+      @category2.down_votes_count.should == 0
+      @category2.votes_count.should == 0
+      @category2.votes_point.should == 0
+
       @post1.up_votes_count.should == 0
       @post1.down_votes_count.should == 0
       @post1.votes_count.should == 0
@@ -30,6 +46,12 @@ describe Mongoid::Voteable do
     end
     
     it 'up_voter_ids, down_voter_ids should be empty' do
+      @category1.up_voter_ids.should be_empty
+      @category1.down_voter_ids.should be_empty
+
+      @category2.up_voter_ids.should be_empty
+      @category2.down_voter_ids.should be_empty
+
       @post1.up_voter_ids.should be_empty
       @post1.down_voter_ids.should be_empty
 
@@ -41,6 +63,9 @@ describe Mongoid::Voteable do
     end
     
     it 'voted by voter should be empty' do
+      Category.voted_by(@user1).should be_empty
+      Category.voted_by(@user2).should be_empty
+
       Post.voted_by(@user1).should be_empty
       Post.voted_by(@user2).should be_empty
       
@@ -100,6 +125,18 @@ describe Mongoid::Voteable do
 
       Post.voted_by(@user1).to_a.should == [ @post1 ]
       Post.voted_by(@user2).to_a.should be_empty
+      
+      @category1.reload
+      @category1.up_votes_count.should == 0
+      @category1.down_votes_count.should == 0
+      @category1.votes_count.should == 0
+      @category1.votes_point.should == 3
+
+      @category2.reload
+      @category2.up_votes_count.should == 0
+      @category2.down_votes_count.should == 0
+      @category2.votes_count.should == 0
+      @category2.votes_point.should == 3
     end
     
     it 'user1 vote post1 has no effect' do
@@ -139,6 +176,20 @@ describe Mongoid::Voteable do
     it 'posts voted_by user1, user2 is post1 only' do
       Post.voted_by(@user1).to_a.should == [ @post1 ]
       Post.voted_by(@user2).to_a.should == [ @post1 ]
+    end
+    
+    it 'categories votes' do
+      @category1.reload
+      @category1.up_votes_count.should == 0
+      @category1.down_votes_count.should == 0
+      @category1.votes_count.should == 0
+      @category1.votes_point.should == -2
+
+      @category2.reload
+      @category2.up_votes_count.should == 0
+      @category2.down_votes_count.should == 0
+      @category2.votes_count.should == 0
+      @category2.votes_point.should == -2
     end
   end
   

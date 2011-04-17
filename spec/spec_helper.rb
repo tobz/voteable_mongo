@@ -29,3 +29,4 @@ Dir[ File.join(MODELS, "*.rb") ].sort.each { |file| require File.basename(file) 
 User.collection.drop
 Post.collection.drop
 Comment.collection.drop
+Category.collection.drop

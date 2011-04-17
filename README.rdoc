@@ -32,7 +32,7 @@ post.rb
       # set points for each vote
       voteable self, :up => +1, :down => -1
 
-      references_many :comments
+      has_many :comments
     end
 
 comment.rb
@@ -43,7 +43,7 @@ comment.rb
       include Mongoid::Document
       include Mongoid::Voteable
 
-      referenced_in :post
+      belongs_to :post
 
       voteable self, :up => +1, :down => -3
 

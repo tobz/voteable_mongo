@@ -149,15 +149,26 @@ module Mongoid
 
           def update_parent_votes(doc, options)
             VOTEABLE[name].each do |class_name, voteable|
-              # For other class in VOTEABLE options, if is parent of current class
-              next unless relation_metadata = relations[class_name.underscore]
-              # If can find current votee foreign_key value for that class
-              next unless foreign_key_value = doc[relation_metadata.foreign_key.to_s]
+              # For other class in VOTEABLE options, if has relationship with current class
+              relation_metadata = relations.find{ |x, r| r.class_name == class_name }.try(:last)
+              next unless relation_metadata.present?
 
-              class_name.constantize.collection.update(
-                { '_id' => foreign_key_value }, 
-                { '$inc' => parent_inc_options(voteable, options) }
-              )
+              # If cannot find current votee foreign_key value for that class
+              foreign_key_value = doc[relation_metadata.foreign_key.to_s]
+              next unless foreign_key_value.present?
+
+              if relation_metadata.relation == Mongoid::Relations::Referenced::In
+                class_name.constantize.collection.update( 
+                  { '_id' => foreign_key_value },
+                  { '$inc' => parent_inc_options(voteable, options) }
+                )
+              elsif relation_metadata.relation == Mongoid::Relations::Referenced::ManyToMany
+                class_name.constantize.collection.update( 
+                  { '_id' => { '$in' => foreign_key_value } },
+                  { '$inc' => parent_inc_options(voteable, options) },
+                  { :multi => true }
+                )
+              end
             end
           end
 
