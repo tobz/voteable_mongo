@@ -70,7 +70,7 @@ describe Mongoid::Voteable do
   
   context 'user1 vote up post1 the first time' do
     before :all do    
-      @return = @post1.vote(:voter_id => @user1.id, :value => :up, :return_votes => true)
+      @return = @post1.vote(:voter_id => @user1.id, :value => :up, :return_votee => true)
     end
     
     it 'validates return post' do

@@ -86,14 +86,8 @@ Re-vote
 Un-vote
     Post.vote(:voter_id => user_id, :votee_id => post_id, :value => :up, :unvote => true)
     
-In-case you need updated votes data, add :return_votes => true
-    votes = Post.vote(:voter_id => user_id, :votee_id => post_id, :value => :up, :return_votes => true)
-    votes['up']         # => up_voter_ids who voted up
-    votes['down']       # => down_voter_ids who voted down
-    votes['up_count']   # => number of up votes (votes_voter_ids.length)
-    votes['down_count'] # => number of down votes (down_voter_ids.length)
-    votes['count']      # => number of votes (up_count + down_count)
-    votes['point']      # => total vote points
+In-case you need updated voteable object, add :return_votee => true
+    votee = Post.vote(:voter_id => user_id, :votee_id => post_id, :value => :up, :return_votee => true)
 
 === Getting vote_value
     

@@ -12,7 +12,7 @@ module Mongoid
         #   - :value: :up or :down
         #   - :revote: if true change vote vote from :up to :down and vise versa
         #   - :unvote: if true undo the voting
-        #   - :return_votes: if true always return updated votes data
+        #   - :return: if true always return updated voteable object
         # 
         # @return [votes, false, nil]
         def vote(options)
@@ -28,7 +28,7 @@ module Mongoid
               new_vote_query_and_update(options)
             end
 
-            if options[:voteable][:update_parents] || options[:votee] || options[:return_votes]
+            if options[:voteable][:update_parents] || options[:votee] || options[:return_votee]
               # If votee exits or need to update parent
               # use Collection#find_and_modify to retrieve updated votes data and parent_ids
               begin
