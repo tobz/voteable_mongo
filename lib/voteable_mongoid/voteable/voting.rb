@@ -19,8 +19,6 @@ module Mongoid
           validate_and_normalize_vote_options(options)
           options[:voteable] = VOTEABLE[name][name]
           
-          update_parents = options[:voteable][:update_parents]
-
           if options[:voteable]
              query, update = if options[:revote]
               revote_query_and_update(options)
@@ -30,7 +28,7 @@ module Mongoid
               new_vote_query_and_update(options)
             end
 
-            if update_parents || options[:votee] || options[:return_votes]
+            if options[:voteable][:update_parents] || options[:votee] || options[:return_votes]
               # If votee exits or need to update parent
               # use Collection#find_and_modify to retrieve updated votes data and parent_ids
               begin
@@ -40,10 +38,9 @@ module Mongoid
                   :new => true
                 )
                 # Update new votes data
-                votes = doc['votes']
-                options[:votee].write_attribute('votes', votes) if options[:votee]
-                update_parent_votes(doc, options) if update_parents
-                return votes
+                options[:votee].write_attribute('votes', doc['votes']) if options[:votee]
+                update_parent_votes(doc, options) if options[:voteable][:update_parents]
+                return doc['votes']
               rescue
                 # Don't update parents if operation fail or no matching object found
                 return false
@@ -151,9 +148,6 @@ module Mongoid
           
 
           def update_parent_votes(doc, options)
-            value = options[:value]
-            votee ||= options[:votee]
-            
             VOTEABLE[name].each do |class_name, voteable|
               # For other class in VOTEABLE options, if is parent of current class
               next unless relation_metadata = relations[class_name.underscore]
@@ -162,17 +156,17 @@ module Mongoid
 
               class_name.constantize.collection.update(
                 { '_id' => foreign_key_value }, 
-                { '$inc' => parent_inc_options(value, voteable, options) }
+                { '$inc' => parent_inc_options(voteable, options) }
               )
             end
           end
 
           
-          def parent_inc_options(value, voteable, options)
+          def parent_inc_options(voteable, options)
             inc_options = {}
 
             if options[:revote]
-              if value == :up
+              if options[:value] == :up
                 inc_options['votes.point'] = voteable[:up] - voteable[:down]
                 unless voteable[:update_counters] == false
                   inc_options['votes.up_count'] = +1
@@ -187,10 +181,10 @@ module Mongoid
               end
 
             elsif options[:unvote]
-              inc_options['votes.point'] = -voteable[value]
+              inc_options['votes.point'] = -voteable[options[:value]]
               unless voteable[:update_counters] == false
                 inc_options['votes.count'] = -1
-                if value == :up
+                if options[:value] == :up
                   inc_options['votes.up_count'] = -1
                 else
                   inc_options['votes.down_count'] = -1
@@ -198,10 +192,10 @@ module Mongoid
               end
 
             else # new vote
-              inc_options['votes.point'] = voteable[value]
+              inc_options['votes.point'] = voteable[options[:value]]
               unless voteable[:update_counters] == false
                 inc_options['votes.count'] = +1
-                if value == :up
+                if options[:value] == :up
                   inc_options['votes.up_count'] = +1
                 else
                   inc_options['votes.down_count'] = +1
