@@ -40,7 +40,7 @@ module Mongoid
                 # Update new votes data
                 options[:votee].write_attribute('votes', doc['votes']) if options[:votee]
                 update_parent_votes(doc, options) if options[:voteable][:update_parents]
-                return doc['votes']
+                return options[:votee] || new(doc)
               rescue
                 # Don't update parents if operation fail or no matching object found
                 return false

@@ -70,8 +70,11 @@ describe Mongoid::Voteable do
   
   context 'user1 vote up post1 the first time' do
     before :all do    
-      votes = @post1.vote(:voter_id => @user1.id, :value => :up, :return_votes => true)
-      votes.should == {
+      @return = @post1.vote(:voter_id => @user1.id, :value => :up, :return_votes => true)
+    end
+    
+    it 'validates return post' do
+      @return.votes.should == {
         'up' => [@user1.id],
         'down' => [],
         'up_count' => 1,
@@ -79,9 +82,12 @@ describe Mongoid::Voteable do
         'count' => 1,
         'point' => 1
       }
+
+      @return.should_not be_new_record
+      @return.should be_is_a(Post)
     end
     
-    it '' do
+    it 'validates' do
       @post1.up_votes_count.should == 1
       @post1.down_votes_count.should == 0
       @post1.votes_count.should == 1
