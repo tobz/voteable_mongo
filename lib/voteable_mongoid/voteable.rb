@@ -6,8 +6,8 @@ module Mongoid
     extend ActiveSupport::Concern
 
     included do
-      include Document
-      include Voting
+      include ::Mongoid::Document
+      include ::Mongoid::Voteable::Voting
       
       field :votes, :type => Votes
 
