@@ -88,68 +88,70 @@ module Mongoid
       end
     end
     
-    # Make a vote on this votee
-    #
-    # @param [Hash] options a hash containings:
-    #   - :voter_id: the voter document id
-    #   - :value: vote :up or vote :down
-    #   - :revote: change from vote up to vote down
-    #   - :unvote: unvote the vote value (:up or :down)
-    def vote(options)
-      options[:votee_id] = id
-      options[:votee] = self
-      options[:voter_id] ||= options[:voter].id
+    module InstanceMethods
+      # Make a vote on this votee
+      #
+      # @param [Hash] options a hash containings:
+      #   - :voter_id: the voter document id
+      #   - :value: vote :up or vote :down
+      #   - :revote: change from vote up to vote down
+      #   - :unvote: unvote the vote value (:up or :down)
+      def vote(options)
+        options[:votee_id] = id
+        options[:votee] = self
+        options[:voter_id] ||= options[:voter].id
 
-      if options[:unvote]
-        options[:value] ||= vote_value(options[:voter_id])
-      else
-        options[:revote] ||= vote_value(options[:voter_id]).present?
+        if options[:unvote]
+          options[:value] ||= vote_value(options[:voter_id])
+        else
+          options[:revote] ||= vote_value(options[:voter_id]).present?
+        end
+
+        self.class.vote(options)
+      end
+    
+      # Get a voted value on this votee
+      #
+      # @param [Mongoid Object, BSON::ObjectId] voter is Mongoid object or the id of the voter who made the vote
+      def vote_value(voter)
+        voter_id = voter.is_a?(BSON::ObjectId) ? voter : voter.id
+        return :up if up_voter_ids.include?(voter_id)
+        return :down if down_voter_ids.include?(voter_id)
+      end
+    
+      def voted_by?(voter)
+        !!vote_value(voter)
       end
 
-      self.class.vote(options)
-    end
-    
-    # Get a voted value on this votee
-    #
-    # @param [Mongoid Object, BSON::ObjectId] voter is Mongoid object or the id of the voter who made the vote
-    def vote_value(voter)
-      voter_id = voter.is_a?(BSON::ObjectId) ? voter : voter.id
-      return :up if up_voter_ids.include?(voter_id)
-      return :down if down_voter_ids.include?(voter_id)
-    end
-    
-    def voted_by?(voter)
-      !!vote_value(voter)
-    end
+      # Array of up voter ids
+      def up_voter_ids
+        votes.try(:[], 'up') || []
+      end
 
-    # Array of up voter ids
-    def up_voter_ids
-      votes.try(:[], 'up') || []
-    end
+      # Array of down voter ids
+      def down_voter_ids
+        votes.try(:[], 'down') || []
+      end
 
-    # Array of down voter ids
-    def down_voter_ids
-      votes.try(:[], 'down') || []
-    end
-
-    # Get the number of up votes
-    def up_votes_count
-      votes.try(:[], 'up_count') || 0
-    end
+      # Get the number of up votes
+      def up_votes_count
+        votes.try(:[], 'up_count') || 0
+      end
   
-    # Get the number of down votes
-    def down_votes_count
-      votes.try(:[], 'down_count') || 0
-    end
+      # Get the number of down votes
+      def down_votes_count
+        votes.try(:[], 'down_count') || 0
+      end
   
-    # Get the number of votes
-    def votes_count
-      votes.try(:[], 'count') || 0
-    end
+      # Get the number of votes
+      def votes_count
+        votes.try(:[], 'count') || 0
+      end
   
-    # Get the votes point
-    def votes_point
-      votes.try(:[], 'point') || 0
+      # Get the votes point
+      def votes_point
+        votes.try(:[], 'point') || 0
+      end
     end
     
   end
