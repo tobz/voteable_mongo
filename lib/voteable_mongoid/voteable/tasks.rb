@@ -94,7 +94,7 @@ module Mongoid
           'votes.up_count' => up_count,
           'votes.down_count' => down_count,
           'votes.count' => up_count + down_count,
-          'votes.point' => voteable[:up]*up_count + voteable[:down]*down_count
+          'votes.point' => voteable[:up].to_i*up_count + voteable[:down].to_i*down_count
         )
       end
 
