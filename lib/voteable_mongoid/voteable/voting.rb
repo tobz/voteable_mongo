@@ -78,10 +78,11 @@ module Mongoid
             }, {
               # then update
               '$push' => { positive_voter_ids => options[:voter_id] },
-              '$inc' => {  
+              '$inc' => {
                 'votes.count' => +1,
                 positive_votes_count => +1,
-                'votes.point' => options[:voteable][options[:value]] }
+                'votes.point' => options[:voteable][options[:value]]
+              }
             }
           end
 
@@ -104,7 +105,9 @@ module Mongoid
             return {
               # Validate voter_id did a vote with value for votee_id
               :_id => options[:votee_id],
-              positive_voter_ids => { '$ne' => options[:voter_id] },
+              # Can skip $ne validation since creating a new vote
+              # already warranty that a voter can vote one only
+              # positive_voter_ids => { '$ne' => options[:voter_id] },
               negative_voter_ids => options[:voter_id]
             }, {
               # then update
@@ -133,7 +136,9 @@ module Mongoid
             return {
               :_id => options[:votee_id],
               # Validate if voter_id did a vote with value for votee_id
-              negative_voter_ids => { '$ne' => options[:voter_id] },
+              # Can skip $ne validation since creating a new vote 
+              # already warranty that a voter can vote one only
+              # negative_voter_ids => { '$ne' => options[:voter_id] },
               positive_voter_ids => options[:voter_id]
             }, {
               # then update
