@@ -134,7 +134,7 @@ describe Mongoid::Voter do
       @user1.vote_value(@post2).should == :up
       @user2.vote_value(@post2).should be_nil
 
-      Post.voted_by(@user1).to_a.should == [ @post1, @post2 ]
+      Post.voted_by(@user1).sort.should == [ @post1, @post2 ].sort
     end
   end  
 end

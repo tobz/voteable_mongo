@@ -8,6 +8,6 @@ class Post
   has_and_belongs_to_many :categories
   has_many :comments
 
-  voteable self, :up => +1, :down => -1
+  voteable self, :up => +1, :down => -1, :index => true
   voteable Category, :up => +3, :down => -5, :update_counters => false
 end

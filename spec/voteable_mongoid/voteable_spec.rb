@@ -1,6 +1,35 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe Mongoid::Voteable do
+  
+  context 'when :index is passed as an argument' do
+    before do
+      Post.collection.drop_indexes
+      Category.collection.drop_indexes
+    end
+
+    it 'defines indexes' do
+      [Post, Category].each do |klass|
+        klass.create_indexes
+        [ 'votes.up_1__id_1',
+          'votes.down_1__id_1'
+        ].each { |index_key|
+          klass.collection.index_information.should have_key index_key
+          klass.collection.index_information[index_key]['unique'].should be_true
+          klass.collection.index_information[index_key]['background'].should be_true
+        }
+
+        [ 'votes.count_-1',
+          'votes.up_count_-1',
+          'votes.down_count_-1',
+          'votes.point_-1'
+        ].each { |index_key|
+          klass.collection.index_information.should have_key index_key
+        }
+      end
+    end
+  end
+  
   before :all do
     @category1 = Category.create!(:name => 'xyz')
     @category2 = Category.create!(:name => 'abc')
@@ -248,7 +277,7 @@ describe Mongoid::Voteable do
       @post2.vote_value(@user1.id).should == :up
       @post2.vote_value(@user2.id).should be_nil
 
-      Post.voted_by(@user1).to_a.should == [ @post1, @post2 ]
+      Post.voted_by(@user1).sort.should == [ @post1, @post2 ].sort
     end
   end
   

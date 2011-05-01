@@ -46,8 +46,12 @@ module Mongoid
       def voteable(klass = self, options = nil)
         VOTEABLE[name] ||= {}
         VOTEABLE[name][klass.name] ||= options
-        if klass != self
-          VOTEABLE[name][name][:update_parents] = true
+        if klass == self
+          if options[:index] == true
+            create_voteable_indexes
+          end
+        else
+          VOTEABLE[name][name][:update_parents] ||= true
         end
       end
       
@@ -85,6 +89,25 @@ module Mongoid
       def down_voted?(options)
         validate_and_normalize_vote_options(options)
         down_voted_by(options[:voter_id]).where(:_id => options[:votee_id]).count == 1
+      end
+      
+      private
+      def create_voteable_indexes
+        class_eval do
+          # Compound index _id and voters.up, _id and voters.down
+          # to make up_voted_by, down_voted_by, voted_by scopes and voting faster
+          # Should run in background since it introduce new index value and
+          # while waiting to build, the system can use _id for voting
+          # http://www.mongodb.org/display/DOCS/Indexing+as+a+Background+Operation
+          index [['votes.up', 1], ['_id', 1]], :unique => true, :background => true
+          index [['votes.down', 1], ['_id', 1]], :unique => true, :background => true
+
+          # Index counters and point for desc ordering
+          index [['votes.count', -1]]
+          index [['votes.up_count', -1]]
+          index [['votes.down_count', -1]]
+          index [['votes.point', -1]]
+        end
       end
     end
     
