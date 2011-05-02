@@ -152,6 +152,10 @@ describe Mongoid::Voteable do
       @post1.vote_value(@user2.id).should be_nil
       @post1.should_not be_voted_by(@user2.id)
 
+      @post1.up_voters(User).should == [ @user1 ]
+      @post1.voters(User).should == [ @user1 ]
+      @post1.down_voters(User).should be_empty
+
       Post.voted_by(@user1).to_a.should == [ @post1 ]
       Post.voted_by(@user2).to_a.should be_empty
       
@@ -200,6 +204,12 @@ describe Mongoid::Voteable do
       @post1.votes_count.should == 2
       @post1.votes_point.should == 0
       @post1.vote_value(@user2.id).should == :down
+    end
+    
+    it 'post1 get voters' do
+      @post1.up_voters(User).should == [ @user1 ]
+      @post1.down_voters(User).should == [ @user2 ]
+      @post1.voters(User).should == [ @user1, @user2 ]
     end
     
     it 'posts voted_by user1, user2 is post1 only' do

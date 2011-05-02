@@ -156,6 +156,11 @@ module Mongoid
         votes.try(:[], 'down') || []
       end
 
+      # Array of voter ids
+      def voter_ids
+        up_voter_ids + down_voter_ids
+      end
+
       # Get the number of up votes
       def up_votes_count
         votes.try(:[], 'up_count') || 0
@@ -175,7 +180,21 @@ module Mongoid
       def votes_point
         votes.try(:[], 'point') || 0
       end
+
+      # Get up voters
+      def up_voters(klass)
+        klass.where(:_id => { '$in' =>  up_voter_ids })
+      end
+
+      # Get down voters
+      def down_voters(klass)
+        klass.where(:_id => { '$in' => down_voter_ids })
+      end
+
+      # Get voters
+      def voters(klass)
+        klass.where(:_id => { '$in' => voter_ids })
+      end
     end
-    
   end
 end
