@@ -42,10 +42,10 @@ module Mongoid
           # count, point)
           votes = doc['votes'] || doc['voteable'] || {}
 
-          up_voter_ids = votes['u'] || votes['up'] || 
+          up_voter_ids = votes['up'] || votes['u'] ||
             votes['up_voter_ids'] || doc['up_voter_ids'] || []
 
-          down_voter_ids = votes['d'] || votes['down'] || 
+          down_voter_ids = votes['down'] || votes['d'] ||
             votes['down_voter_ids'] || doc['down_voter_ids'] || []
 
           up_count = up_voter_ids.size
