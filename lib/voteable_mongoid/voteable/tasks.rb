@@ -59,7 +59,7 @@ module Mongoid
                   'up_count' => up_count,
                   'down_count' => down_count,
                   'count' => up_count + down_count,
-                  'point' => voteable[:up]*up_count + voteable[:down]*down_count
+                  'point' => voteable[:up].to_i*up_count + voteable[:down].to_i*down_count
                 }
             },
             '$unset' => {
@@ -126,7 +126,7 @@ module Mongoid
           return if up_count == 0 && down_count == 0
 
           inc_options = {
-            'votes.point' => voteable[:up]*up_count + voteable[:down]*down_count
+            'votes.point' => voteable[:up].to_i*up_count + voteable[:down].to_i*down_count
           }
         
           unless voteable[:update_counters] == false
