@@ -21,7 +21,7 @@ After that, remember to run "bundle install"
 
 == Usage
 
-=== Making Post and Comment voteable, User being the voter
+=== Make Post and Comment voteable, User become the voter
 
 post.rb
 
@@ -58,7 +58,7 @@ user.rb
       include Mongoid::Voter
     end
 
-=== Making a vote
+=== Make a vote
 
     @user.vote(@post, :up)
 
