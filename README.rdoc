@@ -7,7 +7,7 @@ Voteable Mongoid is built for speed. It uses only one database request per colle
 Sample app at https://github.com/vinova/simple_qa
 
 Projects use voteable_mongoid
- * https://github.com/huacnlee/quora
+https://github.com/huacnlee/quora
 
 == Installation
 
