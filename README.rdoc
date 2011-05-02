@@ -8,7 +8,7 @@ Sample app at https://github.com/vinova/simple_qa
 
 Benchmarks at https://github.com/vinova/voteable_benchmarks
 
-Sites using voteable_mongoid
+=== Sites using voteable_mongoid
 * http://www.amorveneris.com
 * http://zheye.org (https://github.com/huacnlee/quora)
 
@@ -150,7 +150,6 @@ Ruby
     Mongoid::Voteable::Tasks.migrate_old_votes
 
 == Credits
-
 * Alex Nguyen (alex@vinova.sg) - Author
 * Stefan Nguyen (stefan@vinova.sg) - Unvoting
 
