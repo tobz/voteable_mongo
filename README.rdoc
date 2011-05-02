@@ -110,6 +110,16 @@ In-case you need updated voteable object, add :return_votee => true
     puts @post.up_votes_count
     puts @post.down_votes_count
 
+=== Getting voters given voted object and voter class
+
+    @post.up_voters(User)
+    @post.down_voters(User)
+    @post.voters(User)
+    - or -
+    User.up_voted_for(@post)
+    User.down_voted_for(@post)
+    User.voted_for(@post)
+
 === Getting the list of voted objects of a class
 
     Post.voted_by(@user)
