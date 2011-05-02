@@ -1,3 +1,10 @@
+== 0.7.4
+  * Add Voteable#up_voters(VoterClass), Voteable#down_voters(VoterClass), Voteable#voters(VoterClass)
+  * Add Voter scopes: Voter.up_voted_for(voteable_object), Voter.down_voted_for(voteable_object), Voter.voted_for(voteable_object)
+  * Add voteable ..., :index => true options
+  * Optimization on unvote and revote validations
+  * Fix for :up & :down points are nil in rake tasks
+  
 == 0.7.3
   * Add :return_votee => true option to vote function to warranty always return voteable object
   * Add Voteable.voted?, Voteable.up_voted?, Voteable.down_voted?
