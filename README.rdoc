@@ -9,8 +9,8 @@ Sample app at https://github.com/vinova/simple_qa
 Benchmarks at https://github.com/vinova/voteable_benchmarks
 
 Sites using voteable_mongoid
- * http://www.amorveneris.com/
- * http://zheye.org/ (https://github.com/huacnlee/quora)
+* http://www.amorveneris.com/
+* http://zheye.org/ (https://github.com/huacnlee/quora)
 
 == Installation
 
