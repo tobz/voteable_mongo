@@ -53,6 +53,10 @@ describe Mongoid::Voter do
       Post.up_voted_by(@user1).to_a.should == [ @post1 ]
       Post.down_voted_by(@user1).to_a.should be_empty
       Post.voted_by(@user2).to_a.should be_empty
+      
+      User.up_voted_for(@post1).should == [ @user1 ]
+      User.down_voted_for(@post1).should be_empty
+      User.voted_for(@post1).should == [ @user1 ]
     end
     
     it 'user1 vote post1 has no effect' do
@@ -83,6 +87,10 @@ describe Mongoid::Voter do
       Post.voted_by(@user2).to_a.should == [ @post1 ]
       Post.up_voted_by(@user2).to_a.should be_empty
       Post.down_voted_by(@user2).to_a.should == [ @post1 ]
+
+      User.up_voted_for(@post1).should == [ @user1 ]
+      User.down_voted_for(@post1).should == [ @user2 ]
+      User.voted_for(@post1).should == [ @user1, @user2 ]
     end
   end
   

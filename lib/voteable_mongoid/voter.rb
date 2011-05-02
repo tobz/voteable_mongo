@@ -1,7 +1,15 @@
 module Mongoid
   module Voter
     extend ActiveSupport::Concern
-    
+
+    included do
+      include ::Mongoid::Document
+
+      scope :up_voted_for, lambda { |votee| where(:_id => { '$in' =>  votee.up_voter_ids }) }
+      scope :down_voted_for, lambda { |votee| where(:_id => { '$in' =>  votee.down_voter_ids }) }
+      scope :voted_for, lambda { |votee| where(:_id => { '$in' =>  votee.voter_ids }) }
+    end
+
     module InstanceMethods
       # Check to see if this voter voted on the votee or not
       #
