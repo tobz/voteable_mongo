@@ -67,13 +67,13 @@ module Mongo
               'down_voter_ids' => true,
               'votes_count' => true,
               'votes_point' => true,
-              'voteable' => true,
-              'votes.u' => true,
-              'votes.d' => true,
-              'votes.uc' => true,
-              'votes.dc' => true,
-              'votes.c' => true,
-              'votes.p' => true
+              'voteable' => true
+              # 'votes.u' => true,
+              # 'votes.d' => true,
+              # 'votes.uc' => true,
+              # 'votes.dc' => true,
+              # 'votes.c' => true,
+              # 'votes.p' => true
             }
           }, { :safe => true })
         end

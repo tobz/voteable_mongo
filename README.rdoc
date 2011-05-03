@@ -134,19 +134,19 @@ In-case you need updated voteable object, add :return_votee => true
 
 === Re-generate counters and vote points in case you change :up / :down vote points
 Rails
-    rake db:mongoid:voteable:remake_stats
+    rake mongo:voteable:remake_stats
 Ruby
     Mongo::Voteable::Tasks.remake_stats
 
 === Set counters and point to 0 for uninitialized voteable objects in order sort and query
 Rails
-    rake db:mongoid:voteable:init_stats
+    rake mongo:voteable:init_stats
 Ruby
     Mongo::Voteable::Tasks::init_stats
 
 === Migrate from version < 0.7.0
 Rails
-    rake db:mongoid:voteable:migrate_old_votes
+    rake mongo:voteable:migrate_old_votes
 Ruby
     Mongo::Voteable::Tasks.migrate_old_votes
 
