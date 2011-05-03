@@ -16,7 +16,6 @@ describe Mongo::Voteable do
         ].each { |index_key|
           klass.collection.index_information.should have_key index_key
           klass.collection.index_information[index_key]['unique'].should be_true
-          klass.collection.index_information[index_key]['background'].should be_true
         }
 
         [ 'votes.count_-1',
