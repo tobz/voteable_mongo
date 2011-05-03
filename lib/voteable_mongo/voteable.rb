@@ -1,4 +1,3 @@
-require 'voteable_mongo/voteable/votes'
 require 'voteable_mongo/voteable/voting'
 
 module Mongo
