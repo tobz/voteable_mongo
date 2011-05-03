@@ -1,4 +1,4 @@
-module Mongoid
+module Mongo
   module Voteable
     module Voting
       extend ActiveSupport::Concern
@@ -12,7 +12,7 @@ module Mongoid
         #   - :value: :up or :down
         #   - :revote: if true change vote vote from :up to :down and vise versa
         #   - :unvote: if true undo the voting
-        #   - :return: if true always return updated voteable object
+        #   - :return_votee: if true always return updated voteable object
         # 
         # @return [votes, false, nil]
         def vote(options)
@@ -41,8 +41,9 @@ module Mongoid
                 options[:votee].write_attribute('votes', doc['votes']) if options[:votee]
                 update_parent_votes(doc, options) if options[:voteable][:update_parents]
                 return options[:votee] || new(doc)
-              rescue
-                # Don't update parents if operation fail or no matching object found
+              rescue Exception => e
+                # $stderr.puts "Mongo error: #{e.inspect}" # DEBUG
+                # Don't update parents if operation fail or no matched object found
                 return false
               end
             else
@@ -162,12 +163,12 @@ module Mongoid
               foreign_key_value = doc[relation_metadata.foreign_key.to_s]
               next unless foreign_key_value.present?
 
-              if relation_metadata.relation == Mongoid::Relations::Referenced::In
+              if relation_metadata.relation == ::Mongoid::Relations::Referenced::In
                 class_name.constantize.collection.update( 
                   { '_id' => foreign_key_value },
                   { '$inc' => parent_inc_options(voteable, options) }
                 )
-              elsif relation_metadata.relation == Mongoid::Relations::Referenced::ManyToMany
+              elsif relation_metadata.relation == ::Mongoid::Relations::Referenced::ManyToMany
                 class_name.constantize.collection.update( 
                   { '_id' => { '$in' => foreign_key_value } },
                   { '$inc' => parent_inc_options(voteable, options) },

@@ -1,13 +1,12 @@
-require 'voteable_mongoid/voteable/votes'
-require 'voteable_mongoid/voteable/voting'
+require 'voteable_mongo/voteable/votes'
+require 'voteable_mongo/voteable/voting'
 
-module Mongoid
+module Mongo
   module Voteable
     extend ActiveSupport::Concern
 
     included do
-      include ::Mongoid::Document
-      include ::Mongoid::Voteable::Voting
+      include ::Mongo::Voteable::Voting
       
       field :votes, :type => Votes
 

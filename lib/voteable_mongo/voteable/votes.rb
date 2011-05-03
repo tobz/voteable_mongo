@@ -1,4 +1,4 @@
-module Mongoid
+module Mongo
   module Voteable
     
     class Votes

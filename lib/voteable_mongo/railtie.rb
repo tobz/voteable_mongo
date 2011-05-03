@@ -1,5 +1,5 @@
 module Rails #:nodoc:
-  module VoteableMongoid #:nodoc:
+  module VoteableMongo #:nodoc:
     class Railtie < Rails::Railtie #:nodoc:
 
       initializer "preload all application models" do |app|
@@ -9,7 +9,7 @@ module Rails #:nodoc:
       end
 
       rake_tasks do
-        load 'voteable_mongoid/railties/database.rake'
+        load 'voteable_mongo/railties/database.rake'
       end
 
     end

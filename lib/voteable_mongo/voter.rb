@@ -1,4 +1,4 @@
-module Mongoid
+module Mongo
   module Voter
     extend ActiveSupport::Concern
 

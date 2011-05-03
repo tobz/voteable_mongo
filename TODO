@@ -1,2 +1,3 @@
-* Option hash validations
+* Add support for mongo_mapper
+* Add options hash validations
 * Refactor specs

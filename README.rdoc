@@ -1,14 +1,14 @@
-= Voteable Mongoid
+= Voteable Mongo
 
-Voteable Mongoid allows you to make your Mongoid::Document objects voteable (up or down) and tabulate votes count and votes point for you. For instance, in a forum, a user can vote up (or down) on a post or a comment.
+voteable_mongo allows you to make your Mongoid::Document (mongo_mapper support coming soon) objects voteable (up or down) and tabulate votes count and votes point for you. For instance, in a forum, a user can vote up (or down) on a post or a comment.
 
-Voteable Mongoid is built for speed. It uses only one database request per collection to validate data, update data, and get updated data. Initial idea is based on http://cookbook.mongodb.org/patterns/votes
+voteable_mongo is built for speed. It uses only one database request per collection to validate data, update data, and get updated data. Initial idea is based on http://cookbook.mongodb.org/patterns/votes
 
 Sample app at https://github.com/vinova/simple_qa
 
 Benchmarks at https://github.com/vinova/voteable_benchmarks
 
-=== Sites using voteable_mongoid
+=== Sites using voteable_mongo
 * http://www.amorveneris.com
 * http://zheye.org (https://github.com/huacnlee/quora)
 
@@ -18,7 +18,7 @@ Benchmarks at https://github.com/vinova/voteable_benchmarks
 
 To install the gem, add this to your Gemfile
 
-  gem 'voteable_mongoid'
+  gem 'voteable_mongo'
 
 After that, remember to run "bundle install"
 
@@ -30,7 +30,7 @@ post.rb
 
     class Post
       include Mongoid::Document
-      include Mongoid::Voteable
+      include Mongo::Voteable
 
       # set points for each vote
       voteable self, :up => +1, :down => -1
@@ -44,7 +44,7 @@ comment.rb
 
     class Comment
       include Mongoid::Document
-      include Mongoid::Voteable
+      include Mongo::Voteable
 
       belongs_to :post
 
@@ -58,7 +58,7 @@ user.rb
 
     class User
       include Mongoid::Document
-      include Mongoid::Voter
+      include Mongo::Voter
     end
 
 === Make a vote
@@ -135,19 +135,19 @@ In-case you need updated voteable object, add :return_votee => true
 Rails
     rake db:mongoid:voteable:remake_stats
 Ruby
-    Mongoid::Voteable::Tasks.remake_stats
+    Mongo::Voteable::Tasks.remake_stats
 
 === Set counters and point to 0 for uninitialized voteable objects in order sort and query
 Rails
     rake db:mongoid:voteable:init_stats
 Ruby
-    Mongoid::Voteable::Tasks::init_stats
+    Mongo::Voteable::Tasks::init_stats
 
 === Migrate from version < 0.7.0
 Rails
     rake db:mongoid:voteable:migrate_old_votes
 Ruby
-    Mongoid::Voteable::Tasks.migrate_old_votes
+    Mongo::Voteable::Tasks.migrate_old_votes
 
 == Credits
 * Alex Nguyen (alex@vinova.sg) - Author
