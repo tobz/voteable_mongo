@@ -7,7 +7,7 @@
   
 == 0.7.3
   * Add :return_votee => true option to vote function to warranty always return voteable object
-  * Add Votee.voted?, Votee.up_voted?, Voteee.down_voted?
+  * Add Votee.voted?, Votee.up_voted?, Votee.down_voted?
   * Update parent for ManyToMany relationship
   * Refactor
   
