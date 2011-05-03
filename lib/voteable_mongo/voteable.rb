@@ -5,14 +5,23 @@ module Mongo
   module Voteable
     extend ActiveSupport::Concern
 
+    DEFAULT_VOTES = {
+      'up' => [],
+      'down' => [],
+      'up_count' => 0,
+      'down_count' => 0,
+      'count' => 0,
+      'point' => 0
+    }
+
     included do
       include ::Mongo::Voteable::Voting
       
-      field :votes, :type => Votes
+      field :votes, :type => Hash
 
       before_create do
         # Init votes so that counters and point have numeric values (0)
-        self.votes = Votes::DEFAULT_ATTRIBUTES
+        self.votes = DEFAULT_VOTES
       end
       
       scope :voted_by, lambda { |voter|

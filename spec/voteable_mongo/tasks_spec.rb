@@ -8,8 +8,8 @@ describe Mongo::Voteable::Tasks do
     end
 
     it 'after create votes has default value' do
-      @post1.votes.should == Mongo::Voteable::Votes::DEFAULT_ATTRIBUTES
-      @post2.votes.should == Mongo::Voteable::Votes::DEFAULT_ATTRIBUTES
+      @post1.votes.should == ::Mongo::Voteable::DEFAULT_VOTES
+      @post2.votes.should == ::Mongo::Voteable::DEFAULT_VOTES
     end
     
     it 'reset votes data' do
@@ -26,8 +26,8 @@ describe Mongo::Voteable::Tasks do
       @post1.reload
       @post2.reload
     
-      @post1.votes.should == Mongo::Voteable::Votes::DEFAULT_ATTRIBUTES
-      @post2.votes.should == Mongo::Voteable::Votes::DEFAULT_ATTRIBUTES
+      @post1.votes.should == ::Mongo::Voteable::DEFAULT_VOTES
+      @post2.votes.should == ::Mongo::Voteable::DEFAULT_VOTES
     end
   end
 end

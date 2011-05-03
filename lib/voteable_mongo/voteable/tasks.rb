@@ -10,7 +10,7 @@ module Mongo
           klass_voteable = voteable[class_name]
           puts "Init stats for #{class_name}" if log
           klass.collection.update({:votes => nil}, {
-            '$set' => { :votes => Votes::DEFAULT_ATTRIBUTES }
+            '$set' => { :votes => DEFAULT_VOTES }
           }, {
             :safe => true,
             :multi => true
