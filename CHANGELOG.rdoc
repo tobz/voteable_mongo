@@ -1,3 +1,7 @@
+== 0.8.0
+  * Rename to voteable_mongo to support other MongoDB Object-Document Mappers like MongoMapper
+  * Minor fixes and refactoring
+  
 == 0.7.4
   * Add Votee#up_voters(VoterClass), Votee#down_voters(VoterClass), Votee#voters(VoterClass)
   * Add Voter scopes: Voter.up_voted_for(votee), Voter.down_voted_for(votee), Voter.voted_for(votee)

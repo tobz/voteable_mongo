@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.email       = ['alex@vinova.sg']
   s.homepage    = 'https://github.com/vinova/voteable_mongo'
   s.summary     = %q{Add Up / Down Voting for Mongoid}
-  s.description = %q{Add Up / Down Voting for Mongoid (built for speed by using one Mongodb update-in-place for each collection when provided enough information)}
+  s.description = %q{Up / Down Voting for Mongoid (MongoMapper support coming soon). Built for speed by using only one database request per collection to validate data, update data, and get updated data.}
 
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'mongoid', '~> 2.0.0'

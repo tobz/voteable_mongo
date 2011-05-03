@@ -18,6 +18,7 @@ Benchmarks at https://github.com/vinova/voteable_benchmarks
 
 To install the gem, add this to your Gemfile
 
+  gem 'mongoid'
   gem 'voteable_mongo'
 
 After that, remember to run "bundle install"
