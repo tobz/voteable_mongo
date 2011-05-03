@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.email       = ["alex@vinova.sg"]
   s.homepage    = "https://github.com/vinova/voteable_mongoid"
   s.summary     = %q{Add Up / Down Voting for Mongoid}
-  s.description = %q{Add Up / Down Voting for Mongoid (built for speed by using one Mongodb update-in-place for each collection when provided enough information)}
+  s.description = %q{Renamed to voteable_mongo to support both Mongoid and MongoMapper.}
 
   s.add_dependency 'mongoid', '~> 2.0.0'
   
