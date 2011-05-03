@@ -11,6 +11,7 @@ $LOAD_PATH.unshift(MODELS)
 
 
 require 'mongoid'
+require 'mongo_mapper'
 require 'voteable_mongo'
 require 'rspec'
 require 'rspec/autorun'
