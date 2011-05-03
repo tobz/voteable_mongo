@@ -89,9 +89,8 @@ Re-vote
 
 Un-vote
     Post.vote(:voter_id => user_id, :votee_id => post_id, :value => :up, :unvote => true)
-    
-In-case you need updated voteable object, add :return_votee => true
-    votee = Post.vote(:voter_id => user_id, :votee_id => post_id, :value => :up, :return_votee => true)
+
+Note: vote function always return updated votee object
 
 === Get vote_value
     

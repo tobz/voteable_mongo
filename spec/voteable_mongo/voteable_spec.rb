@@ -2,42 +2,42 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe Mongo::Voteable do
   
-  context 'when :index is passed as an argument' do
-    before do
-      Post.collection.drop_indexes
-      Category.collection.drop_indexes
-    end
-
-    it 'defines indexes' do
-      [Post, Category].each do |klass|
-        klass.create_indexes
-        [ 'votes.up_1__id_1',
-          'votes.down_1__id_1'
-        ].each { |index_key|
-          klass.collection.index_information.should have_key index_key
-          klass.collection.index_information[index_key]['unique'].should be_true
-        }
-
-        [ 'votes.count_-1',
-          'votes.up_count_-1',
-          'votes.down_count_-1',
-          'votes.point_-1'
-        ].each { |index_key|
-          klass.collection.index_information.should have_key index_key
-        }
-      end
-    end
-  end
+  # context 'when :index is passed as an argument' do
+  #   before do
+  #     Post.collection.drop_indexes
+  #     Category.collection.drop_indexes
+  #   end
+  # 
+  #   it 'defines indexes' do
+  #     [Post, Category].each do |klass|
+  #       klass.create_indexes
+  #       [ 'votes.up_1__id_1',
+  #         'votes.down_1__id_1'
+  #       ].each { |index_key|
+  #         klass.collection.index_information.should have_key index_key
+  #         klass.collection.index_information[index_key]['unique'].should be_true
+  #       }
+  # 
+  #       [ 'votes.count_-1',
+  #         'votes.up_count_-1',
+  #         'votes.down_count_-1',
+  #         'votes.point_-1'
+  #       ].each { |index_key|
+  #         klass.collection.index_information.should have_key index_key
+  #       }
+  #     end
+  #   end
+  # end
   
   before :all do
     @category1 = Category.create!(:name => 'xyz')
     @category2 = Category.create!(:name => 'abc')
     
-    @post1 = Post.create!
+    @post1 = Post.create!(:category_ids => [@category1.id, @category2.id])
     @post2 = Post.create!
     
-    @post1.categories << @category1
-    @category2.posts << @post1
+    # @post1.categories << @category1
+    # @category2.posts << @post1
     
     @comment = @post2.comments.create!
     

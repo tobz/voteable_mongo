@@ -12,9 +12,8 @@ module Mongo
         #   - :value: :up or :down
         #   - :revote: if true change vote vote from :up to :down and vise versa
         #   - :unvote: if true undo the voting
-        #   - :return_votee: if true always return updated voteable object
         # 
-        # @return [votes, false, nil]
+        # @return [votee, false]
         def vote(options)
           validate_and_normalize_vote_options(options)
           options[:voteable] = VOTEABLE[name][name]
@@ -28,27 +27,21 @@ module Mongo
               new_vote_query_and_update(options)
             end
 
-            if options[:voteable][:update_parents] || options[:votee] || options[:return_votee]
-              # If votee exits or need to update parent
-              # use Collection#find_and_modify to retrieve updated votes data and parent_ids
-              begin
-                doc = collection.master.collection.find_and_modify(
-                  :query => query,
-                  :update => update,
-                  :new => true
-                )
-                # Update new votes data
-                options[:votee].write_attribute('votes', doc['votes']) if options[:votee]
-                update_parent_votes(doc, options) if options[:voteable][:update_parents]
-                return options[:votee] || new(doc)
-              rescue Exception => e
-                # $stderr.puts "Mongo error: #{e.inspect}" # DEBUG
-                # Don't update parents if operation fail or no matched object found
-                return false
-              end
+            # If votee exits or need to update parent
+            # use Collection#find_and_modify to retrieve updated votes data and parent_ids
+            doc = voteable_collection.find_and_modify(
+              :query => query,
+              :update => update,
+              :new => true
+            )
+
+            if doc
+              update_parent_votes(doc, options) if options[:voteable][:update_parents]
+              # Update new votes data
+              options[:votee].write_attribute('votes', doc['votes']) if options[:votee]
+              options[:votee] || new(doc)
             else
-              # Just update and don't care the result
-              collection.update(query, update)
+              false
             end
           end
         end
@@ -156,19 +149,17 @@ module Mongo
           def update_parent_votes(doc, options)
             VOTEABLE[name].each do |class_name, voteable|
               # For other class in VOTEABLE options, if has relationship with current class
-              relation_metadata = relations.find{ |x, r| r.class_name == class_name }.try(:last)
-              next unless relation_metadata.present?
-
+              metadata = relations.find{ |x, r| r.class_name == class_name }.try(:last)
+              next unless metadata.present?
               # If cannot find current votee foreign_key value for that class
-              foreign_key_value = doc[relation_metadata.foreign_key.to_s]
+              foreign_key_value = doc[voteable_foreign_key(metadata)]
               next unless foreign_key_value.present?
-
-              if relation_metadata.relation == ::Mongoid::Relations::Referenced::In
+              if voteable_belongs_to_relation?(metadata)
                 class_name.constantize.collection.update( 
                   { '_id' => foreign_key_value },
                   { '$inc' => parent_inc_options(voteable, options) }
                 )
-              elsif relation_metadata.relation == ::Mongoid::Relations::Referenced::ManyToMany
+              elsif voteable_belongs_to_many_relation?(metadata)
                 class_name.constantize.collection.update( 
                   { '_id' => { '$in' => foreign_key_value } },
                   { '$inc' => parent_inc_options(voteable, options) },

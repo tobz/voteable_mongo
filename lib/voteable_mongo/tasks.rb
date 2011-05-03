@@ -109,10 +109,10 @@ module Mongo
         VOTEABLE.each do |class_name, voteable|
           klass = class_name.constantize
           voteable.each do |parent_class_name, parent_voteable|
-            relation_metadata = klass.relations[parent_class_name.underscore]
-            if relation_metadata
+            metadata = klass.relations[parent_class_name.underscore]
+            if metadata
               parent_class = parent_class_name.constantize
-              foreign_key = relation_metadata.foreign_key
+              foreign_key = voteable_foreign_key(metadata)
               puts "Updating stats for #{class_name} > #{parent_class_name}" if log
               klass.all.each{ |doc|
                 update_parent_stats_for(doc, parent_class, foreign_key, parent_voteable)

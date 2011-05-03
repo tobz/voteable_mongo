@@ -6,7 +6,8 @@ Bundler.setup
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 
-MODELS = File.join(File.dirname(__FILE__), "models")
+# MODELS = File.join(File.dirname(__FILE__), 'mongoid/models')
+MODELS = File.join(File.dirname(__FILE__), 'mongo_mapper/models')
 $LOAD_PATH.unshift(MODELS)
 
 
@@ -18,13 +19,14 @@ require 'rspec/autorun'
 
 
 Mongoid.configure do |config|
-  name = "voteable_mongo_test"
-  host = "localhost"
+  name = 'voteable_mongo_test'
+  host = 'localhost'
   config.master = Mongo::Connection.new.db(name)
 end
 
+MongoMapper.database = 'voteable_mongo_test'
 
-Dir[ File.join(MODELS, "*.rb") ].sort.each { |file| require File.basename(file) }
+Dir[ File.join(MODELS, '*.rb') ].sort.each { |file| require File.basename(file) }
 
 User.collection.drop
 Post.collection.drop

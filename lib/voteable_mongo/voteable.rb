@@ -1,6 +1,4 @@
 require 'voteable_mongo/voting'
-require 'voteable_mongo/integrations/mongoid'
-require 'voteable_mongo/integrations/mongo_mapper'
 
 module Mongo
   module Voteable
@@ -17,8 +15,65 @@ module Mongo
 
     included do
       include ::Mongo::Voteable::Voting
-      include ::Mongo::Voteable::Integrations::Mongoid if defined?(Mongoid)
-      include ::Mongo::Voteable::Integrations::MongoMapper if defined?(MongoMapper)
+
+      if defined?(Mongoid) && defined?(field)
+        field :votes, :type => Hash, :default => DEFAULT_VOTES
+
+        class << self
+          alias_method :ensure_index, :index
+        end
+
+        def self.voteable_collection
+          collection.master.collection
+        end
+        
+        def self.voteable_foreign_key(metadata)
+          metadata.foreign_key.to_s
+        end
+
+        def self.voteable_belongs_to_relation?(metadata)
+          metadata.relation == ::Mongoid::Relations::Referenced::In
+        end
+
+        def self.voteable_belongs_to_many_relation?(metadata)
+          metadata.relation == ::Mongoid::Relations::Referenced::ManyToMany
+        end
+
+      elsif defined?(MongoMapper)
+        key :votes, Hash, :default => DEFAULT_VOTES
+
+        class << self
+          alias_method :voteable_collection, :collection
+          alias_method :relations, :associations
+        end
+
+        def self.voteable_foreign_key(metadata)
+          metadata.options[:in].to_s || "#{metadata.name}_id"
+        end
+        
+        def self.voteable_belongs_to_relation?(metadata)
+          metadata.is_a?(::MongoMapper::Plugins::Associations::BelongsToAssociation)
+        end
+
+        def self.voteable_belongs_to_many_relation?(metadata)
+          metadata.is_a?(::MongoMapper::Plugins::Associations::ManyAssociation)
+        end
+      end
+      
+      scope :voted_by, lambda { |voter|
+        voter_id = voter.is_a?(::BSON::ObjectId) ? voter : voter.id
+        where('$or' => [{ 'votes.up' => voter_id }, { 'votes.down' => voter_id }])
+      }
+
+      scope :up_voted_by, lambda { |voter|
+        voter_id = voter.is_a?(::BSON::ObjectId) ? voter : voter.id
+        where('votes.up' => voter_id)
+      }
+
+      scope :down_voted_by, lambda { |voter|
+        voter_id = voter.is_a?(::BSON::ObjectId) ? voter : voter.id
+        where('votes.down' => voter_id)
+      }
     end
 
     # How many points should be assigned for each up or down vote and other options
@@ -79,6 +134,25 @@ module Mongo
         validate_and_normalize_vote_options(options)
         down_voted_by(options[:voter_id]).where(:_id => options[:votee_id]).count == 1
       end
+
+      private
+        def create_voteable_indexes
+          class_eval do
+            # Compound index _id and voters.up, _id and voters.down
+            # to make up_voted_by, down_voted_by, voted_by scopes and voting faster
+            # Should run in background since it introduce new index value and
+            # while waiting to build, the system can use _id for voting
+            # http://www.mongodb.org/display/DOCS/Indexing+as+a+Background+Operation
+            ensure_index [['votes.up', 1], ['_id', 1]], :unique => true
+            ensure_index [['votes.down', 1], ['_id', 1]], :unique => true
+
+            # Index counters and point for desc ordering
+            ensure_index [['votes.up_count', -1]]
+            ensure_index [['votes.down_count', -1]]
+            ensure_index [['votes.count', -1]]
+            ensure_index [['votes.point', -1]]
+          end
+        end
     end
     
     module InstanceMethods
