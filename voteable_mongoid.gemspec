@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Alex Nguyen"]
   s.email       = ["alex@vinova.sg"]
-  s.homepage    = "https://github.com/vinova/voteable_mongoid"
+  s.homepage    = "https://github.com/vinova/voteable_mongo"
   s.summary     = %q{Add Up / Down Voting for Mongoid}
   s.description = %q{Renamed to voteable_mongo to support both Mongoid and MongoMapper.}
 
