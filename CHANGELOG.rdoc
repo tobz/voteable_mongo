@@ -1,3 +1,6 @@
+== 0.8.1
+  * Fix gem release bug
+  
 == 0.8.0
   * Rename to voteable_mongo to support other MongoDB Object-Document Mappers like MongoMapper
   * Minor fixes and refactoring
