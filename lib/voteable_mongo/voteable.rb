@@ -1,13 +1,12 @@
-require 'voteable_mongoid/voteable/votes'
-require 'voteable_mongoid/voteable/voting'
+require 'voteable_mongo/voteable/votes'
+require 'voteable_mongo/voteable/voting'
 
-module Mongoid
+module Mongo
   module Voteable
     extend ActiveSupport::Concern
 
     included do
-      include ::Mongoid::Document
-      include ::Mongoid::Voteable::Voting
+      include ::Mongo::Voteable::Voting
       
       field :votes, :type => Votes
 
@@ -99,16 +98,14 @@ module Mongoid
           # Should run in background since it introduce new index value and
           # while waiting to build, the system can use _id for voting
           # http://www.mongodb.org/display/DOCS/Indexing+as+a+Background+Operation
-          index [['votes.up', ::Mongo::ASCENDING], ['_id', ::Mongo::ASCENDING]],
-            :unique => true, :background => true
-          index [['votes.down', ::Mongo::ASCENDING], ['_id', ::Mongo::ASCENDING]],
-            :unique => true, :background => true
+          index [['votes.up', 1], ['_id', 1]], :unique => true
+          index [['votes.down', 1], ['_id', 1]], :unique => true
 
           # Index counters and point for desc ordering
-          index [['votes.up_count', ::Mongo::DESCENDING]]
-          index [['votes.down_count', ::Mongo::DESCENDING]]
-          index [['votes.count', ::Mongo::DESCENDING]]
-          index [['votes.point', ::Mongo::DESCENDING]]
+          index [['votes.up_count', -1]]
+          index [['votes.down_count', -1]]
+          index [['votes.count', -1]]
+          index [['votes.point', -1]]
         end
       end
     end

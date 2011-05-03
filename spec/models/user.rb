@@ -1,4 +1,4 @@
 class User
   include Mongoid::Document
-  include Mongoid::Voter
+  include Mongo::Voter
 end

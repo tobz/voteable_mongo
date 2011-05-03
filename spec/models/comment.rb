@@ -1,8 +1,8 @@
 require 'post'
 
 class Comment
-  include Mongoid::Voteable
   include Mongoid::Document
+  include Mongo::Voteable
 
   field :content
 

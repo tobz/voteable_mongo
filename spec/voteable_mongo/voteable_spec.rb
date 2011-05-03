@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-describe Mongoid::Voteable do
+describe Mongo::Voteable do
   
   context 'when :index is passed as an argument' do
     before do
@@ -16,7 +16,6 @@ describe Mongoid::Voteable do
         ].each { |index_key|
           klass.collection.index_information.should have_key index_key
           klass.collection.index_information[index_key]['unique'].should be_true
-          klass.collection.index_information[index_key]['background'].should be_true
         }
 
         [ 'votes.count_-1',
@@ -123,12 +122,15 @@ describe Mongoid::Voteable do
   end
   
   context 'user1 vote up post1 the first time' do
-    before :all do    
-      @return = @post1.vote(:voter_id => @user1.id, :value => :up, :return_votee => true)
+    before :all do
+      @post = @post1.vote(:voter_id => @user1.id, :value => :up, :return_votee => true)
     end
     
     it 'validates return post' do
-      @return.votes.should == {
+      @post.should be_is_a Post
+      @post.should_not be_new_record
+
+      @post.votes.should == {
         'up' => [@user1.id],
         'down' => [],
         'up_count' => 1,
@@ -136,9 +138,6 @@ describe Mongoid::Voteable do
         'count' => 1,
         'point' => 1
       }
-
-      @return.should_not be_new_record
-      @return.should be_is_a(Post)
     end
     
     it 'validates' do
@@ -235,7 +234,7 @@ describe Mongoid::Voteable do
   context 'user1 change vote on post1 from up to down' do
     before :all do
       Post.vote(:revote => true, :votee_id => @post1.id, :voter_id => @user1.id, :value => :down)
-      Mongoid::Voteable::Tasks.remake_stats
+      Mongo::Voteable::Tasks.remake_stats
       @post1.reload
     end
     
@@ -274,7 +273,7 @@ describe Mongoid::Voteable do
   context 'user1 change vote on post2 from down to up' do
     before :all do
       Post.vote(:revote => true, :votee_id => @post2.id.to_s, :voter_id => @user1.id.to_s, :value => :up)
-      Mongoid::Voteable::Tasks.remake_stats
+      Mongo::Voteable::Tasks.remake_stats
       @post2.reload
     end
     
@@ -350,7 +349,7 @@ describe Mongoid::Voteable do
   context "user1 unvote on post1" do
     before(:all) do
       @post1.vote(:voter_id => @user1.id, :votee_id => @post1.id, :unvote => true)
-      Mongoid::Voteable::Tasks.remake_stats
+      Mongo::Voteable::Tasks.remake_stats
       @post1.reload
     end
     
@@ -386,7 +385,7 @@ describe Mongoid::Voteable do
   context "user1 unvote on comment" do
     before(:all) do
       @user1.unvote(@comment)
-      Mongoid::Voteable::Tasks.remake_stats
+      Mongo::Voteable::Tasks.remake_stats
       @comment.reload
       @post2.reload
     end
@@ -406,7 +405,7 @@ describe Mongoid::Voteable do
   
   context 'final' do
     it "test remake stats" do
-      Mongoid::Voteable::Tasks.remake_stats
+      Mongo::Voteable::Tasks.remake_stats
 
       @post1.up_votes_count.should == 0
       @post1.down_votes_count.should == 1

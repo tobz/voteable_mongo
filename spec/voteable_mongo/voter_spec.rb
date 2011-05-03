@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-describe Mongoid::Voter do
+describe Mongo::Voter do
   before :all do
     @post1 = Post.create!
     @post2 = Post.create!

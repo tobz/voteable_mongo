@@ -1,6 +1,6 @@
 class Category
   include Mongoid::Document
-  include Mongoid::Voteable
+  include Mongo::Voteable
 
   field :name  
 
