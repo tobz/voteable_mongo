@@ -1,3 +1,6 @@
+== 0.9.1
+  * Update gem description
+  
 == 0.9.0
   * Add MongoMapper support
   * Simplify voting algorithm
