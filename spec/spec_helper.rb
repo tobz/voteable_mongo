@@ -3,7 +3,8 @@ require 'bundler'
 Bundler.setup
 
 
-if false
+if rand > 0.6
+  puts 'Mongoid'
   require 'mongoid'
   models_folder = File.join(File.dirname(__FILE__), 'mongoid/models')
   Mongoid.configure do |config|
@@ -13,6 +14,7 @@ if false
     config.autocreate_indexes = true
   end
 else
+  puts 'MongoMapper'
   require 'mongo_mapper'
   models_folder = File.join(File.dirname(__FILE__), 'mongo_mapper/models')
   MongoMapper.database = 'voteable_mongo_test'
