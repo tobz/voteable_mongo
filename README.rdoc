@@ -195,7 +195,7 @@ Rails
 Ruby
     Mongo::Voteable::Tasks::init_stats
 
-=== Migrate from version < 0.7.0
+=== Migrate from voteable_mongoid version < 0.7.0
 Rails
     rake mongo:voteable:migrate_old_votes
 Ruby
