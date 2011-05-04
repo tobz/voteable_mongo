@@ -6,7 +6,8 @@ Initial idea based on http://cookbook.mongodb.org/patterns/votes
 
 Sample app at https://github.com/vinova/simple_qa
 
-Wonder how fast voteable_mongo is compare to other SQL & MongoDB solutions? Visit benchmarks at https://github.com/vinova/voteable_benchmarks
+Wonder how fast voteable_mongo is compare to other SQL & MongoDB solutions?
+Visit benchmarks at https://github.com/vinova/voteable_benchmarks
 
 == Why voteable_mongo?
 
