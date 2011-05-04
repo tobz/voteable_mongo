@@ -1,8 +1,3 @@
-* Use mongo_ruby_driver as much as possible
-* Move mongoid dependency to a separate module
-* Learn from other gems how they manage and support multiple adaptors
-  - https://github.com/pluginaweek/state_machine/tree/master/lib/state_machine/integrations
-  - https://github.com/ianwhite/orm_adapter
-* Add support for mongo_mapper
 * Add options hash validations
 * Refactor specs
+* More test cases for Tasks module
