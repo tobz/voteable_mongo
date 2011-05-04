@@ -54,9 +54,9 @@ describe Mongo::Voter do
       Post.down_voted_by(@user1).to_a.should be_empty
       Post.voted_by(@user2).to_a.should be_empty
       
-      User.up_voted_for(@post1).should == [ @user1 ]
-      User.down_voted_for(@post1).should be_empty
-      User.voted_for(@post1).should == [ @user1 ]
+      User.up_voted_for(@post1).to_a.should == [ @user1 ]
+      User.down_voted_for(@post1).to_a.should be_empty
+      User.voted_for(@post1).to_a.should == [ @user1 ]
     end
     
     it 'user1 vote post1 has no effect' do
@@ -88,9 +88,9 @@ describe Mongo::Voter do
       Post.up_voted_by(@user2).to_a.should be_empty
       Post.down_voted_by(@user2).to_a.should == [ @post1 ]
 
-      User.up_voted_for(@post1).should == [ @user1 ]
-      User.down_voted_for(@post1).should == [ @user2 ]
-      User.voted_for(@post1).should == [ @user1, @user2 ]
+      User.up_voted_for(@post1).to_a.should == [ @user1 ]
+      User.down_voted_for(@post1).to_a.should == [ @user2 ]
+      User.voted_for(@post1).to_a.should == [ @user1, @user2 ]
     end
   end
   
@@ -142,7 +142,9 @@ describe Mongo::Voter do
       @user1.vote_value(@post2).should == :up
       @user2.vote_value(@post2).should be_nil
 
-      Post.voted_by(@user1).sort.should == [ @post1, @post2 ].sort
+      Post.voted_by(@user1).size.should == 2
+      Post.voted_by(@user1).should be_include @post1
+      Post.voted_by(@user1).should be_include @post2
     end
   end  
 end

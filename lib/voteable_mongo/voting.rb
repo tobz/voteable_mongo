@@ -148,23 +148,15 @@ module Mongo
 
           def update_parent_votes(doc, options)
             VOTEABLE[name].each do |class_name, voteable|
-              # For other class in VOTEABLE options, if has relationship with current class
-              metadata = relations.find{ |x, r| r.class_name == class_name }.try(:last)
-              next unless metadata.present?
-              # If cannot find current votee foreign_key value for that class
-              foreign_key_value = doc[voteable_foreign_key(metadata)]
-              next unless foreign_key_value.present?
-              if voteable_belongs_to_relation?(metadata)
-                class_name.constantize.collection.update( 
-                  { '_id' => foreign_key_value },
-                  { '$inc' => parent_inc_options(voteable, options) }
-                )
-              elsif voteable_belongs_to_many_relation?(metadata)
-                class_name.constantize.collection.update( 
-                  { '_id' => { '$in' => foreign_key_value } },
-                  { '$inc' => parent_inc_options(voteable, options) },
-                  { :multi => true }
-                )
+              if metadata = voteable_relation(class_name)
+                if parent_id = doc[voteable_foreign_key(metadata)]
+                  parent_ids = parent_id.is_a?(Array) ? parent_id : [ parent_id ]
+                  class_name.constantize.collection.update( 
+                    { '_id' => { '$in' => parent_ids } },
+                    { '$inc' => parent_inc_options(voteable, options) },
+                    { :multi => true }
+                  )
+                end
               end
             end
           end

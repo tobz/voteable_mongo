@@ -2,32 +2,34 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe Mongo::Voteable do
   
-  # context 'when :index is passed as an argument' do
-  #   before do
-  #     Post.collection.drop_indexes
-  #     Category.collection.drop_indexes
-  #   end
-  # 
-  #   it 'defines indexes' do
-  #     [Post, Category].each do |klass|
-  #       klass.create_indexes
-  #       [ 'votes.up_1__id_1',
-  #         'votes.down_1__id_1'
-  #       ].each { |index_key|
-  #         klass.collection.index_information.should have_key index_key
-  #         klass.collection.index_information[index_key]['unique'].should be_true
-  #       }
-  # 
-  #       [ 'votes.count_-1',
-  #         'votes.up_count_-1',
-  #         'votes.down_count_-1',
-  #         'votes.point_-1'
-  #       ].each { |index_key|
-  #         klass.collection.index_information.should have_key index_key
-  #       }
-  #     end
-  #   end
-  # end
+  context 'when :index is passed as an argument' do
+    before do
+      Post.collection.drop_indexes
+      Category.collection.drop_indexes
+      
+      Post.create_voteable_indexes
+      Category.create_voteable_indexes
+    end
+  
+    it 'defines indexes' do
+      [Post, Category].each do |klass|
+        [ 'votes.up_1__id_1',
+          'votes.down_1__id_1'
+        ].each { |index_key|
+          klass.collection.index_information.should have_key index_key
+          klass.collection.index_information[index_key]['unique'].should be_true
+        }
+  
+        [ 'votes.count_-1',
+          'votes.up_count_-1',
+          'votes.down_count_-1',
+          'votes.point_-1'
+        ].each { |index_key|
+          klass.collection.index_information.should have_key index_key
+        }
+      end
+    end
+  end
   
   before :all do
     @category1 = Category.create!(:name => 'xyz')
@@ -35,10 +37,7 @@ describe Mongo::Voteable do
     
     @post1 = Post.create!(:category_ids => [@category1.id, @category2.id])
     @post2 = Post.create!
-    
-    # @post1.categories << @category1
-    # @category2.posts << @post1
-    
+        
     @comment = @post2.comments.create!
     
     @user1 = User.create!
@@ -151,8 +150,8 @@ describe Mongo::Voteable do
       @post1.vote_value(@user2.id).should be_nil
       @post1.should_not be_voted_by(@user2.id)
 
-      @post1.up_voters(User).should == [ @user1 ]
-      @post1.voters(User).should == [ @user1 ]
+      @post1.up_voters(User).to_a.should == [ @user1 ]
+      @post1.voters(User).to_a.should == [ @user1 ]
       @post1.down_voters(User).should be_empty
 
       Post.voted_by(@user1).to_a.should == [ @post1 ]
@@ -206,9 +205,9 @@ describe Mongo::Voteable do
     end
     
     it 'post1 get voters' do
-      @post1.up_voters(User).should == [ @user1 ]
-      @post1.down_voters(User).should == [ @user2 ]
-      @post1.voters(User).should == [ @user1, @user2 ]
+      @post1.up_voters(User).to_a.should == [ @user1 ]
+      @post1.down_voters(User).to_a.should == [ @user2 ]
+      @post1.voters(User).to_a.should == [ @user1, @user2 ]
     end
     
     it 'posts voted_by user1, user2 is post1 only' do
@@ -286,7 +285,9 @@ describe Mongo::Voteable do
       @post2.vote_value(@user1.id).should == :up
       @post2.vote_value(@user2.id).should be_nil
 
-      Post.voted_by(@user1).sort.should == [ @post1, @post2 ].sort
+      Post.voted_by(@user1).size.should == 2
+      Post.voted_by(@user1).should be_include @post1
+      Post.voted_by(@user1).should be_include @post2
     end
   end
   

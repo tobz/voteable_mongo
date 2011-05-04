@@ -68,12 +68,6 @@ module Mongo
               'votes_count' => true,
               'votes_point' => true,
               'voteable' => true
-              # 'votes.u' => true,
-              # 'votes.d' => true,
-              # 'votes.uc' => true,
-              # 'votes.dc' => true,
-              # 'votes.c' => true,
-              # 'votes.p' => true
             }
           }, { :safe => true })
         end
@@ -95,12 +89,15 @@ module Mongo
       def self.remake_stats_for(doc, voteable)
         up_count = doc.up_voter_ids.length
         down_count = doc.down_voter_ids.length
-    
         doc.update_attributes(
-          'votes.up_count' => up_count,
-          'votes.down_count' => down_count,
-          'votes.count' => up_count + down_count,
-          'votes.point' => voteable[:up].to_i*up_count + voteable[:down].to_i*down_count
+          'votes' => {
+            'up' => doc.up_voter_ids,
+            'down' => doc.down_voter_ids,
+            'up_count' => up_count,
+            'down_count' => down_count,
+            'count' => up_count + down_count,
+            'point' => voteable[:up].to_i*up_count + voteable[:down].to_i*down_count
+          }
         )
       end
 
@@ -109,10 +106,10 @@ module Mongo
         VOTEABLE.each do |class_name, voteable|
           klass = class_name.constantize
           voteable.each do |parent_class_name, parent_voteable|
-            metadata = klass.relations[parent_class_name.underscore]
+            metadata = klass.voteable_relation(parent_class_name)
             if metadata
               parent_class = parent_class_name.constantize
-              foreign_key = voteable_foreign_key(metadata)
+              foreign_key = klass.voteable_foreign_key(metadata)
               puts "Updating stats for #{class_name} > #{parent_class_name}" if log
               klass.all.each{ |doc|
                 update_parent_stats_for(doc, parent_class, foreign_key, parent_voteable)
@@ -142,9 +139,11 @@ module Mongo
               'votes.down_count' => down_count
             )
           end
-      
+
+          parent_ids = parent_id.is_a?(Array) ? parent_id : [ parent_id ]
+          
           parent_class.collection.update(
-            { '_id' => parent_id }, 
+            { '_id' => { '$in' => parent_ids } }, 
             { '$inc' =>  inc_options },
             { :safe => true }
           )

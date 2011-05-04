@@ -1,4 +1,4 @@
-require 'post'
+require File.join(File.dirname(__FILE__), 'post')
 
 class Comment
   include MongoMapper::Document

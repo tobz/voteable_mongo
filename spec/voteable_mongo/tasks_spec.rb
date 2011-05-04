@@ -21,11 +21,12 @@ describe Mongo::Voteable::Tasks do
     end
     
     it 'init_stats recover votes default value' do
-      Mongo::Voteable::Tasks.init_stats
+      ::Mongo::Voteable::Tasks.init_stats
+      ::Mongo::Voteable::Tasks.migrate_old_votes
 
       @post1.reload
       @post2.reload
-    
+
       @post1.votes.should == ::Mongo::Voteable::DEFAULT_VOTES
       @post2.votes.should == ::Mongo::Voteable::DEFAULT_VOTES
     end

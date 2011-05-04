@@ -1,3 +1,5 @@
+require File.join(File.dirname(__FILE__), 'category')
+
 class Post
   include MongoMapper::Document
   include Mongo::Voteable

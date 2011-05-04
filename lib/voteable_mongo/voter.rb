@@ -3,8 +3,6 @@ module Mongo
     extend ActiveSupport::Concern
 
     included do
-      include ::Mongoid::Document
-
       scope :up_voted_for, lambda { |votee| where(:_id => { '$in' =>  votee.up_voter_ids }) }
       scope :down_voted_for, lambda { |votee| where(:_id => { '$in' =>  votee.down_voter_ids }) }
       scope :voted_for, lambda { |votee| where(:_id => { '$in' =>  votee.voter_ids }) }
@@ -41,7 +39,7 @@ module Mongo
         votee = unless options.is_a?(Hash)
           options
         else
-          options[:votee] || options[:votee_type].classify.constantize.only(:votes).where(
+          options[:votee] || options[:votee_type].classify.constantize.where(
             :_id => options[:votee_id]
           ).first
         end
