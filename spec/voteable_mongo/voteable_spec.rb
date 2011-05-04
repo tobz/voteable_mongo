@@ -122,7 +122,7 @@ describe Mongo::Voteable do
   
   context 'user1 vote up post1 the first time' do
     before :all do
-      @post = @post1.vote(:voter_id => @user1.id, :value => :up, :return_votee => true)
+      @post = @post1.vote(:voter_id => @user1.id, :value => :up)
     end
     
     it 'validates return post' do

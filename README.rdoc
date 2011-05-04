@@ -1,6 +1,6 @@
 = Voteable Mongo
 
-voteable_mongo allows you to make your Mongoid::Document (mongo_mapper support coming soon) objects voteable (up or down) and tabulate votes count and votes point for you. For instance, in a forum, a user can vote up (or down) on a post or a comment.
+voteable_mongo allows you to make your Mongoid::Document or MongoMapper::Document objects voteable (up or down) and tabulate votes count and votes point for you. For instance, in a forum, a user can vote up (or down) on a post or a comment.
 
 voteable_mongo is built for speed. It uses only one database request per collection to validate data, update data, and get updated data. Initial idea is based on http://cookbook.mongodb.org/patterns/votes
 
@@ -27,6 +27,7 @@ After that, remember to run "bundle install"
 
 === Make Post and Comment voteable, User become the voter
 
+== Mongoid
 post.rb
 
     class Post
@@ -61,6 +62,42 @@ user.rb
       include Mongoid::Document
       include Mongo::Voter
     end
+
+
+== MongoMapper
+post.rb
+
+    class Post
+      include MongoMapper::Document
+      include Mongo::Voteable
+
+      # set points for each vote
+      voteable self, :up => +1, :down => -1
+
+      many :comments
+    end
+
+comment.rb
+
+    require 'post'
+
+    class Comment
+      include MongoMapper::Document
+      include Mongo::Voteable
+
+      belongs_to :post
+
+      voteable self, :up => +1, :down => -3
+      voteable Post, :up => +2, :down => -1
+    end
+
+user.rb
+
+    class User
+      include MongoMapper::Document
+      include Mongo::Voter
+    end
+
 
 === Make a vote
 
