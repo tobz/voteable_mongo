@@ -19,7 +19,7 @@ There are various solution for up / down voting problem (see list below)
 
 Most of them using additional votes table (SQL) or votes collection (MongoDB) to store votes and do data tabulation on that votes table or votes collection.
 
-voteable_mongo is different. It can do much more with just ONE request to MongoDB database. It takes advantage of document-oriented database to store all related votes data inside voteable document do you don't have to maintain additional collection. When do vote up, vote down, revote, unvote, voteable_mongo validates vote data, updates voteable document data and retrieves updated data using only ONE database request (thanks to atomic find_and_modify operation). When voteable document is loaded, all votes data related to it also be loaded, no more additional database requests to see how many votes this document got?, who give up votes? who give down vote? total vote points, votes count ...
+voteable_mongo is different. It can do much more with a single request to MongoDB database. It takes advantage of document-oriented database to store all related votes data inside voteable document do you don't have to maintain additional collection. When do vote up, vote down, revote, unvote, voteable_mongo validates vote data, updates voteable document data and retrieves updated data using only ONE database request (thanks to atomic find_and_modify operation). When voteable document is loaded, all votes data related to it also be loaded, no more additional database requests to see how many votes this document got?, who give up votes? who give down vote? total vote points, votes count ...
 
 So use voteable_mongo and save your database requests for other other tasks.
 
