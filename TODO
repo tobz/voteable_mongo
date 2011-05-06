@@ -1,3 +1,9 @@
+* Add :foreign_key => ... option to update parents' votes
+  - Reduce time to check relationships and foreign keys
+  - More flexible
+  - Need to change votable interface?
+* Support http://mongomatic.com/
+* Support https://github.com/carlosparamio/mongo_odm
 * Add options hash validations
 * Refactor specs
 * More test cases for Tasks module
