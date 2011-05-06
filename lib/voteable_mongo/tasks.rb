@@ -145,7 +145,7 @@ module Mongo
           parent_class.collection.update(
             { '_id' => { '$in' => parent_ids } }, 
             { '$inc' =>  inc_options },
-            { :safe => true }
+            { :safe => true, :multi => true }
           )
         end
       end
