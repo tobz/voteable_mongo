@@ -4,7 +4,9 @@ module Rails #:nodoc:
 
       initializer "preload all application models" do |app|
         config.to_prepare do
-          ::Rails::Mongoid.load_models(app)
+          if defined?(Mongoid)
+            ::Rails::Mongoid.load_models(app)
+          end
         end
       end
 
