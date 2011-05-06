@@ -28,11 +28,15 @@ module Mongo
             end
 
             # http://www.mongodb.org/display/DOCS/findAndModify+Command
-            doc = voteable_collection.find_and_modify(
-              :query => query,
-              :update => update,
-              :new => true
-            )
+            begin
+              doc = voteable_collection.find_and_modify(
+                :query => query,
+                :update => update,
+                :new => true
+              )
+            rescue Mongo::OperationFailure
+              doc = nil
+            end  
 
             if doc
               update_parent_votes(doc, options) if options[:voteable][:update_parents]
