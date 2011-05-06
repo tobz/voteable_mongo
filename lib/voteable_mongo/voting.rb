@@ -27,8 +27,7 @@ module Mongo
               new_vote_query_and_update(options)
             end
 
-            # If votee exits or need to update parent
-            # use Collection#find_and_modify to retrieve updated votes data and parent_ids
+            # http://www.mongodb.org/display/DOCS/findAndModify+Command
             doc = voteable_collection.find_and_modify(
               :query => query,
               :update => update,
