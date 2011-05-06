@@ -203,7 +203,7 @@ Ruby
 
 == Credits
 * Alex Nguyen (alex@vinova.sg) - Author
-* Stefan Nguyen (stefan@vinova.sg) - Unvoting
+* https://github.com/vinova/voteable_mongo/contributors
 
 Copyright (c) 2010-2011 Vinova Pte Ltd (http://vinova.sg)
 
