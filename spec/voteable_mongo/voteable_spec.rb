@@ -45,7 +45,7 @@ describe Mongo::Voteable do
   end
   
   it "vote for unexisting post" do
-    @user1.vote(:votee_type => 'Post', :votee_id => BSON::ObjectId.new, :value => :up).should == false
+    @user1.vote(:votee_class => Post, :votee_id => BSON::ObjectId.new, :value => :up).should == false
   end
   
   context "just created" do

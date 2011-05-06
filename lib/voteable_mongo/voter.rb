@@ -23,7 +23,7 @@ module Mongo
             votee_class = votee.class
             votee_id = votee.id
           else
-            votee_class = options[:votee_type].classify.constantize
+            votee_class = options[:votee_class]
             votee_id = options[:votee_id]
           end
         end
@@ -39,9 +39,7 @@ module Mongo
         votee = unless options.is_a?(Hash)
           options
         else
-          options[:votee] || options[:votee_type].classify.constantize.where(
-            :_id => options[:votee_id]
-          ).first
+          options[:votee] || options[:votee_class].find(options[:votee_id])
         end
         votee.vote_value(_id)
       end
@@ -74,7 +72,7 @@ module Mongo
           options[:votee_id] = votee.id
           votee_class = votee.class
         else
-          votee_class = options[:votee_type].classify.constantize
+          votee_class = options[:votee_class]
         end
       
         if options[:value].nil?
@@ -87,7 +85,7 @@ module Mongo
         options[:voter] = self
         options[:voter_id] = id
 
-        ( votee || votee_class ).vote(options)
+        (votee || votee_class).vote(options)
       end
     end
     

@@ -123,7 +123,7 @@ Is equivalent to
     @post.vote(:voter => @user, :value => :up)
 
 In case you don't need to init voter and / or votee objects you can
-    @user.vote(:votee_type => 'Post', :votee_id => post_id, :value => :down)
+    @user.vote(:votee_class => Post, :votee_id => post_id, :value => :down)
     @post.vote(:voter_id => user_id, :value => :up)
     Post.vote(:voter_id => user_id, :votee_id => post_id, :value => :up)
 

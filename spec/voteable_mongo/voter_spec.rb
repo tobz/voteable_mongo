@@ -35,7 +35,7 @@ describe Mongo::Voter do
   
   context 'user1 vote up post1 the first time' do
     before :all do    
-      @user1.vote(:revote => '', :votee_id => @post1.id, :votee_type => 'Post', :value => :up)
+      @user1.vote(:revote => '', :votee_id => @post1.id, :votee_class => Post, :value => :up)
       @post1.reload
     end
     
@@ -44,10 +44,10 @@ describe Mongo::Voter do
       @post1.votes_point.should == 1
 
       @user1.vote_value(@post1).should == :up
-      @user2.vote_value(:votee_type => 'Post', :votee_id => @post1.id).should be_nil
+      @user2.vote_value(:votee_class => Post, :votee_id => @post1.id).should be_nil
       
       @user1.should be_voted(@post1)
-      @user2.should_not be_voted(:votee_type => 'Post', :votee_id => @post1.id)
+      @user2.should_not be_voted(:votee_class => Post, :votee_id => @post1.id)
       
       Post.voted_by(@user1).to_a.should == [ @post1 ]
       Post.up_voted_by(@user1).to_a.should == [ @post1 ]
