@@ -202,9 +202,9 @@ Ruby
     Mongo::Voteable::Tasks.migrate_old_votes
 
 == Credits
-* Alex Nguyen (alex@vinova.sg) - Author
+* Alex Nguyen - Author
 * https://github.com/vinova/voteable_mongo/contributors
 
-Copyright (c) 2010-2011 Vinova Pte Ltd (http://vinova.sg)
+Copyright (c) 2010-2011 Vinova Pte Ltd
 
 Licensed under the MIT license.
