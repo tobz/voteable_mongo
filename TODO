@@ -2,8 +2,10 @@
   - Reduce time to check relationships and foreign keys
   - More flexible
   - Need to change votable interface?
-* Support http://mongomatic.com/
-* Support https://github.com/carlosparamio/mongo_odm
+* Support https://github.com/benmyles/mongomatic &
+          https://github.com/carlosparamio/mongo_odm
+  - Don't have scope
+  - Don't have relationships
 * Add options hash validations
 * Refactor specs
 * More test cases for Tasks module
