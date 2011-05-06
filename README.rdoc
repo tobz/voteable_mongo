@@ -147,14 +147,14 @@ Note: vote function always return updated votee object
 === Get vote_value
     
     @user.vote_value(@post)
-    @user.vote_value(:class_type => 'Post', :votee_id => post_id)
+    @user.vote_value(:votee_class => Post, :votee_id => post_id)
     @post.vote_value(@user)
     @post.vote_value(user_id)
 
 === Check if voted?
 
     @user.voted?(@post)
-    @user.voted?(:class_type => 'Post', :votee_id => post_id)
+    @user.voted?(:votee_class => Post, :votee_id => post_id)
     @post.voted_by?(@user)
     @post.voted_by?(user_id)
 
