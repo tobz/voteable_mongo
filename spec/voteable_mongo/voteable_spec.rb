@@ -44,6 +44,10 @@ describe Mongo::Voteable do
     @user2 = User.create!
   end
   
+  it "vote for unexisting post" do
+    @user1.vote(:votee_type => 'Post', :votee_id => BSON::ObjectId.new, :value => :up).should == false
+  end
+  
   context "just created" do
     it 'votes_count, up_votes_count, down_votes_count, votes_point should be zero' do
       @category1.up_votes_count.should == 0
