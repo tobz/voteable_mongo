@@ -2,8 +2,8 @@ require 'rubygems'
 require 'bundler'
 Bundler.setup
 
-
-if rand > 0.6
+# TODO: Need better solution
+if rand > 0.5
   puts 'Mongoid'
   require 'mongoid'
   models_folder = File.join(File.dirname(__FILE__), 'mongoid/models')
