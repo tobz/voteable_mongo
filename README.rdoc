@@ -27,7 +27,7 @@ voteable_mongo is different. It can do much more with a single request to MongoD
 
 * When voteable document is loaded, all votes data related to it also be loaded, no more additional database requests to see how many votes this document got, who give up votes who give down vote, total vote points, votes count ...
 
-So use voteable_mongo for less maintain cost, data integrity and save your database requests for other other tasks.
+So use voteable_mongo for less maintain cost, data integrity and save database requests for other tasks.
 
 == Sites using voteable_mongo
 * http://www.amorveneris.com
