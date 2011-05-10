@@ -10,15 +10,17 @@ Visit benchmarks at https://github.com/vinova/voteable_benchmarks
 
 == Why voteable_mongo?
 
-There are various solutions for up / down voting problem (1[https://github.com/medihack/make_voteable], 2[https://github.com/brady8/thumbs_up], 3[https://github.com/icaruswings/mm-voteable], 4[https://github.com/jcoene/mongoid_voteable], ...) Most of them using additional votes table (SQL) or votes collection (MongoDB) to store votes and do data tabulation on that votes table or votes collection.
+There are various solutions for up / down voting problem (1[https://github.com/medihack/make_voteable], 2[https://github.com/brady8/thumbs_up], 3[https://github.com/icaruswings/mm-voteable], 4[https://github.com/jcoene/mongoid_voteable], ...). Most of them using additional votes table (SQL) or votes collection (MongoDB) to store votes and do data tabulation on that votes table or votes collection.
 
-voteable_mongo is different. It can do much more with a single request to MongoDB database. It takes advantage of document-oriented database to store all related votes data inside voteable document do you don't have to maintain additional collection. That has three advantages:
+voteable_mongo is different. It takes advantage of document-oriented database to store all related votes data inside voteable document. That has following benefits:
+
+* Don't have to maintain additional votes table or votes collection.
+
+* When voteable document is loaded, all votes data related to it also be loaded, no more additional database requests to see how many votes this document got, who give up votes who give down vote, total vote points, votes count ...
 
 * When vote up, vote down, revote, unvote, voteable_mongo validates vote data, updates voteable document and retrieves updated data using only ONE database request thanks to atomic findAndModify operation.
 
 * Atomic operations on single document warranty data integrity that makes sure if votes created / changed / deleted their associated counters and points will be updated.
-
-* When voteable document is loaded, all votes data related to it also be loaded, no more additional database requests to see how many votes this document got, who give up votes who give down vote, total vote points, votes count ...
 
 So use voteable_mongo for less maintain cost, data integrity and save database requests for other tasks.
 
