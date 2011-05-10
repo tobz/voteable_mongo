@@ -2,8 +2,9 @@
 
 voteable_mongo allows you to make your Mongoid::Document or MongoMapper::Document objects voteable and tabulate votes count and votes point for you. For instance, in a forum, a user can vote up (or down) on a post or a comment. It's optimized for speed by using only ONE database request per collection to validate, update, and retrieve updated data.
 
-Initial idea based on http://cookbook.mongodb.org/patterns/votes
-Sample app at https://github.com/vinova/simple_qa
+Initial idea based on http://cookbook.mongodb.org/patterns/votes.
+
+Sample app at https://github.com/vinova/simple_qa.
 
 Wonder how fast voteable_mongo is compare to other SQL & MongoDB solutions?
 Visit benchmarks at https://github.com/vinova/voteable_benchmarks
