@@ -11,11 +11,7 @@ Visit benchmarks at https://github.com/vinova/voteable_benchmarks
 
 == Why voteable_mongo?
 
-There are various solution for up / down voting problem:
-* https://github.com/medihack/make_voteable
-* https://github.com/brady8/thumbs_up
-* https://github.com/icaruswings/mm-voteable
-* https://github.com/jcoene/mongoid_voteable
+There are various solutions for up / down voting problem (1[https://github.com/medihack/make_voteable], 2[https://github.com/brady8/thumbs_up], 3[https://github.com/icaruswings/mm-voteable], 4[https://github.com/jcoene/mongoid_voteable], ...)
 
 Most of them using additional votes table (SQL) or votes collection (MongoDB) to store votes and do data tabulation on that votes table or votes collection.
 
@@ -209,8 +205,8 @@ Ruby
     Mongo::Voteable::Tasks.migrate_old_votes
 
 == Credits
-* Alex Nguyen - Author
-* https://github.com/vinova/voteable_mongo/contributors
+* Alex Nguyen[http://twitter.com/tiendung] - Author
+* Contributors[https://github.com/vinova/voteable_mongo/contributors]
 
 Copyright (c) 2010-2011 Vinova Pte Ltd
 
