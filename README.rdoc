@@ -30,6 +30,7 @@ voteable_mongo is different. It can do much more with a single request to MongoD
 So use voteable_mongo for less maintain cost, data integrity and save database requests for other tasks.
 
 == Sites using voteable_mongo
+* http://www.naiku.net
 * http://www.amorveneris.com
 * http://zheye.org (https://github.com/huacnlee/quora)
 
