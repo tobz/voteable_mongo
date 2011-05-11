@@ -25,14 +25,14 @@ voteable_mongo is different. It takes advantage of document-oriented database to
 
 So use voteable_mongo for less maintain cost, data integrity and save database requests for other tasks.
 
-== Sites using it
+== Sites using voteable_mongo
 * http://www.naiku.net
 * http://www.amorveneris.com
-* http://zheye.org (https://github.com/huacnlee/quora)
+* http://zheye.org
 
 == Installation
 
-=== Rails 3.0.x
+=== Rails 3.x
 
 To install the gem, add this to your Gemfile
 
@@ -186,17 +186,17 @@ Note: vote function always return updated votee object
 
 == Utilities
 
-=== Re-generate counters and vote points in case you change :up / :down vote points
-Rails
-    rake mongo:voteable:remake_stats
-Ruby
-    Mongo::Voteable::Tasks.remake_stats
-
 === Set counters and point to 0 for uninitialized voteable objects in order sort and query
 Rails
     rake mongo:voteable:init_stats
 Ruby
     Mongo::Voteable::Tasks::init_stats
+
+=== Re-generate counters and vote points in case you change :up / :down vote points
+Rails
+    rake mongo:voteable:remake_stats
+Ruby
+    Mongo::Voteable::Tasks.remake_stats
 
 === Migrate from voteable_mongoid version < 0.7.0
 Rails
