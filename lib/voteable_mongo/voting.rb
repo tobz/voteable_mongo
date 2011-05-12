@@ -53,8 +53,14 @@ module Mongo
         private
           def validate_and_normalize_vote_options(options)
             options.symbolize_keys!
-            options[:votee_id] = BSON::ObjectId(options[:votee_id]) if options[:votee_id].is_a?(String)
-            options[:voter_id] = BSON::ObjectId(options[:voter_id]) if options[:voter_id].is_a?(String)
+            if options[:votee_id].is_a?(String) && BSON::ObjectId.legal?(options[:votee_id])
+              options[:votee_id] = BSON::ObjectId(options[:votee_id])
+            end
+
+            if options[:voter_id].is_a?(String) && BSON::ObjectId.legal?(options[:voter_id])
+              options[:voter_id] = BSON::ObjectId(options[:voter_id])
+            end
+
             options[:value] &&= options[:value].to_sym
           end
         
