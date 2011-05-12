@@ -25,17 +25,17 @@ module Mongo
       end
       
       scope :voted_by, lambda { |voter|
-        voter_id = voter.respond_to?(:id) ? voter.id : voter
+        voter_id = Helpers.get_mongo_id(voter)
         where('$or' => [{ 'votes.up' => voter_id }, { 'votes.down' => voter_id }])
       }
 
       scope :up_voted_by, lambda { |voter|
-        voter_id = voter.respond_to?(:id) ? voter.id : voter
+        voter_id = Helpers.get_mongo_id(voter)
         where('votes.up' => voter_id)
       }
 
       scope :down_voted_by, lambda { |voter|
-        voter_id = voter.respond_to?(:id) ? voter.id : voter
+        voter_id = Helpers.get_mongo_id(voter)
         where('votes.down' => voter_id)
       }
     end
@@ -142,7 +142,7 @@ module Mongo
       #
       # @param voter is object or the id of the voter who made the vote
       def vote_value(voter)
-        voter_id = voter.respond_to?(:id) ? voter.id : voter
+        voter_id = Helpers.get_mongo_id(voter)
         return :up if up_voter_ids.include?(voter_id)
         return :down if down_voter_ids.include?(voter_id)
       end
