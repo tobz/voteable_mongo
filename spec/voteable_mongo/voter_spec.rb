@@ -2,8 +2,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe Mongo::Voter do
   before :all do
-    @post1 = Post.create!
-    @post2 = Post.create!
+    @post1 = Post.create!(:title => 'post_1')
+    @post2 = Post.create!(:title => 'post_2')
 
     @user1 = User.create!
     @user2 = User.create!

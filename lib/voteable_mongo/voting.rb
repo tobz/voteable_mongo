@@ -158,7 +158,7 @@ module Mongo
           def update_parent_votes(doc, options)
             VOTEABLE[name].each do |class_name, voteable|
               if metadata = voteable_relation(class_name)
-                if parent_id = doc[voteable_foreign_key(metadata)]
+                if (parent_id = doc[voteable_foreign_key(metadata)]).present?
                   parent_ids = parent_id.is_a?(Array) ? parent_id : [ parent_id ]
                   class_name.constantize.collection.update( 
                     { '_id' => { '$in' => parent_ids } },

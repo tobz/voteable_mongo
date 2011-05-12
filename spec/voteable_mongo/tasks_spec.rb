@@ -3,8 +3,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe Mongo::Voteable::Tasks do
   describe 'Mongo::Voteable::Tasks.init_stats' do
     before :all do
-      @post1 = Post.create!
-      @post2 = Post.create!
+      @post1 = Post.create!(:title => 'post1')
+      @post2 = Post.create!(:title => 'post2')
     end
 
     it 'after create votes has default value' do

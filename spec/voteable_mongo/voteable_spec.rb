@@ -35,9 +35,12 @@ describe Mongo::Voteable do
     @category1 = Category.create!(:name => 'xyz')
     @category2 = Category.create!(:name => 'abc')
     
-    @post1 = Post.create!(:category_ids => [@category1.id, @category2.id])
-    @post2 = Post.create!
-        
+    @post1 = Post.create!(:title => 'post1')
+    @post2 = Post.create!(:title => 'post2')
+
+    @post1.category_ids = [@category1.id, @category2.id]
+    @post1.save!
+
     @comment = @post2.comments.create!
     
     @user1 = User.create!
