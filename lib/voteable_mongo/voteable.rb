@@ -16,26 +16,26 @@ module Mongo
     }
 
     included do
-      include ::Mongo::Voteable::Voting
+      include Mongo::Voteable::Voting
 
       if defined?(Mongoid) && defined?(field)
-        include ::Mongo::Voteable::Integrations::Mongoid
+        include Mongo::Voteable::Integrations::Mongoid
       elsif defined?(MongoMapper)
-        include ::Mongo::Voteable::Integrations::MongoMapper
+        include Mongo::Voteable::Integrations::MongoMapper
       end
       
       scope :voted_by, lambda { |voter|
-        voter_id = voter.is_a?(::BSON::ObjectId) ? voter : voter.id
+        voter_id = voter.respond_to?(:id) ? voter.id : voter
         where('$or' => [{ 'votes.up' => voter_id }, { 'votes.down' => voter_id }])
       }
 
       scope :up_voted_by, lambda { |voter|
-        voter_id = voter.is_a?(::BSON::ObjectId) ? voter : voter.id
+        voter_id = voter.respond_to?(:id) ? voter.id : voter
         where('votes.up' => voter_id)
       }
 
       scope :down_voted_by, lambda { |voter|
-        voter_id = voter.is_a?(::BSON::ObjectId) ? voter : voter.id
+        voter_id = voter.respond_to?(:id) ? voter.id : voter
         where('votes.down' => voter_id)
       }
     end
@@ -140,9 +140,9 @@ module Mongo
     
       # Get a voted value on this votee
       #
-      # @param [Mongoid Object, BSON::ObjectId] voter is Mongoid object or the id of the voter who made the vote
+      # @param voter is object or the id of the voter who made the vote
       def vote_value(voter)
-        voter_id = voter.is_a?(BSON::ObjectId) ? voter : voter.id
+        voter_id = voter.respond_to?(:id) ? voter.id : voter
         return :up if up_voter_ids.include?(voter_id)
         return :down if down_voter_ids.include?(voter_id)
       end
