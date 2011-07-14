@@ -15,3 +15,8 @@
 * Refactor specs
 
 * More test cases for Tasks module
+
+----- angelim
+
+* Allow customizations of votes field name
+* Votes on embedded documents

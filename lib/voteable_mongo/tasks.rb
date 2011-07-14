@@ -50,12 +50,16 @@ module Mongo
 
           up_count = up_voter_ids.size
           down_count = down_voter_ids.size
+          faceless_up_count = votes['faceless_up_count']
+          faceless_down_count = votes['faceless_down_count']
 
           klass.collection.update({ :_id => doc.id }, {
             '$set' => {
                 'votes' => {
                   'up' => up_voter_ids,
                   'down' => down_voter_ids,
+                  'faceless_up_count' => faceless_up_count,
+                  'faceless_down_count' => faceless_down_count,
                   'up_count' => up_count,
                   'down_count' => down_count,
                   'count' => up_count + down_count,
@@ -89,11 +93,16 @@ module Mongo
       def self.remake_stats_for(doc, voteable)
         up_count = doc.up_voter_ids.length
         down_count = doc.down_voter_ids.length
+        faceless_up_count = doc.faceless_up_count
+        faceless_down_count = doc.faceless_down_count
+        
         doc.update_attributes(
           'votes' => {
             'up' => doc.up_voter_ids,
             'down' => doc.down_voter_ids,
             'up_count' => up_count,
+            'faceless_up_count' => faceless_up_count,
+            'faceless_down_count' => faceless_down_count,
             'down_count' => down_count,
             'count' => up_count + down_count,
             'point' => voteable[:up].to_i*up_count + voteable[:down].to_i*down_count
@@ -125,18 +134,22 @@ module Mongo
         if parent_id
           up_count = doc.up_voter_ids.length
           down_count = doc.down_voter_ids.length
+          faceless_up_count = doc.faceless_up_count
+          faceless_down_count = doc.faceless_down_count
       
           return if up_count == 0 && down_count == 0
 
           inc_options = {
-            'votes.point' => voteable[:up].to_i*up_count + voteable[:down].to_i*down_count
+            'votes.point' => voteable[:up].to_i*(up_count+faceless_up_count) + voteable[:down].to_i*(down_count+faceless_down_count)
           }
         
           unless voteable[:update_counters] == false
             inc_options.merge!(
               'votes.count' => up_count + down_count,
               'votes.up_count' => up_count,
-              'votes.down_count' => down_count
+              'votes.down_count' => down_count,
+              'votes.faceless_up_count' => faceless_up_count,
+              'votes.faceless_down_count' => faceless_down_count
             )
           end
 

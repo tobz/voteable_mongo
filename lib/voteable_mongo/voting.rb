@@ -17,39 +17,35 @@ module Mongo
         def vote(options)
           validate_and_normalize_vote_options(options)
           options[:voteable] = VOTEABLE[name][name]
-          
-          if options[:voteable]
-             query, update = if options[:revote]
-              revote_query_and_update(options)
-            elsif options[:unvote]
-              unvote_query_and_update(options)
-            else
-              new_vote_query_and_update(options)
-            end
+          return unless options[:voteable]
+          query, update = if options[:revote]
+            revote_query_and_update(options)
+          elsif options[:unvote]
+            unvote_query_and_update(options)
+          else
+            new_vote_query_and_update(options)
+          end
 
-            # http://www.mongodb.org/display/DOCS/findAndModify+Command
-            begin
-              doc = voteable_collection.find_and_modify(
-                :query => query,
-                :update => update,
-                :new => true
-              )
-            rescue Mongo::OperationFailure
-              doc = nil
-            end  
+          # http://www.mongodb.org/display/DOCS/findAndModify+Command
+          begin
+            doc = voteable_collection.find_and_modify(
+              :query => query,
+              :update => update,
+              :new => true
+            )
+          rescue Mongo::OperationFailure
+            doc = nil
+          end  
 
-            if doc
-              update_parent_votes(doc, options) if options[:voteable][:update_parents]
-              # Update new votes data
-              options[:votee].write_attribute('votes', doc['votes']) if options[:votee]
-              options[:votee] || new(doc)
-            else
-              false
-            end
+          if doc
+            update_parent_votes(doc, options) if options[:voteable][:update_parents]
+            # Update new votes data
+            options[:votee].try(:reload) || new(doc)
+          else
+            false
           end
         end
 
-        
         private
           def validate_and_normalize_vote_options(options)
             options.symbolize_keys!
@@ -60,12 +56,13 @@ module Mongo
         
           def new_vote_query_and_update(options)
             if options[:value] == :up
-              positive_voter_ids = 'votes.up'
-              positive_votes_count = 'votes.up_count'
+              vote_option_ids = 'votes.up'
+              vote_option_count = options[:voter_id].present? ? 'votes.up_count' : 'votes.faceless_up_count'
             else
-              positive_voter_ids = 'votes.down'
-              positive_votes_count = 'votes.down_count'
+              vote_option_ids = 'votes.down'
+              vote_option_count = options[:voter_id].present? ? 'votes.down_count' : 'votes.faceless_down_count'
             end
+            push_option = options[:voter_id].present? ? { '$push' => { vote_option_ids => options[:voter_id] } } : {}
 
             return {
               # Validate voter_id did not vote for votee_id yet
@@ -74,13 +71,12 @@ module Mongo
               'votes.down' => { '$ne' => options[:voter_id] }
             }, {
               # then update
-              '$push' => { positive_voter_ids => options[:voter_id] },
               '$inc' => {
                 'votes.count' => +1,
-                positive_votes_count => +1,
+                vote_option_count => +1,
                 'votes.point' => options[:voteable][options[:value]]
               }
-            }
+            }.merge!(push_option)
           end
 
           
@@ -150,6 +146,7 @@ module Mongo
           
 
           def update_parent_votes(doc, options)
+
             VOTEABLE[name].each do |class_name, voteable|
               if metadata = voteable_relation(class_name)
                 if (parent_id = doc[voteable_foreign_key(metadata)]).present?
@@ -199,9 +196,9 @@ module Mongo
               unless voteable[:update_counters] == false
                 inc_options['votes.count'] = +1
                 if options[:value] == :up
-                  inc_options['votes.up_count'] = +1
+                  options[:voter_id].present? ? inc_options['votes.up_count'] = +1 : inc_options['votes.faceless_up_count'] = +1
                 else
-                  inc_options['votes.down_count'] = +1
+                  options[:voter_id].present? ? inc_options['votes.down_count'] = +1 : inc_options['votes.faceless_down_count'] = +1
                 end
               end
             end

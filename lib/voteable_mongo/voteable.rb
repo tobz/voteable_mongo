@@ -9,6 +9,8 @@ module Mongo
     DEFAULT_VOTES = {
       'up' => [],
       'down' => [],
+      'faceless_up_count' => 0,
+      'faceless_down_count' => 0,
       'up_count' => 0,
       'down_count' => 0,
       'count' => 0,
@@ -127,7 +129,7 @@ module Mongo
       def vote(options)
         options[:votee_id] = id
         options[:votee] = self
-        options[:voter_id] ||= options[:voter].id
+        options[:voter_id] ||= options[:voter].try(:id)
 
         if options[:unvote]
           options[:value] ||= vote_value(options[:voter_id])
@@ -169,6 +171,14 @@ module Mongo
       # Get the number of up votes
       def up_votes_count
         votes.try(:[], 'up_count') || 0
+      end
+      
+      def faceless_up_count
+        votes.try(:[], 'faceless_up_count') || 0
+      end
+      
+      def faceless_down_count
+        votes.try(:[], 'faceless_down_count') || 0
       end
   
       # Get the number of down votes
