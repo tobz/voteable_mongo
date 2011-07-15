@@ -19,14 +19,13 @@ module Mongo
       end
       
       def self.reset_stats(klass, log = false)
-          puts "Init stats for #{class_name}" if log
-          klass.collection.update({}, {
-            '$set' => { :votes => DEFAULT_VOTES }
-          }, {
-            :safe => true,
-            :multi => true
-          })
-        end
+        puts "Init stats for #{class_name}" if log
+        klass.collection.update({}, {
+          '$set' => { :votes => DEFAULT_VOTES }
+        }, {
+          :safe => true,
+          :multi => true
+        })
       end
       
       # Re-generate vote counters and vote points
