@@ -171,6 +171,8 @@ describe Mongo::Voteable do
         @_post1.down_votes_count.should == 0
         @_post1.faceless_up_count.should == 1
         @_post1.faceless_down_count.should == 0
+        @_post1.total_up_count.should == 1
+        @_post1.total_down_count.should == 0
         @_post1.votes_count.should == 1
         @_post1.votes_point.should == 1
       end
@@ -185,6 +187,8 @@ describe Mongo::Voteable do
         @_category1.down_votes_count.should == 0
         @_category1.faceless_up_count.should == 0
         @_category1.faceless_down_count.should == 0
+        @_category1.total_up_count.should == 0
+        @_category1.total_down_count.should == 0
         @_category1.votes_count.should == 0
         @_category1.votes_point.should == 3
     
@@ -193,6 +197,8 @@ describe Mongo::Voteable do
         @_category2.down_votes_count.should == 0
         @_category2.faceless_up_count.should == 0
         @_category2.faceless_down_count.should == 0
+        @_category2.total_up_count.should == 0
+        @_category2.total_down_count.should == 0
         @_category2.votes_count.should == 0
         @_category2.votes_point.should == 3
       end

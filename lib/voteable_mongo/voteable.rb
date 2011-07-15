@@ -167,6 +167,14 @@ module Mongo
       def voter_ids
         up_voter_ids + down_voter_ids
       end
+      
+      def total_up_count
+        up_votes_count + faceless_up_count
+      end
+      
+      def total_down_count
+        down_votes_count + faceless_down_count
+      end
 
       # Get the number of up votes
       def up_votes_count
