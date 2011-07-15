@@ -2,23 +2,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe Mongo::Voteable, "Embedded Documents" do
 
-  # Helper Methods
-  
-  # Compare object stats with expectations in array
-  # 
-  #   up_votes_count, 
-  #   down_votes_count, 
-  #   faceless_up_count, 
-  #   faceless_down_count, 
-  #   votes_count, 
-  #   votes_point
-  # 
-  def stats_for(obj, expected)
-    obj.reload
-    stats = [obj.up_votes_count, obj.down_votes_count, obj.faceless_up_count, obj.faceless_down_count, obj.votes_count, obj.votes_point]
-    stats.should == expected
-  end
-  
   before :all do
     Mongoid.master.collections.select {|c| c.name !~ /system/ }.each(&:drop)
     @post1 = Post.create!(:title => 'post1')
@@ -69,16 +52,6 @@ describe Mongo::Voteable, "Embedded Documents" do
       stats_for(@image1, [0,0,0,0,0,0])
     end
   end
-  # [up,down,point]
-  # user1 vote up image1 the first time[1,0,1]
-  # user1 vote image1 has no effect[1,0,1]
-  # user2 vote down image1 the first time[1,1,0]
-  # user1 change vote on image1 from up to down[0,2,-2]
-  # user1 vote down image2 the first time
-  # user1 change vote on image2 from down to up
-  # user1 vote up image3 the first time'
-  # user1 revote image3 from up to down
-  # user1 unvote on image1[0,1,-1]
   
   # Last stats:
   #   @image1     [0,0,0,0,0,0]
@@ -218,7 +191,8 @@ describe Mongo::Voteable, "Embedded Documents" do
    #
    context 'user1 vote up post2 image3 the first time' do
      before :all do
-       @image3.vote(:voter_id => @user1.id, :value => :up)
+       # @image3.vote(:voter_id => @user1.id, :value => :up)
+       @user1.vote(@image3, :up)
      end
      it "image3 stats" do
        stats_for(@image3, [1,0,0,0,1,1])
@@ -253,7 +227,8 @@ describe Mongo::Voteable, "Embedded Documents" do
    #
    context "user1 unvote on image3" do
      before(:all) do
-       @image3.vote(:voter_id => @user1.id, :unvote => true)
+       # @image3.vote(:voter_id => @user1.id, :unvote => true)
+       @user1.unvote(:votee => @image3)
      end
 
      it "image3 stats" do      

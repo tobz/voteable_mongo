@@ -1,19 +1,22 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-describe "Anonymous support" do
+
+describe Mongo::Voteable, "Anonymous support" do
   before(:all) do
     Mongoid.master.collections.select {|c| c.name !~ /system/ }.each(&:drop)
     # for anonymous voting tests
-    @_category1 = Category.create!(:name => '123')
-    @_category2 = Category.create!(:name => '456')
-    @_post1 = Post.create!(:title => 'post11')
-    @_post2 = Post.create!(:title => 'post21')
-    @_post1.category_ids = [@_category1.id, @_category2.id]
-    @_post1.save!
-    @_comment = @_post2.comments.create!
+    @category1 = Category.create!(:name => '123')
+    @category2 = Category.create!(:name => '456')
+    @post1 = Post.create!(:title => 'post11')
+    @post2 = Post.create!(:title => 'post21')
+    @post1.category_ids = [@category1.id, @category2.id]
+    @post1.save!
+    @comment = @post2.comments.create!
+    @user1 = User.create
   end
+  
   context 'anonymous vote up post1 the first time' do
      before :all do
-       @post = @_post1.vote(:value => :up)
+       @post = @post1.vote(:value => :up)
      end
      it 'validates return post' do
        @post.should be_is_a Post
@@ -30,108 +33,106 @@ describe "Anonymous support" do
          'point' => 1
        }
      end
-     it 'validates post counters' do
-       @_post1.up_votes_count.should == 0
-       @_post1.down_votes_count.should == 0
-       @_post1.faceless_up_count.should == 1
-       @_post1.faceless_down_count.should == 0
-       @_post1.total_up_count.should == 1
-       @_post1.total_down_count.should == 0
-       @_post1.votes_count.should == 1
-       @_post1.votes_point.should == 1
+     it 'post1 stats' do
+       stats_for(@post1, [0,0,1,0,1,1])
      end
      it "validates voters stats" do
-       @_post1.up_voters(User).to_a.should be_empty
-       @_post1.voters(User).to_a.should be_empty
-       @_post1.down_voters(User).should be_empty
+       @post1.up_voters(User).to_a.should be_empty
+       @post1.voters(User).to_a.should be_empty
+       @post1.down_voters(User).should be_empty
      end
-     it "validates parents stats" do
-       @_category1.reload
-       @_category1.up_votes_count.should == 0
-       @_category1.down_votes_count.should == 0
-       @_category1.faceless_up_count.should == 0
-       @_category1.faceless_down_count.should == 0
-       @_category1.total_up_count.should == 0
-       @_category1.total_down_count.should == 0
-       @_category1.votes_count.should == 0
-       @_category1.votes_point.should == 3
-   
-       @_category2.reload
-       @_category2.up_votes_count.should == 0
-       @_category2.down_votes_count.should == 0
-       @_category2.faceless_up_count.should == 0
-       @_category2.faceless_down_count.should == 0
-       @_category2.total_up_count.should == 0
-       @_category2.total_down_count.should == 0
-       @_category2.votes_count.should == 0
-       @_category2.votes_point.should == 3
+     
+     it "category1 stats" do
+       stats_for(@category1, [0,0,0,0,0,3])
+     end
+     
+     it "category2 stats" do
+       stats_for(@category2, [0,0,0,0,0,3])
      end
    end
+   
+   # Last stats:
+   #   @post1      [0,0,1,0,1,1]
+   #   @category1  [0,0,0,0,0,3]
+   #   @category2  [0,0,0,0,0,3]
+   #
    context "anonymous votes down post1 the first time" do
      before :all do
-       Post.vote(:votee_id => @_post1.id, :value => :down)
-       @_post1.reload
+       Post.vote(:votee_id => @post1.id, :value => :down)
      end
-     it 'post1 up_votes_count is the same' do
-       @_post1.up_votes_count.should == 0
+     
+     it "post1 stats" do
+       stats_for(@post1, [0,0,1,1,2,0])
      end
-
-     it 'post1 faceless_up_count is the same' do
-       @_post1.faceless_up_count.should == 1
+     
+     it "category1 stats" do
+       stats_for(@category1, [0,0,0,0,0,-2])
      end
-
-     it 'down_votes_count, votes_count, and votes_point changed' do
-       @_post1.down_votes_count.should == 0
-       @_post1.faceless_down_count.should == 1
-       @_post1.votes_count.should == 2
-       @_post1.votes_point.should == 0
-     end
-
-     it 'post1 get voters' do
-       @_post1.up_voters(User).to_a.should be_empty
-       @_post1.down_voters(User).to_a.should be_empty
-       @_post1.voters(User).to_a.should be_empty
-     end
-
-     it 'categories votes' do
-       @_category1.reload
-       @_category1.up_votes_count.should == 0
-       @_category1.down_votes_count.should == 0
-       @_category1.faceless_up_count.should == 0
-       @_category1.faceless_down_count.should == 0
-       @_category1.votes_count.should == 0
-       @_category1.votes_point.should == -2
-
-       @_category2.reload
-       @_category2.up_votes_count.should == 0
-       @_category2.down_votes_count.should == 0
-       @_category2.faceless_up_count.should == 0
-       @_category2.faceless_down_count.should == 0
-       @_category2.votes_count.should == 0
-       @_category2.votes_point.should == -2
+     
+     it "category2 stats" do
+       stats_for(@category1, [0,0,0,0,0,-2])
      end
    end
-   context 'anonymous vote up post2 comment the first time' do
+   
+   # Last stats:
+   #   @post1      [0,0,1,1,2,0]
+   #   @category1  [0,0,0,0,0,-2]
+   #   @category2  [0,0,0,0,0,-2]
+   #
+   context "user1 votes down post1 the first time" do
      before :all do
-       @_comment.vote(:value => :up)
-       @_comment.reload
-       @_post2.reload
+       @user1.vote(@post1, :down)
      end
-
-     it 'validates' do
-       @_post2.up_votes_count.should == 0
-       @_post2.down_votes_count.should == 0
-       @_post2.faceless_up_count.should == 1
-       @_post2.faceless_down_count.should == 0
-       @_post2.votes_count.should == 1
-       @_post2.votes_point.should == 2
-
-       @_comment.up_votes_count.should == 0
-       @_comment.down_votes_count.should == 0
-       @_comment.faceless_up_count.should == 1
-       @_comment.faceless_down_count.should == 0
-       @_comment.votes_count.should == 1
-       @_comment.votes_point.should == 1
+     
+     it "post1 stats" do
+       stats_for(@post1, [0,1,1,1,3,-1])
+     end
+     
+     it "category1 stats" do
+       stats_for(@category1, [0,0,0,0,0,-7])
+     end
+     
+     it "category2 stats" do
+       stats_for(@category1, [0,0,0,0,0,-7])
+     end
+   end
+   # Last stats:
+   #   @post1      [0,1,1,1,3,-1]
+   #   @category1  [0,0,0,0,0,-7]
+   #   @category2  [0,0,0,0,0,-7]
+   #
+   context "user1 changes vote on post1 from down to up" do
+     before :all do
+       Post.vote(:votee_id => @post1.id, :voter_id => @user1.id, :value => :up, :revote => true)
+     end
+     
+     it "post1 stats" do
+       stats_for(@post1, [1,0,1,1,3,1])
+     end
+     
+     it "category1 stats" do
+       stats_for(@category1, [0,0,0,0,0,1])
+     end
+     
+     it "category2 stats" do
+       stats_for(@category1, [0,0,0,0,0,1])
+     end
+   end
+   
+   # Last stats:
+   #   @post2      [0,0,0,0,0,0]
+   #   @comment    [0,0,0,0,0,0]
+   #   @category2  [0,0,0,0,0,3]
+   #
+   context 'anonymous vote up for comment the first time' do
+     before :all do
+       @comment.vote(:value => :up)
+     end
+     its "post2 stats" do
+       stats_for(@post2, [0,0,1,0,1,2])
+     end
+     it "comment stats" do
+       stats_for(@comment, [0,0,1,0,1,1])
      end
    end
 end

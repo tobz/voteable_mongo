@@ -29,10 +29,14 @@ require 'voteable_mongo'
 require 'rspec'
 require 'rspec/autorun'
 
+Dir[ File.join(File.dirname(__FILE__),"support/**/*.rb")].each {|f| require f}
+
 Dir[ File.join(models_folder, '*.rb') ].each { |file|
   require file
   file_name = File.basename(file).sub('.rb', '')
   klass = file_name.classify.constantize
   klass.collection.drop
 }
-
+RSpec.configure do |config|
+  config.include Helpers
+end
