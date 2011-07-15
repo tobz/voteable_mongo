@@ -134,7 +134,7 @@ module Mongo
         if options[:unvote]
           options[:value] ||= vote_value(options[:voter_id])
         else
-          options[:revote] ||= vote_value(options[:voter_id]).present?
+          options[:revote] ||= options[:voter_id] && vote_value(options[:voter_id]).present?
         end
 
         self.class.vote(options)
