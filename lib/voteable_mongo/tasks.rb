@@ -19,7 +19,7 @@ module Mongo
       end
       
       def self.reset_stats(klass, log = false)
-        puts "Init stats for #{class_name}" if log
+        puts "Init stats for #{klass.name}" if log
         klass.collection.update({}, {
           '$set' => { :votes => DEFAULT_VOTES }
         }, {
