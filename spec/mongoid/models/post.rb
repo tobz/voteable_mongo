@@ -1,4 +1,5 @@
 require File.join(File.dirname(__FILE__), 'category')
+require File.join(File.dirname(__FILE__), '/embedded/image')
 
 class Post
   include Mongoid::Document
@@ -9,6 +10,8 @@ class Post
   
   has_and_belongs_to_many :categories
   has_many :comments
+  embeds_many :images
+  embeds_many :audios
   
   key :title
   

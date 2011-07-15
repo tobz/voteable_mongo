@@ -35,3 +35,4 @@ Dir[ File.join(models_folder, '*.rb') ].each { |file|
   klass = file_name.classify.constantize
   klass.collection.drop
 }
+

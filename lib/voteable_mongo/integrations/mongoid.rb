@@ -18,7 +18,15 @@ module Mongo
           end
 
           def voteable_collection
-            collection.master.collection
+            if self.embedded?
+              Post.collection.master.collection
+            else
+              collection.master.collection
+            end
+          end
+          
+          def evoteable_collection
+            Post.collection.master.collection
           end
 
           def voteable_foreign_key(metadata)

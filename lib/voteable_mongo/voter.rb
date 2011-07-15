@@ -30,6 +30,30 @@ module Mongo
       
         votee_class.voted?(:voter_id => id, :votee_id => votee_id)
       end
+      
+      def evoted?(options)
+        unless options.is_a?(Hash)
+          votee_class = options.class
+          votee_id = options.id
+        else
+          votee = options[:votee]
+          if votee
+            votee_class = votee.class
+            votee_id = votee.id
+          else
+            votee_class = options[:votee_class]
+            votee_id = options[:votee_id]
+          end
+        end
+        Post.collection.find(
+        "images" => {
+          '$elemMatch' => {
+            "_id" => options[:votee_id],
+            'votes.up' => { '$ne' => options[:voter_id] },
+            'votes.down' => { '$ne' => options[:voter_id] }
+          }
+        }).present?
+      end
 
       # Get the voted value on a votee
       #
@@ -56,6 +80,14 @@ module Mongo
         vote(options)
       end
 
+      def eunvote(options)
+        unless options.is_a?(Hash)
+          options = { :votee => options }
+        end
+        options[:unvote] = true
+        options[:revote] = false
+        evote(options)
+      end
       # Vote on a votee
       #
       # @param (see #voted?)
@@ -86,6 +118,34 @@ module Mongo
         options[:voter_id] = id
 
         (votee || votee_class).vote(options)
+      end
+      
+      def evote(options, value = nil)
+        if options.is_a?(Hash)
+          votee = options[:votee]
+        else
+          votee = options
+          options = { :votee => votee, :value => value }
+        end
+
+        if votee
+          options[:votee_id] = votee.id
+          votee_class = votee.class
+        else
+          votee_class = options[:votee_class]
+        end
+      
+        if options[:value].nil?
+          options[:unvote] = true
+          options[:value] = vote_value(options)
+        else
+          options[:revote] = options.has_key?(:revote) ? !options[:revote].blank? : evoted?(options)
+        end
+      
+        options[:voter] = self
+        options[:voter_id] = id
+
+        (votee || votee_class).evote(options)
       end
     end
     

@@ -26,6 +26,11 @@ module Mongo
         include Mongo::Voteable::Integrations::MongoMapper
       end
       
+      # 
+      # 
+      # No support for embedded documents
+      # 
+      # 
       scope :voted_by, lambda { |voter|
         voter_id = Helpers.get_mongo_id(voter)
         where('$or' => [{ 'votes.up' => voter_id }, { 'votes.down' => voter_id }])
@@ -119,6 +124,46 @@ module Mongo
     end
     
     module InstanceMethods
+      
+      # Provides reloading funcionality for embedded documents.
+      #  
+      # Embedded Documents are not true mongo collections, what 
+      # prevents them from reloading. This method evaluates whether
+      # this instance is embedded and reloads it through its parent.
+      # 
+      # Example:
+      #   Image embedded in Post
+      #   self.attributes = Post.find(post.id).images.find(id)
+      # 
+      def reload
+        if self.class.embedded?
+          self.attributes = parent_klass.find(eval("#{parent_name}.id")).
+                            send(inverse_relation).find(id).attributes
+        else
+          super
+        end
+      end
+      
+      # Finds mongoid embedded-in Relation
+      def relation
+        relations.find{|k,v| v.relation==Mongoid::Relations::Embedded::In }.try(:last)
+      end
+      
+      # "post"
+      def parent_name
+        relation.name.to_s
+      end
+      
+      # Post
+      def parent_klass
+        relation.class_name.constantize
+      end
+      
+      # "images"
+      def inverse_relation
+        relation.inverse_setter.delete("=")
+      end
+      
       # Make a vote on this votee
       #
       # @param [Hash] options a hash containings:
@@ -126,6 +171,7 @@ module Mongo
       #   - :value: vote :up or vote :down
       #   - :revote: change from vote up to vote down
       #   - :unvote: unvote the vote value (:up or :down)
+      # 
       def vote(options)
         options[:votee_id] = id
         options[:votee] = self
@@ -138,6 +184,26 @@ module Mongo
         end
 
         self.class.vote(options)
+      end
+      
+      def evote(options)
+        options[:votee_id] = id
+        options[:votee] = self
+        options[:voter_id] ||= options[:voter].try(:id)
+        
+        if self.class.embedded?
+          options[:embedded] = {}
+          options[:embedded][:relation] = inverse_relation
+          options[:embedded][:klass] = parent_klass
+        end
+        
+        if options[:unvote]
+          options[:value] ||= vote_value(options[:voter_id])
+        else
+          options[:revote] ||= options[:voter_id] && vote_value(options[:voter_id]).present?
+        end
+
+        self.class.evote(options)
       end
     
       # Get a voted value on this votee

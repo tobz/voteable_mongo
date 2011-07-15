@@ -33,6 +33,11 @@ module Mongo
         remake_stats_for_all_voteable_classes(log)
         update_parent_stats(log)
       end
+      
+      def self.eremake_stats(log = false)
+        eremake_stats_for_all_voteable_classes(log)
+        eupdate_parent_stats(log)
+      end
 
       # Convert votes from from version < 0.7.0 to new data store
       def self.migrate_old_votes(log = false)
@@ -91,6 +96,7 @@ module Mongo
       def self.remake_stats_for_all_voteable_classes(log)
         VOTEABLE.each do |class_name, voteable|
           klass = class_name.constantize
+          next if klass.embedded?
           klass_voteable = voteable[class_name]
           puts "Generating stats for #{class_name}" if log
           klass.all.each{ |doc|
@@ -99,8 +105,43 @@ module Mongo
         end
       end
 
+      def self.eremake_stats_for_all_voteable_classes(log)
+        Post.all.each do |post|
+          post.images.all.each do |doc|
+            eremake_stats_for(doc, VOTEABLE["Image"]["Image"])
+          end
+        end
+        # VOTEABLE.each do |class_name, voteable|
+        #   klass = class_name.constantize
+        #   next unless klass.embedded?
+        #   klass_voteable = voteable[class_name]
+        #   puts "Generating stats for #{class_name}" if log
+        #   klass.all.each{ |doc|
+        #     remake_stats_for(doc, klass_voteable)
+        #   }
+        # end
+      end
   
       def self.remake_stats_for(doc, voteable)
+        up_count = doc.up_voter_ids.length
+        down_count = doc.down_voter_ids.length
+        faceless_up_count = doc.faceless_up_count
+        faceless_down_count = doc.faceless_down_count
+        
+        doc.update_attributes(
+          'votes' => {
+            'up' => doc.up_voter_ids,
+            'down' => doc.down_voter_ids,
+            'up_count' => up_count,
+            'faceless_up_count' => faceless_up_count,
+            'faceless_down_count' => faceless_down_count,
+            'down_count' => down_count,
+            'count' => up_count + down_count,
+            'point' => voteable[:up].to_i*up_count + voteable[:down].to_i*down_count
+          }
+        )
+      end
+      def self.eremake_stats_for(doc, voteable)
         up_count = doc.up_voter_ids.length
         down_count = doc.down_voter_ids.length
         faceless_up_count = doc.faceless_up_count
@@ -137,7 +178,48 @@ module Mongo
           end
         end
       end
-  
+      
+      def self.eupdate_parent_stats(log)
+        Post.all.each do |post|
+          post.images.all.each do |doc|
+            eupdate_parent_stats_for(doc, Post, VOTEABLE["Image"]["Post"])
+          end
+        end
+      end
+      
+      def self.eupdate_parent_stats_for(doc, parent_class, voteable)
+        parent_id = doc.post.id
+        if parent_id
+          up_count = doc.up_voter_ids.length
+          down_count = doc.down_voter_ids.length
+          faceless_up_count = doc.faceless_up_count
+          faceless_down_count = doc.faceless_down_count
+      
+          return if up_count == 0 && down_count == 0
+
+          inc_options = {
+            'votes.point' => voteable[:up].to_i*(up_count+faceless_up_count) + voteable[:down].to_i*(down_count+faceless_down_count)
+          }
+        
+          unless voteable[:update_counters] == false
+            inc_options.merge!(
+              'votes.count' => up_count + down_count,
+              'votes.up_count' => up_count,
+              'votes.down_count' => down_count,
+              'votes.faceless_up_count' => faceless_up_count,
+              'votes.faceless_down_count' => faceless_down_count
+            )
+          end
+
+          parent_ids = parent_id.is_a?(Array) ? parent_id : [ parent_id ]
+          
+          parent_class.collection.update(
+            { '_id' => { '$in' => parent_ids } }, 
+            { '$inc' =>  inc_options },
+            { :safe => true, :multi => true }
+          )
+        end
+      end
   
       def self.update_parent_stats_for(doc, parent_class, foreign_key, voteable)
         parent_id = doc.read_attribute(foreign_key.to_sym)

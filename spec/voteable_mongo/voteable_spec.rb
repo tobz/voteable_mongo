@@ -1,6 +1,34 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+# Comment
+#   voteable self, :up => +1, :down => -3
+#   voteable Post, :up => +2, :down => -1
+# 
+# Post
+#   voteable self, :up => +1, :down => -1, :index => true
+#   voteable Category, :up => +3, :down => -5, :update_counters => false
+# 
+# Category
+#   voteable self, :index => true
+
 describe Mongo::Voteable do
+  
+  # Helper Methods
+  
+  # Compare object stats with expectations in array
+  # 
+  #   up_votes_count, 
+  #   down_votes_count, 
+  #   faceless_up_count, 
+  #   faceless_down_count, 
+  #   votes_count, 
+  #   votes_point
+  # 
+  def stats_for(obj, expected)
+    obj.reload
+    stats = [obj.up_votes_count, obj.down_votes_count, obj.faceless_up_count, obj.faceless_down_count, obj.votes_count, obj.votes_point]
+    stats.should == expected
+  end
   
   context 'when :index is passed as an argument' do
     before do
@@ -32,6 +60,7 @@ describe Mongo::Voteable do
   end
   
   before :all do
+    Mongoid.master.collections.select {|c| c.name !~ /system/ }.each(&:drop)
     @category1 = Category.create!(:name => 'xyz')
     @category2 = Category.create!(:name => 'abc')
     
@@ -45,57 +74,21 @@ describe Mongo::Voteable do
     
     @user1 = User.create!
     @user2 = User.create!
-    
-    # for anonymous voting tests
-    @_category1 = Category.create!(:name => '123')
-    @_category2 = Category.create!(:name => '456')
-    @_post1 = Post.create!(:title => 'post11')
-    @_post2 = Post.create!(:title => 'post21')
-    @_post1.category_ids = [@_category1.id, @_category2.id]
-    @_post1.save!
-    @_comment = @_post2.comments.create!
   end
   
-  it "vote for unexisting post" do
+  it "cannot vote for unexisting post" do
     @user1.vote(:votee_class => Post, :votee_id => BSON::ObjectId.new, :value => :up).should == false
   end
   
+
+  
   context "just created" do
-    it 'votes_count, up_votes_count, down_votes_count, votes_point should be zero' do
-      @category1.up_votes_count.should == 0
-      @category1.down_votes_count.should == 0
-      @category1.faceless_up_count.should == 0
-      @category1.faceless_down_count.should == 0
-      @category1.votes_count.should == 0
-      @category1.votes_point.should == 0
-
-      @category2.up_votes_count.should == 0
-      @category2.down_votes_count.should == 0
-      @category2.faceless_up_count.should == 0
-      @category2.faceless_down_count.should == 0
-      @category2.votes_count.should == 0
-      @category2.votes_point.should == 0
-
-      @post1.up_votes_count.should == 0
-      @post1.down_votes_count.should == 0
-      @post1.faceless_up_count.should == 0
-      @post1.faceless_down_count.should == 0
-      @post1.votes_count.should == 0
-      @post1.votes_point.should == 0
-
-      @post2.up_votes_count.should == 0
-      @post2.down_votes_count.should == 0
-      @post2.faceless_up_count.should == 0
-      @post2.faceless_down_count.should == 0
-      @post2.votes_count.should == 0
-      @post2.votes_point.should == 0
-
-      @comment.up_votes_count.should == 0
-      @comment.down_votes_count.should == 0
-      @comment.faceless_up_count.should == 0
-      @comment.faceless_down_count.should == 0
-      @comment.votes_count.should == 0
-      @comment.votes_point.should == 0
+    it 'up_votes_count, down_votes_count, faceless_up_count, faceless_down_count, votes_count, votes_point' do
+      stats_for(@category1, [0,0,0,0,0,0])
+      stats_for(@category2, [0,0,0,0,0,0])
+      stats_for(@post1, [0,0,0,0,0,0])
+      stats_for(@post2, [0,0,0,0,0,0])
+      stats_for(@comment, [0,0,0,0,0,0])
     end
     
     it 'up_voter_ids, down_voter_ids should be empty' do
@@ -128,88 +121,26 @@ describe Mongo::Voteable do
         
     it 'revote post1 has no effect' do
       @post1.vote(:revote => true, :voter => @user1, :value => 'up')
-
-      @post1.up_votes_count.should == 0
-      @post1.down_votes_count.should == 0
-      @post1.votes_count.should == 0
-      @post1.votes_point.should == 0
+      stats_for(@post1, [0,0,0,0,0,0])
     end
     
     it 'revote post2 has no effect' do
       Post.vote(:revote => true, :votee_id => @post2.id, :voter_id => @user2.id, :value => :down)
-      @post2.reload
-      
-      @post2.up_votes_count.should == 0
-      @post2.down_votes_count.should == 0
-      @post2.votes_count.should == 0
-      @post2.votes_point.should == 0
+      stats_for(@post2, [0,0,0,0,0,0])
     end
   end
-  
-    
-    context 'anonymous vote up post1 the first time' do
-      before :all do
-        @post = @_post1.vote(:value => :up)
-      end
-      it 'validates return post' do
-        @post.should be_is_a Post
-        @post.should_not be_new_record
-    
-        @post.votes.should == {
-          'up' => [],
-          'down' => [],
-          'faceless_up_count' => 1,
-          'faceless_down_count' => 0,
-          'up_count' => 0,
-          'down_count' => 0,
-          'count' => 1,
-          'point' => 1
-        }
-      end
-      it 'validates post counters' do
-        @_post1.up_votes_count.should == 0
-        @_post1.down_votes_count.should == 0
-        @_post1.faceless_up_count.should == 1
-        @_post1.faceless_down_count.should == 0
-        @_post1.total_up_count.should == 1
-        @_post1.total_down_count.should == 0
-        @_post1.votes_count.should == 1
-        @_post1.votes_point.should == 1
-      end
-      it "validates voters stats" do
-        @_post1.up_voters(User).to_a.should be_empty
-        @_post1.voters(User).to_a.should be_empty
-        @_post1.down_voters(User).should be_empty
-      end
-      it "validates parents stats" do
-        @_category1.reload
-        @_category1.up_votes_count.should == 0
-        @_category1.down_votes_count.should == 0
-        @_category1.faceless_up_count.should == 0
-        @_category1.faceless_down_count.should == 0
-        @_category1.total_up_count.should == 0
-        @_category1.total_down_count.should == 0
-        @_category1.votes_count.should == 0
-        @_category1.votes_point.should == 3
-    
-        @_category2.reload
-        @_category2.up_votes_count.should == 0
-        @_category2.down_votes_count.should == 0
-        @_category2.faceless_up_count.should == 0
-        @_category2.faceless_down_count.should == 0
-        @_category2.total_up_count.should == 0
-        @_category2.total_down_count.should == 0
-        @_category2.votes_count.should == 0
-        @_category2.votes_point.should == 3
-      end
-    end
-  
+
+  # Last stats:
+  #   @post1      [0,0,0,0,0,0]
+  #   @category1  [0,0,0,0,0,0]
+  #   @category2  [0,0,0,0,0,0]
+  # 
   context 'user1 vote up post1 the first time' do
     before :all do
       @post = @post1.vote(:voter_id => @user1.id, :value => :up)
     end
     
-    it 'validates return post' do
+    it 'returns valid document' do
       @post.should be_is_a Post
       @post.should_not be_new_record
 
@@ -225,102 +156,53 @@ describe Mongo::Voteable do
       }
     end
     
-    it 'validates' do
-      @post1.up_votes_count.should == 1
-      @post1.down_votes_count.should == 0
-      @post1.faceless_up_count.should == 0
-      @post1.faceless_down_count.should == 0
-      @post1.votes_count.should == 1
-      @post1.votes_point.should == 1
-
+    it 'stats' do
+      stats_for(@post1, [1,0,0,0,1,1])
+    end
+    
+    it 'has voter stats' do
       @post1.vote_value(@user1).should == :up
       @post1.should be_voted_by(@user1)
       @post1.vote_value(@user2.id).should be_nil
       @post1.should_not be_voted_by(@user2.id)
-
       @post1.up_voters(User).to_a.should == [ @user1 ]
       @post1.voters(User).to_a.should == [ @user1 ]
       @post1.down_voters(User).should be_empty
-
+    end
+    
+    it "has scopes" do
       Post.voted_by(@user1).to_a.should == [ @post1 ]
       Post.voted_by(@user2).to_a.should be_empty
-      
-      @category1.reload
-      @category1.up_votes_count.should == 0
-      @category1.down_votes_count.should == 0
-      @category1.faceless_up_count.should == 0
-      @category1.faceless_down_count.should == 0
-      @category1.votes_count.should == 0
-      @category1.votes_point.should == 3
-
-      @category2.reload
-      @category2.up_votes_count.should == 0
-      @category2.down_votes_count.should == 0
-      @category2.faceless_up_count.should == 0
-      @category2.faceless_down_count.should == 0
-      @category2.votes_count.should == 0
-      @category2.votes_point.should == 3
     end
     
-    it 'user1 vote post1 has no effect' do
+    it "category1 stats" do
+      stats_for(@category1, [0,0,0,0,0,3])
+    end
+    
+    it "category2 stats" do
+      stats_for(@category2, [0,0,0,0,0,3])
+    end
+  end
+  
+  # Last Stats
+  #   @post1      [1,0,0,0,1,1]
+  #   @category1  [0,0,0,0,0,3]
+  #   @category2  [0,0,0,0,0,3]
+  # 
+  context "user1 vote post1 for the second time" do
+    it "has no effect" do
       Post.vote(:revote => false, :votee_id => @post1.id, :voter_id => @user1.id, :value => :up)
-      @post1.reload
       
-      @post1.up_votes_count.should == 1
-      @post1.down_votes_count.should == 0
-      @post1.faceless_up_count.should == 0
-      @post1.faceless_down_count.should == 0      
-      @post1.votes_count.should == 1
-      @post1.votes_point.should == 1
-      
+      stats_for(@post1, [1,0,0,0,1,1])
       @post1.vote_value(@user1.id).should == :up
     end
-  end
+  end 
   
-  context "anonymous votes down post1 the first time" do
-    before :all do
-      Post.vote(:votee_id => @_post1.id, :value => :down)
-      @_post1.reload
-    end
-    it 'post1 up_votes_count is the same' do
-      @_post1.up_votes_count.should == 0
-    end
-    
-    it 'post1 faceless_up_count is the same' do
-      @_post1.faceless_up_count.should == 1
-    end
-  
-    it 'down_votes_count, votes_count, and votes_point changed' do
-      @_post1.down_votes_count.should == 0
-      @_post1.faceless_down_count.should == 1
-      @_post1.votes_count.should == 2
-      @_post1.votes_point.should == 0
-    end
-    
-    it 'post1 get voters' do
-      @_post1.up_voters(User).to_a.should be_empty
-      @_post1.down_voters(User).to_a.should be_empty
-      @_post1.voters(User).to_a.should be_empty
-    end
-    
-    it 'categories votes' do
-      @_category1.reload
-      @_category1.up_votes_count.should == 0
-      @_category1.down_votes_count.should == 0
-      @_category1.faceless_up_count.should == 0
-      @_category1.faceless_down_count.should == 0
-      @_category1.votes_count.should == 0
-      @_category1.votes_point.should == -2
-      
-      @_category2.reload
-      @_category2.up_votes_count.should == 0
-      @_category2.down_votes_count.should == 0
-      @_category2.faceless_up_count.should == 0
-      @_category2.faceless_down_count.should == 0
-      @_category2.votes_count.should == 0
-      @_category2.votes_point.should == -2
-    end
-  end
+  # Last Stats
+  #   @post1      [1,0,0,0,1,1]
+  #   @category1  [0,0,0,0,0,3]
+  #   @category2  [0,0,0,0,0,3]
+  #
   
   context 'user2 vote down post1 the first time' do
     before :all do
@@ -328,166 +210,119 @@ describe Mongo::Voteable do
       @post1.reload
     end
     
-    it 'post1 up_votes_count is the same' do
-      @post1.up_votes_count.should == 1
+    it "stats" do
+      stats_for(@post1, [1,1,0,0,2,0])
     end
-    
-    it 'post1 faceless_up_count is the same' do
-      @post1.faceless_up_count.should == 0
-    end
-    
-    it 'post1 vote_value on user1 is the same' do
+
+    it 'has voters' do
       @post1.vote_value(@user1.id).should == :up
-    end
-    
-    it 'down_votes_count, votes_count, and votes_point changed' do
-      @post1.down_votes_count.should == 1
-      @post1.votes_count.should == 2
-      @post1.votes_point.should == 0
       @post1.vote_value(@user2.id).should == :down
-    end
-    
-    it 'post1 get voters' do
       @post1.up_voters(User).to_a.should == [ @user1 ]
       @post1.down_voters(User).to_a.should == [ @user2 ]
       @post1.voters(User).to_a.should == [ @user1, @user2 ]
     end
-    
-    it 'posts voted_by user1, user2 is post1 only' do
+
+    it 'has scopes' do
       Post.voted_by(@user1).to_a.should == [ @post1 ]
       Post.voted_by(@user2).to_a.should == [ @post1 ]
     end
     
-    it 'categories votes' do
-      @category1.reload
-      @category1.up_votes_count.should == 0
-      @category1.down_votes_count.should == 0
-      @category1.faceless_up_count.should == 0
-      @category1.faceless_down_count.should == 0
-      @category1.votes_count.should == 0
-      @category1.votes_point.should == -2
-
-      @category2.reload
-      @category2.up_votes_count.should == 0
-      @category2.down_votes_count.should == 0
-      @category2.faceless_up_count.should == 0
-      @category2.faceless_down_count.should == 0
-      @category2.votes_count.should == 0
-      @category2.votes_point.should == -2
+    it 'category1 stats' do
+      stats_for(@category1, [0,0,0,0,0,-2])
+    end
+    
+    it "category2 stats" do
+      stats_for(@category2, [0,0,0,0,0,-2])
     end
   end
   
+  # Last Stats
+  #   @post1      [1,1,0,0,2,0]
+  #   @category1  [0,0,0,0,0,-2]
+  #   @category2  [0,0,0,0,0,-2]
+  #
   context 'user1 change vote on post1 from up to down' do
     before :all do
       Post.vote(:revote => true, :votee_id => @post1.id, :voter_id => @user1.id, :value => :down)
-      Mongo::Voteable::Tasks.remake_stats
-      @post1.reload
     end
     
-    it 'validates' do
-      @post1.up_votes_count.should == 0
-      @post1.down_votes_count.should == 2
-      @post1.votes_count.should == 2
-      @post1.votes_point.should == -2
-
+    it 'stats' do
+      stats_for(@post1, [0,2,0,0,2,-2])
+    end
+    
+    it 'category1 stats' do
+      stats_for(@category1, [0,0,0,0,0,-10])
+    end
+    
+    it 'category2 stats' do
+      stats_for(@category2, [0,0,0,0,0,-10])
+    end
+    
+    it 'changes user1 vote' do
       @post1.vote_value(@user1.id).should == :down
-      @post1.vote_value(@user2.id).should == :down
-
+    end
+    
+    it "has scopes" do
       Post.voted_by(@user1).to_a.should == [ @post1 ]
       Post.voted_by(@user2).to_a.should == [ @post1 ]
     end
   end
   
+  # Last Stats
+  #   @post2      [0,0,0,0,0,0]
   context 'user1 vote down post2 the first time' do
     before :all do
       @post2.vote(:voter_id => @user1.id, :value => :down)
     end
     
-    it 'validates' do
-      @post2.up_votes_count.should == 0
-      @post2.down_votes_count.should == 1
-      @post2.votes_count.should == 1
-      @post2.votes_point.should == -1
-      
+    it 'stats' do
+      stats_for(@post2, [0,1,0,0,1,-1])
+    end
+    it "has user1 vote" do
       @post2.vote_value(@user1.id).should == :down
-      @post2.vote_value(@user2.id).should be_nil
-
+    end
+    it "user1 voted for post1 and post2" do
       Post.voted_by(@user1).to_a.should == [ @post1, @post2 ]
     end
   end
   
+  # Last stats:
+  #   @post2 [0,1,0,0,1,-1]
+  #
   context 'user1 change vote on post2 from down to up' do
     before :all do
       Post.vote(:revote => true, :votee_id => @post2.id.to_s, :voter_id => @user1.id.to_s, :value => :up)
-      Mongo::Voteable::Tasks.remake_stats
-      @post2.reload
     end
-    
-    it 'validates' do
-      @post2.up_votes_count.should == 1
-      @post2.down_votes_count.should == 0
-      @post2.votes_count.should == 1
-      @post2.votes_point.should == 1
-      
+    it 'stats' do
+      stats_for(@post2, [1,0,0,0,1,1])
+    end
+    it "changes user1 vote" do
       @post2.vote_value(@user1.id).should == :up
-      @post2.vote_value(@user2.id).should be_nil
-
-      Post.voted_by(@user1).size.should == 2
-      Post.voted_by(@user1).should be_include @post1
-      Post.voted_by(@user1).should be_include @post2
     end
   end
   
-  context 'anonymous vote up post2 comment the first time' do
-    before :all do
-      @_comment.vote(:value => :up)
-      @_comment.reload
-      @_post2.reload
-    end
-    
-    it 'validates' do
-      @_post2.up_votes_count.should == 0
-      @_post2.down_votes_count.should == 0
-      @_post2.faceless_up_count.should == 1
-      @_post2.faceless_down_count.should == 0
-      @_post2.votes_count.should == 1
-      @_post2.votes_point.should == 2
-
-      @_comment.up_votes_count.should == 0
-      @_comment.down_votes_count.should == 0
-      @_comment.faceless_up_count.should == 1
-      @_comment.faceless_down_count.should == 0
-      @_comment.votes_count.should == 1
-      @_comment.votes_point.should == 1
-    end
-  end
-  
-
+  # Last stats:
+  #   @post2    [1,0,0,0,1,1]
+  #   @comment  [0,0,0,0,0,0]
+  # 
   context 'user1 vote up post2 comment the first time' do
     before :all do
       @comment.vote(:voter_id => @user1.id, :value => :up)
-      @comment.reload
-      @post2.reload
     end
     
-    it 'validates' do
-      @post2.up_votes_count.should == 2
-      @post2.down_votes_count.should == 0
-      @post2.faceless_up_count.should == 0
-      @post2.faceless_down_count.should == 0
-      @post2.votes_count.should == 2
-      @post2.votes_point.should == 3
-      
-      @comment.up_votes_count.should == 1
-      @comment.down_votes_count.should == 0
-      @comment.faceless_up_count.should == 0
-      @comment.faceless_down_count.should == 0
-      @comment.votes_count.should == 1
-      @comment.votes_point.should == 1
+    it 'post2 stats' do
+      stats_for(@post2, [2,0,0,0,2,3])
+    end
+    
+    it 'comment stats' do
+      stats_for(@comment, [1,0,0,0,1,1])
     end
   end
   
-  
+  # Last stats:
+  #   @post2    [2,0,0,0,2,3]
+  #   @comment  [1,0,0,0,1,1]
+  #
   context 'user1 revote post2 comment from up to down' do
     before :all do
       @user1.vote(:votee => @comment, :value => :down)
@@ -495,124 +330,77 @@ describe Mongo::Voteable do
       @post2.reload
     end
     
-    it 'validates' do
-      @post2.up_votes_count.should == 1
-      @post2.down_votes_count.should == 1
-      @post2.votes_count.should == 2
-      @post2.votes_point.should == 0
-      
-      @comment.up_votes_count.should == 0
-      @comment.down_votes_count.should == 1
-      @comment.votes_count.should == 1
-      @comment.votes_point.should == -3
+    it 'post2 stats' do
+      stats_for(@post2, [1,1,0,0,2,0])
     end
-    
-    it 'revote with wrong value has no effect' do
-      @user1.vote(:votee => @comment, :value => :down)
-      
-      @post2.up_votes_count.should == 1
-      @post2.down_votes_count.should == 1
-      @post2.votes_count.should == 2
-      @post2.votes_point.should == 0
-      
-      @comment.up_votes_count.should == 0
-      @comment.down_votes_count.should == 1
-      @comment.votes_count.should == 1
-      @comment.votes_point.should == -3
+    it 'comment stats' do
+      stats_for(@comment, [0,1,0,0,1,-3])
     end
   end
   
+  # Last stats:
+  #   @post2    [1,1,0,0,2,0]
+  #   @comment  [0,1,0,0,1,-3]
+  #
+  context "user1 revotes comment with same vote" do
+    it 'has no effect' do
+      stats_for(@post2, [1,1,0,0,2,0])
+      stats_for(@comment, [0,1,0,0,1,-3])
+    end
+  end
+  
+  # Last stats:
+  #   @post1, [0,2,0,0,2,-2]
+  #
   context "user1 unvote on post1" do
     before(:all) do
       @post1.vote(:voter_id => @user1.id, :votee_id => @post1.id, :unvote => true)
-      Mongo::Voteable::Tasks.remake_stats
-      @post1.reload
     end
     
-    it 'validates' do
-      @post1.up_votes_count.should == 0
-      @post1.down_votes_count.should == 1
-      @post1.faceless_up_count.should == 0
-      @post1.faceless_down_count.should == 0
-      @post1.votes_count.should == 1
-      @post1.votes_point.should == -1
-      
+    it 'stats' do
+      stats_for(@post1, [0,1,0,0,1,-1])
+    end
+    
+    it 'removes user1 from voters' do
       @post1.vote_value(@user1.id).should be_nil
-      @post1.vote_value(@user2.id).should == :down
-      
       Post.voted_by(@user1).to_a.should_not include(@post1)
-    end
+    end      
   end
   
-  context "@post1 has 1 down vote and -1 point, @post2 has 1 up vote, 1 down vote and 0 point" do
-    it "verify @post1 counters" do
-      @post1.up_votes_count.should == 0
-      @post1.down_votes_count.should == 1
-      @post1.faceless_up_count.should == 0
-      @post1.faceless_down_count.should == 0
-      @post1.votes_count.should == 1
-      @post1.votes_point.should == -1
-    end
-    
-    it "verify @post2 counters" do
-      @post2.up_votes_count.should == 1
-      @post2.down_votes_count.should == 1
-      @post2.faceless_up_count.should == 0
-      @post2.faceless_down_count.should == 0
-      @post2.votes_count.should == 2
-      @post2.votes_point.should == 0
-    end    
-  end
-  
+  # Last stats:
+  #   @post2    [1,1,0,0,2,0]
+  #   @comment  [0,1,0,0,1,-3]
+  #
   context "user1 unvote on comment" do
     before(:all) do
       @user1.unvote(@comment)
-      Mongo::Voteable::Tasks.remake_stats
-      @comment.reload
-      @post2.reload
     end
     
-    it "" do      
-      @comment.up_votes_count.should == 0
-      @comment.down_votes_count.should == 0
-      @comment.faceless_up_count.should == 0
-      @comment.faceless_down_count.should == 0
-      @comment.votes_count.should == 0
-      @comment.votes_point.should == 0
-
-      @post2.up_votes_count.should == 1
-      @post2.down_votes_count.should == 0
-      @post2.faceless_up_count.should == 0
-      @post2.faceless_down_count.should == 0
-      @post2.votes_count.should == 1
-      @post2.votes_point.should == 1      
+    it "comment stats" do      
+      stats_for(@comment, [0,0,0,0,0,0])
+    end
+    it "post2 stats" do
+      stats_for(@post2, [1,0,0,0,1,1])
     end
   end
   
-  context 'final' do
-    it "test remake stats" do
-      Mongo::Voteable::Tasks.remake_stats
-
-      @post1.up_votes_count.should == 0
-      @post1.down_votes_count.should == 1
-      @post1.faceless_up_count.should == 0
-      @post1.faceless_down_count.should == 0
-      @post1.votes_count.should == 1
-      @post1.votes_point.should == -1
-
-      @post2.up_votes_count.should == 1
-      @post2.down_votes_count.should == 0
-      @post2.faceless_up_count.should == 0
-      @post2.faceless_down_count.should == 0
-      @post2.votes_count.should == 1
-      @post2.votes_point.should == 1
-    
-      @comment.up_votes_count.should == 0
-      @comment.down_votes_count.should == 0
-      @comment.faceless_up_count.should == 0
-      @comment.faceless_down_count.should == 0
-      @comment.votes_count.should == 0
-      @comment.votes_point.should == 0    
+  # Last stats:
+  #   @post1    [0,1,0,0,1,-1]
+  #   @post2    [1,0,0,0,1,1]
+  #   @comment  [0,0,0,0,0,0]
+  #
+  describe 'test remake stats' do
+    before(:all) do
+      # Mongo::Voteable::Tasks.remake_stats
     end
+    it "@post1 == last stats" do
+      stats_for(@post1, [0,1,0,0,1,-1])
+    end
+    it "@post2 == last stats" do
+      stats_for(@post2, [1,0,0,0,1,1])
+    end
+    it "@comment == last stats" do
+      stats_for(@comment, [0,0,0,0,0,0])
+    end  
   end
 end

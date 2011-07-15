@@ -20,3 +20,4 @@
 
 * Allow customizations of votes field name
 * Votes on embedded documents
+* Store votes in user too
