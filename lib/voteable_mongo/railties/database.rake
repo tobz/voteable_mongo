@@ -6,7 +6,7 @@ namespace :mongo do
     end
     
     desc 'Set counters and points to 0 for klass. Usage: rake mongo:voteable:reset_stats[klass]'
-    task :reset_stats, :klass => :environment do |t, args|
+    task :reset_stats, [:klass] => :environment do |t, args|
       klass = args.klass
       klass = klass.classify.constantize
       raise "This klass should be Voteable" unless klass.ancestors.include? Mongo::Voteable
