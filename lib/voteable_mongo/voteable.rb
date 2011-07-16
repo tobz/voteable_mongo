@@ -1,11 +1,11 @@
 require 'voteable_mongo/voting'
 require 'voteable_mongo/integrations/mongoid'
 require 'voteable_mongo/integrations/mongo_mapper'
+require 'voteable_mongo/embedded_relations'
 
 module Mongo
   module Voteable
     extend ActiveSupport::Concern
-
     DEFAULT_VOTES = {
       'up' => [],
       'down' => [],
@@ -19,6 +19,7 @@ module Mongo
 
     included do
       include Mongo::Voteable::Voting
+      include Mongo::Voteable::EmbeddedRelations
 
       if defined?(Mongoid) && defined?(field)
         include Mongo::Voteable::Integrations::Mongoid
@@ -124,46 +125,6 @@ module Mongo
     end
     
     module InstanceMethods
-      
-      # Provides reloading funcionality for embedded documents.
-      #  
-      # Embedded Documents are not true mongo collections, what 
-      # prevents them from reloading. This method evaluates whether
-      # this instance is embedded and reloads it through its parent.
-      # 
-      # Example:
-      #   Image embedded in Post
-      #   self.attributes = Post.find(post.id).images.find(id)
-      # 
-      def reload
-        if self.class.embedded?
-          self.attributes = parent_klass.find(eval("#{parent_name}.id")).
-                            send(inverse_relation).find(id).attributes
-        else
-          super
-        end
-      end
-      
-      # Finds mongoid embedded-in Relation
-      def relation
-        relations.find{|k,v| v.relation==Mongoid::Relations::Embedded::In }.try(:last)
-      end
-      
-      # "post"
-      def parent_name
-        relation.name.to_s
-      end
-      
-      # Post
-      def parent_klass
-        relation.class_name.constantize
-      end
-      
-      # "images"
-      def inverse_relation
-        relation.inverse_setter.delete("=")
-      end
-      
       # Make a vote on this votee
       #
       # @param [Hash] options a hash containings:

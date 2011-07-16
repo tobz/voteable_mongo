@@ -374,8 +374,10 @@ describe Mongo::Voteable do
   #
   describe 'test remake stats' do
     before(:all) do
-      # Mongo::Voteable::Tasks.remake_stats
+      Mongo::Voteable::Tasks.remake_stats
+      [@post1, @post2, @comment, @category1, @category2].map(&:reload)
     end
+    
     it "@post1 == last stats" do
       stats_for(@post1, [0,1,0,0,1,-1])
     end
@@ -385,5 +387,12 @@ describe Mongo::Voteable do
     it "@comment == last stats" do
       stats_for(@comment, [0,0,0,0,0,0])
     end  
+    it "@category1 == last stats" do
+       stats_for(@category1, [0,0,0,0,0,-5])
+    end
+    it "@category2 == last stats" do
+       stats_for(@category2, [0,0,0,0,0,-5])
+    end
+    
   end
 end

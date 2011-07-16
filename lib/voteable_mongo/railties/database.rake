@@ -17,10 +17,5 @@ namespace :mongo do
     task :init_stats => :environment do
       Mongo::Voteable::Tasks.init_stats(:log)
     end
-
-    desc 'Migrate vote data created by version < 0.7.0 to new vote data storage'
-    task :migrate_old_votes => :environment do
-      Mongo::Voteable::Tasks.migrate_old_votes(:log)
-    end
   end
 end

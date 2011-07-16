@@ -19,5 +19,5 @@
 ----- angelim
 
 * Allow customizations of votes field name
-* Votes on embedded documents
-* Store votes in user too
+* Also Store votes in user (no scopes for embedded documents)
+* consider ip storage for faceless votes

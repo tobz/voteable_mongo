@@ -1,8 +1,9 @@
+require 'voteable_mongo/embedded_relations'
 module Mongo
   module Voteable
     module Voting
       extend ActiveSupport::Concern
-
+      # extend Mongo::Voteable::EmbeddedRelations
       module ClassMethods
         # Make a vote on an object of this class
         #
@@ -17,12 +18,6 @@ module Mongo
         def vote(options)
           validate_and_normalize_vote_options(options)
           options[:voteable] = VOTEABLE[name][name]
-          if self.embedded?
-            options[:embedded] = {}
-            @dummy ||= self.new
-            options[:embedded][:relation] = @dummy.inverse_relation
-            options[:embedded][:klass] = @dummy.parent_klass
-          end
           return unless options[:voteable]
           query, update = if options[:revote]
           revote_query_and_update(options)
@@ -43,7 +38,7 @@ module Mongo
           doc = nil
         end
         if doc
-          inner_doc = options[:embedded] ? find_inner_doc(doc, options) : doc
+          inner_doc = embedded? ? find_inner_doc(doc, options) : doc
           update_parent_votes(doc, options) if options[:voteable][:update_parents]
           # Return new vote attributes to instance
           options[:votee].write_attribute('votes', inner_doc['votes']) if options[:votee]
@@ -54,7 +49,7 @@ module Mongo
       end
 
       def find_inner_doc(doc, options)
-        doc[options[:embedded][:relation]].find{|img| img["_id"] == options[:votee_id] }
+        doc[inverse_relation].find{|img| img["_id"] == options[:votee_id] }
       end
 
       private
@@ -66,9 +61,9 @@ module Mongo
       end
 
       def new_vote_query(options)
-        if options[:embedded]
+        if embedded?
           {
-            options[:embedded][:relation] => {
+            inverse_relation => {
               '$elemMatch' => {
                 "_id" => options[:votee_id],
                 'votes.up' => { '$ne' => options[:voter_id] },
@@ -100,8 +95,8 @@ module Mongo
         vote_option_count = options[:voter_id] ? "votes.#{val}_count" : "votes.faceless_#{val}_count"
         vote_count = "votes.count"
         vote_point = "votes.point"
-        if options[:embedded]
-          rel = "#{options[:embedded][:relation]}.$." # prepend relation for embedded collections
+        if embedded?
+          rel = "#{inverse_relation}.$." # prepend relation for embedded collections
           vote_option_ids.prepend rel
           vote_option_count.prepend rel
           vote_count.prepend rel
@@ -114,7 +109,7 @@ module Mongo
       end
 
       def revote_query_and_update(options)
-        rel = options[:embedded] && options[:embedded][:relation]
+        rel = embedded? && inverse_relation
         if options[:value] == :up
           positive_voter_ids =    ['votes.up', "#{rel}.$.votes.up"]
           negative_voter_ids =    ['votes.down', "#{rel}.$.votes.down"]
@@ -135,7 +130,7 @@ module Mongo
       end
 
       def update_for_revote(options, negative_voter_ids, positive_voter_ids, positive_votes_count, negative_votes_count, point_delta, rel)
-        if options[:embedded]
+        if embedded?
           {
             # then update
             '$pull' => { negative_voter_ids.last => options[:voter_id] },
@@ -160,7 +155,7 @@ module Mongo
       end
 
       def query_for_revote(options, negative_voter_ids, rel)
-        if options[:embedded]
+        if embedded?
           {
             rel => {
               "$elemMatch" => {
@@ -178,7 +173,7 @@ module Mongo
       end
 
       def query_for_unvote(options, positive_voter_ids, rel)
-        if options[:embedded]
+        if embedded?
           {
             rel => {
               "$elemMatch" => {
@@ -196,7 +191,7 @@ module Mongo
       end
 
       def update_for_unvote(options, positive_voter_ids, votes_count, votes_point, positive_votes_count)
-        if options[:embedded]
+        if embedded?
           {
             # then update
             '$pull' => { positive_voter_ids.last => options[:voter_id] },
@@ -220,7 +215,7 @@ module Mongo
       end
 
       def unvote_query_and_update(options)
-        rel = options[:embedded] && options[:embedded][:relation]
+        rel = embedded? && inverse_relation
         if options[:value] == :up
           positive_voter_ids    = ['votes.up', "#{rel}.$.votes.up"]
           positive_votes_count  = ['votes.up_count', "#{rel}.$.votes.up_count"]
@@ -237,7 +232,7 @@ module Mongo
       end
 
       def update_parent_votes(doc, options)
-        if parent_klass = options[:embedded] && options[:embedded][:klass]
+        if embedded?
           voteable = VOTEABLE[name][parent_klass.name]
           if doc['_id']
             parent_klass.collection.update(

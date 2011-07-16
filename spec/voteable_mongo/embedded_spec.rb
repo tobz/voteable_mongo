@@ -205,7 +205,7 @@ describe Mongo::Voteable, "Embedded Documents" do
    
    # Last Stats
    #   @image1      [0,2,0,0,2,-2]
-   #   @post1       [0,2,0,0,2,-2]
+   #   @post1       [1,2,0,0,3,0]
    #
    context "user1 unvote on image1" do
      before(:all) do
@@ -217,7 +217,7 @@ describe Mongo::Voteable, "Embedded Documents" do
      end
      
      it "post1 stats" do
-       stats_for(@image1, [0,1,0,0,1,-1])
+       stats_for(@post1, [1,1,0,0,2,1])
      end
    end
    
@@ -237,5 +237,29 @@ describe Mongo::Voteable, "Embedded Documents" do
      it "post2 stats" do
        stats_for(@post2, [0,0,0,0,0,0])
      end
+   end
+   
+   describe 'test remake stats' do
+     before(:all) do
+       Mongo::Voteable::Tasks.remake_stats
+       [@image1, @image2, @image3, @post1, @post2].map(&:reload)
+     end
+
+     it "@image1 == last stats" do
+       stats_for(@image1, [0,1,0,0,1,-1])
+     end
+     it "@image2 == last stats" do
+       stats_for(@image2, [1,0,0,0,1,1])
+     end
+     it "@image3 == last stats" do
+       stats_for(@image3, [0,0,0,0,0,0])
+     end  
+     it "@post1 == last stats" do
+        stats_for(@post1, [1,1,0,0,2,1])
+     end
+     it "@post2 == last stats" do
+        stats_for(@post2, [0,0,0,0,0,0])
+     end
+
    end
 end
