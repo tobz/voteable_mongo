@@ -12,9 +12,9 @@ module Mongo
           klass = class_name.constantize
 
           if klass.embedded?
-            master_class = klass.parent_klass
-            query = { "#{klass.inverse_relation}.votes" => nil}
-            update = { "$set" => {"#{klass.inverse_relation}.$.votes" => DEFAULT_VOTES } }
+            master_class = klass._parent_klass
+            query = { "#{klass._inverse_relation}.votes" => nil}
+            update = { "$set" => {"#{klass._inverse_relation}.$.votes" => DEFAULT_VOTES } }
           else
             master_class = klass
             query = {:votes => nil}
@@ -33,9 +33,9 @@ module Mongo
       def self.reset_stats(klass, log = false)
         puts "Reset stats for #{klass.name}" if log
         if klass.embedded?
-          master_class = klass.parent_klass
-          query = { "#{klass.inverse_relation}.votes" => {"$exists" => true}}
-          update = { "$set" => {"#{klass.inverse_relation}.$.votes" => DEFAULT_VOTES } }
+          master_class = klass._parent_klass
+          query = { "#{klass._inverse_relation}.votes" => {"$exists" => true}}
+          update = { "$set" => {"#{klass._inverse_relation}.$.votes" => DEFAULT_VOTES } }
         else
           master_class = klass
           query = {}
@@ -76,10 +76,10 @@ module Mongo
       
       def self.remake_stats_for_all_embedded_classes(embedded_classes, log)
         embedded_classes.each do |klass, voteable|
-          master_klass = klass.parent_klass
+          master_klass = klass._parent_klass
           klass_voteable = voteable[klass.name]
           master_klass.all.each do |master_doc|
-            master_doc.send(klass.inverse_relation).each do |doc|
+            master_doc.send(klass._inverse_relation).each do |doc|
               remake_stats_for(doc, klass_voteable)
             end
           end
@@ -110,7 +110,7 @@ module Mongo
               parent_class = parent_class_name.constantize
               puts "Updating stats for #{class_name} > #{parent_class_name}" if log
               parent_class.all.each do |master_doc|
-                master_doc.send(klass.inverse_relation).each do |doc|
+                master_doc.send(klass._inverse_relation).each do |doc|
                   update_parent_stats_for(doc, parent_class, parent_voteable)
                 end
               end

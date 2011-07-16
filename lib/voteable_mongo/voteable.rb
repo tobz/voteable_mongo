@@ -147,26 +147,6 @@ module Mongo
         self.class.vote(options)
       end
       
-      def evote(options)
-        options[:votee_id] = id
-        options[:votee] = self
-        options[:voter_id] ||= options[:voter].try(:id)
-        
-        if self.class.embedded?
-          options[:embedded] = {}
-          options[:embedded][:relation] = inverse_relation
-          options[:embedded][:klass] = parent_klass
-        end
-        
-        if options[:unvote]
-          options[:value] ||= vote_value(options[:voter_id])
-        else
-          options[:revote] ||= options[:voter_id] && vote_value(options[:voter_id]).present?
-        end
-
-        self.class.evote(options)
-      end
-    
       # Get a voted value on this votee
       #
       # @param voter is object or the id of the voter who made the vote

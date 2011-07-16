@@ -49,7 +49,7 @@ module Mongo
       end
 
       def find_inner_doc(doc, options)
-        doc[inverse_relation].find{|img| img["_id"] == options[:votee_id] }
+        doc[_inverse_relation].find{|img| img["_id"] == options[:votee_id] }
       end
 
       private
@@ -63,7 +63,7 @@ module Mongo
       def new_vote_query(options)
         if embedded?
           {
-            inverse_relation => {
+            _inverse_relation => {
               '$elemMatch' => {
                 "_id" => options[:votee_id],
                 'votes.up' => { '$ne' => options[:voter_id] },
@@ -96,7 +96,7 @@ module Mongo
         vote_count = "votes.count"
         vote_point = "votes.point"
         if embedded?
-          rel = "#{inverse_relation}.$." # prepend relation for embedded collections
+          rel = "#{_inverse_relation}.$." # prepend relation for embedded collections
           vote_option_ids.prepend rel
           vote_option_count.prepend rel
           vote_count.prepend rel
@@ -109,7 +109,7 @@ module Mongo
       end
 
       def revote_query_and_update(options)
-        rel = embedded? && inverse_relation
+        rel = embedded? && _inverse_relation
         if options[:value] == :up
           positive_voter_ids =    ['votes.up', "#{rel}.$.votes.up"]
           negative_voter_ids =    ['votes.down', "#{rel}.$.votes.down"]
@@ -215,7 +215,7 @@ module Mongo
       end
 
       def unvote_query_and_update(options)
-        rel = embedded? && inverse_relation
+        rel = embedded? && _inverse_relation
         if options[:value] == :up
           positive_voter_ids    = ['votes.up', "#{rel}.$.votes.up"]
           positive_votes_count  = ['votes.up_count', "#{rel}.$.votes.up_count"]
@@ -233,9 +233,9 @@ module Mongo
 
       def update_parent_votes(doc, options)
         if embedded?
-          voteable = VOTEABLE[name][parent_klass.name]
+          voteable = VOTEABLE[name][_parent_klass.name]
           if doc['_id']
-            parent_klass.collection.update(
+            _parent_klass.collection.update(
             { '_id' =>  doc['_id'] },
             { '$inc' => parent_inc_options(voteable, options) },
             { :multi => true }

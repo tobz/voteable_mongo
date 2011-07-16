@@ -15,8 +15,8 @@ module Mongo
       def reload
         if self.class.embedded?
           klass = self.class
-          self.attributes = klass.parent_klass.find(eval(klass.parent_name).id) # Post.find(post.id)
-                            .send(klass.inverse_relation)                       # .images
+          self.attributes = klass._parent_klass.find(eval(klass._parent_name).id) # Post.find(post.id)
+                            .send(klass._inverse_relation)                       # .images
                             .find(id).attributes                                # .find(id).attributes
         else
           super
@@ -24,23 +24,23 @@ module Mongo
       end
       # Finds mongoid embedded-in Relation
       module ClassMethods
-        def relation
+        def _relation
           relations.find{|k,v| v.relation==Mongoid::Relations::Embedded::In }.try(:last)
         end
     
         # "post"
-        def parent_name
-          relation.name.to_s
+        def _parent_name
+          _relation.name.to_s
         end
     
         # Post
-        def parent_klass
-          relation.class_name.constantize
+        def _parent_klass
+          _relation.class_name.constantize
         end
     
         # "images"
-        def inverse_relation
-          relation.inverse_setter.delete("=")
+        def _inverse_relation
+          _relation.inverse_setter.delete("=")
         end
       end
     end
