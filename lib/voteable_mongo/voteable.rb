@@ -14,7 +14,8 @@ module Mongo
       'up_count' => 0,
       'down_count' => 0,
       'count' => 0,
-      'point' => 0
+      'point' => 0,
+      'ip' => []
     }
 
     included do

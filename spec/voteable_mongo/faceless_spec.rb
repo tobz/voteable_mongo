@@ -16,7 +16,7 @@ describe Mongo::Voteable, "Anonymous support" do
   
   context 'anonymous vote up post1 the first time' do
      before :all do
-       @post = @post1.vote(:value => :up)
+       @post = @post1.vote(:value => :up, :ip => "200")
      end
      it 'validates return post' do
        @post.should be_is_a Post
@@ -30,7 +30,8 @@ describe Mongo::Voteable, "Anonymous support" do
          'up_count' => 0,
          'down_count' => 0,
          'count' => 1,
-         'point' => 1
+         'point' => 1,
+         'ip' => ["200"]
        }
      end
      it 'post1 stats' do
@@ -51,6 +52,21 @@ describe Mongo::Voteable, "Anonymous support" do
      end
    end
    
+   context "anonymous user voting in @post1 with same IP" do
+     before(:all) do
+       @post = @post1.vote(:value => :up, :ip => "200")
+     end
+     it "does not have any effect on @post1" do
+       stats_for(@post1, [0,0,1,0,1,1])
+     end
+     it "does not have any effect on @category1" do
+       stats_for(@category1, [0,0,0,0,0,3])
+     end
+     it "does not have any effect on @category2" do
+       stats_for(@category2, [0,0,0,0,0,3])
+     end
+   end
+   
    # Last stats:
    #   @post1      [0,0,1,0,1,1]
    #   @category1  [0,0,0,0,0,3]
@@ -58,7 +74,7 @@ describe Mongo::Voteable, "Anonymous support" do
    #
    context "anonymous votes down post1 the first time" do
      before :all do
-       Post.vote(:votee_id => @post1.id, :value => :down)
+       Post.vote(:votee_id => @post1.id, :value => :down, :ip => "201")
      end
      
      it "post1 stats" do

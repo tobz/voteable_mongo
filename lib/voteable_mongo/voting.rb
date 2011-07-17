@@ -67,7 +67,8 @@ module Mongo
               '$elemMatch' => {
                 "_id" => options[:votee_id],
                 'votes.up' => { '$ne' => options[:voter_id] },
-                'votes.down' => { '$ne' => options[:voter_id] }
+                'votes.down' => { '$ne' => options[:voter_id] },
+                'votes.ip' => { '$ne' => options[:ip]}
               }
             }
           }
@@ -75,7 +76,8 @@ module Mongo
           {
             :_id => options[:votee_id],
             'votes.up' => { '$ne' => options[:voter_id] },
-            'votes.down' => { '$ne' => options[:voter_id] }
+            'votes.down' => { '$ne' => options[:voter_id] },
+            'votes.ip' => { '$ne' => options[:ip]}
           }
         end
       end
@@ -95,14 +97,19 @@ module Mongo
         vote_option_count = options[:voter_id] ? "votes.#{val}_count" : "votes.faceless_#{val}_count"
         vote_count = "votes.count"
         vote_point = "votes.point"
+        ip_option = "votes.ip"
         if embedded?
           rel = "#{_inverse_relation}.$." # prepend relation for embedded collections
           vote_option_ids.prepend rel
           vote_option_count.prepend rel
           vote_count.prepend rel
           vote_point.prepend rel
+          ip_option.prepend rel
         end
-        push_option = options[:voter_id].present? ? { '$push' => { vote_option_ids => options[:voter_id] } } : {}
+        ip_option = options[:ip].present? ? { ip_option => options[:ip] } : {}
+        user_option = options[:voter_id].present? ? { vote_option_ids => options[:voter_id] } : {}
+        combined_push = ip_option.merge(user_option)
+        push_option = combined_push.empty? ? {} : { '$push' => combined_push }
         query = new_vote_query(options)
         update = new_vote_update(options, vote_option_count,vote_count,vote_point, push_option)
         return query, update

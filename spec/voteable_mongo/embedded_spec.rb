@@ -74,7 +74,8 @@ describe Mongo::Voteable, "Embedded Documents" do
         'up_count' => 1,
         'down_count' => 0,
         'count' => 1,
-        'point' => 1
+        'point' => 1,
+        'ip' => []
       }
     end
     
