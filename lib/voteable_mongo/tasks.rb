@@ -44,7 +44,7 @@ module Mongo
             query = {}
             update = { '$set' => { voting_hash[:voting_field] => DEFAULT_VOTES } }
           end
-          puts "Init stats for #{class_name}" if log
+          puts "Init stats for #{klass.name}" if log
           master_class.collection.update(query, update, {
             :safe => true,
             :multi => true
