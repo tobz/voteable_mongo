@@ -132,15 +132,15 @@ module Mongo
       end
       
       def self.remake_stats_for(doc, voteable)
-        up_count = doc.up_voter_ids.length
-        down_count = doc.down_voter_ids.length
-        faceless_up_count = doc.faceless_up_count
-        faceless_down_count = doc.faceless_down_count
+        up_count = doc.up_voter_ids(voteable[:voting_field]).length
+        down_count = doc.down_voter_ids(voteable[:voting_field]).length
+        faceless_up_count = doc.faceless_up_count(voteable[:voting_field])
+        faceless_down_count = doc.faceless_down_count(voteable[:voting_field])
 
         doc.update_attributes(
         voteable[:voting_field] => {
-          'up' => doc.up_voter_ids,
-          'down' => doc.down_voter_ids,
+          'up' => doc.up_voter_ids(voteable[:voting_field]),
+          'down' => doc.down_voter_ids(voteable[:voting_field]),
           'up_count' => up_count,
           'faceless_up_count' => faceless_up_count,
           'faceless_down_count' => faceless_down_count,
