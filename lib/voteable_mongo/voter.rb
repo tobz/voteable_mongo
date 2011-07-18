@@ -13,7 +13,8 @@ module Mongo
       #
       # @param [Hash, Object] options the hash containing the votee, or the votee itself
       # @return [true, false] true if voted, false otherwise
-      def voted?(options)
+      def voter_voted?(options)
+        options[:voting_field] ||= "votes"
         unless options.is_a?(Hash)
           votee_class = options.class
           votee_id = options.id
@@ -32,12 +33,12 @@ module Mongo
           "images" => {
             '$elemMatch' => {
               "_id" => options[:votee_id],
-              'votes.up' => :voter_id,
-              'votes.down' => :voter_id
+              "#{options[:voting_field]}.up" => :voter_id,
+              "#{options[:voting_field]}.down" => :voter_id
             }
           }).count > 0
         else
-          votee_class.voted?(:voter_id => id, :votee_id => votee_id)
+          votee_class.voted?(:voter_id => id, :votee_id => votee_id, :voting_field => options[:voting_field])
         end
       end
 
@@ -45,19 +46,21 @@ module Mongo
       #
       # @param (see #voted?)
       # @return [Symbol, nil] :up or :down or nil if not voted
-      def vote_value(options)
+      def voter_vote_value(options)
+        options[:voting_field] ||= "votes"
         votee = unless options.is_a?(Hash)
           options
         else
           options[:votee] || options[:votee_class].find(options[:votee_id])
         end
-        votee.vote_value(_id)
+        votee.vote_value(_id, options[:voting_field])
       end
     
       # Cancel the vote on a votee
       #
       # @param [Object] votee the votee to be unvoted
       def unvote(options)
+        options[:voting_field] ||= "votes"
         unless options.is_a?(Hash)
           options = { :votee => options }
         end
@@ -71,6 +74,8 @@ module Mongo
       # @param (see #voted?)
       # @param [:up, :down] vote_value vote up or vote down, nil to unvote
       def vote(options, value = nil)
+        options[:voting_field] ||= "votes"
+        
         if options.is_a?(Hash)
           votee = options[:votee]
         else
@@ -87,15 +92,15 @@ module Mongo
       
         if options[:value].nil?
           options[:unvote] = true
-          options[:value] = vote_value(options)
+          options[:value] = voter_vote_value(options)
         else
-          options[:revote] = options.has_key?(:revote) ? !options[:revote].blank? : voted?(options)
+          options[:revote] = options.has_key?(:revote) ? !options[:revote].blank? : voter_voted?(options)
         end
       
         options[:voter] = self
         options[:voter_id] = id
 
-        (votee || votee_class).vote(options)
+        (votee || votee_class).set_vote(options)
       end
     end
   end

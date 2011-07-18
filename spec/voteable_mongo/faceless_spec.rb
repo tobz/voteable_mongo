@@ -16,7 +16,7 @@ describe Mongo::Voteable, "Anonymous support" do
   
   context 'anonymous vote up post1 the first time' do
      before :all do
-       @post = @post1.vote(:value => :up, :ip => "200")
+       @post = @post1.set_vote(:value => :up, :ip => "200")
      end
      it 'validates return post' do
        @post.should be_is_a Post
@@ -54,7 +54,7 @@ describe Mongo::Voteable, "Anonymous support" do
    
    context "anonymous user voting in @post1 with same IP" do
      before(:all) do
-       @post = @post1.vote(:value => :up, :ip => "200")
+       @post = @post1.set_vote(:value => :up, :ip => "200")
      end
      it "does not have any effect on @post1" do
        stats_for(@post1, [0,0,1,0,1,1])
@@ -74,7 +74,7 @@ describe Mongo::Voteable, "Anonymous support" do
    #
    context "anonymous votes down post1 the first time" do
      before :all do
-       Post.vote(:votee_id => @post1.id, :value => :down, :ip => "201")
+       Post.set_vote(:votee_id => @post1.id, :value => :down, :ip => "201")
      end
      
      it "post1 stats" do
@@ -119,7 +119,7 @@ describe Mongo::Voteable, "Anonymous support" do
    #
    context "user1 changes vote on post1 from down to up" do
      before :all do
-       Post.vote(:votee_id => @post1.id, :voter_id => @user1.id, :value => :up, :revote => true)
+       Post.set_vote(:votee_id => @post1.id, :voter_id => @user1.id, :value => :up, :revote => true)
      end
      
      it "post1 stats" do
@@ -142,7 +142,7 @@ describe Mongo::Voteable, "Anonymous support" do
    #
    context 'anonymous vote up for comment the first time' do
      before :all do
-       @comment.vote(:value => :up)
+       @comment.set_vote(:value => :up)
      end
      its "post2 stats" do
        stats_for(@post2, [0,0,1,0,1,2])

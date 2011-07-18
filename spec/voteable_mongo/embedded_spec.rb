@@ -42,13 +42,13 @@ describe Mongo::Voteable, "Embedded Documents" do
   end
   context "revote post1" do
     it 'has no effect' do
-      @post1.vote(:revote => true, :voter => @user1, :value => 'up')
+      @post1.set_vote(:revote => true, :voter => @user1, :value => 'up')
       stats_for(@image1, [0,0,0,0,0,0])
     end
   end
   context "revote post2" do
     it 'has no effect' do
-      Image.vote(:revote => true, :votee_id => @image2.id, :voter_id => @user2.id, :value => :down)
+      Image.set_vote(:revote => true, :votee_id => @image2.id, :voter_id => @user2.id, :value => :down)
       stats_for(@image1, [0,0,0,0,0,0])
     end
   end
@@ -59,7 +59,7 @@ describe Mongo::Voteable, "Embedded Documents" do
   #
   context 'user1 vote up image1 the first time' do
     before :all do
-      @image = @image1.vote(:voter_id => @user1.id, :value => :up)
+      @image = @image1.set_vote(:voter_id => @user1.id, :value => :up)
     end
     
     it 'returns valid document' do
@@ -102,7 +102,7 @@ describe Mongo::Voteable, "Embedded Documents" do
   #
   context "user1 votes image1 again" do
     it 'has no effect' do
-      Image.vote(:revote => false, :votee_id => @image1.id, :voter_id => @user1.id, :value => :up)
+      Image.set_vote(:revote => false, :votee_id => @image1.id, :voter_id => @user1.id, :value => :up)
       stats_for(@image1, [1,0,0,0,1,1])
       stats_for(@post1, [1,0,0,0,1,2])
       @image1.vote_value(@user1.id).should == :up
@@ -115,7 +115,7 @@ describe Mongo::Voteable, "Embedded Documents" do
   #
   context 'user2 vote down image1 the first time' do
      before :all do
-       Image.vote(:votee_id => @image1.id, :voter_id => @user2.id, :value => :down)
+       Image.set_vote(:votee_id => @image1.id, :voter_id => @user2.id, :value => :down)
      end
      
      it "image1 stats" do
@@ -140,7 +140,7 @@ describe Mongo::Voteable, "Embedded Documents" do
    #
    context 'user1 change vote on image1 from up to down' do
      before :all do
-       Image.vote(:revote => true, :votee_id => @image1.id, :voter_id => @user1.id, :value => :down)
+       Image.set_vote(:revote => true, :votee_id => @image1.id, :voter_id => @user1.id, :value => :down)
      end
      it 'image1 stats' do
        stats_for(@image1, [0,2,0,0,2,-2])
@@ -156,7 +156,7 @@ describe Mongo::Voteable, "Embedded Documents" do
    #
    context 'user1 vote down image2 the first time' do
      before :all do
-       @image2.vote(:voter_id => @user1.id, :value => :down)
+       @image2.set_vote(:voter_id => @user1.id, :value => :down)
      end
 
      it "image2 stats" do
@@ -174,7 +174,7 @@ describe Mongo::Voteable, "Embedded Documents" do
    #
    context 'user1 change vote on image2 from down to up' do
      before :all do
-       Image.vote(:revote => true, :votee_id => @image2.id.to_s, :voter_id => @user1.id.to_s, :value => :up)
+       Image.set_vote(:revote => true, :votee_id => @image2.id.to_s, :voter_id => @user1.id.to_s, :value => :up)
      end
      
      it "image2 stats" do
@@ -210,7 +210,7 @@ describe Mongo::Voteable, "Embedded Documents" do
    #
    context "user1 unvote on image1" do
      before(:all) do
-       @image1.vote(:voter_id => @user1.id, :votee_id => @image1.id, :unvote => true)
+       @image1.set_vote(:voter_id => @user1.id, :votee_id => @image1.id, :unvote => true)
      end
      
      it "image1 stats" do

@@ -10,9 +10,15 @@ module Helpers
   #   votes_count, 
   #   votes_point
   # 
-  def stats_for(obj, expected)
+  def stats_for(obj, expected, voting_field = "votes")
     obj.reload
-    stats = [obj.up_votes_count, obj.down_votes_count, obj.faceless_up_count, obj.faceless_down_count, obj.votes_count, obj.votes_point]
+    stats = [obj.up_votes_count(voting_field), 
+            obj.down_votes_count(voting_field), 
+            obj.faceless_up_count(voting_field), 
+            obj.faceless_down_count(voting_field), 
+            obj.votes_count(voting_field), 
+            obj.votes_point(voting_field)
+            ]
     stats.should == expected
   end
 end

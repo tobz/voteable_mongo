@@ -10,21 +10,22 @@ module Mongo
       def self.init_stats(log = false)
         VOTEABLE.each do |class_name, voteable|
           klass = class_name.constantize
-
-          if klass.embedded?
-            master_class = klass._parent_klass
-            query = { "#{klass._inverse_relation}.votes" => nil}
-            update = { "$set" => {"#{klass._inverse_relation}.$.votes" => DEFAULT_VOTES } }
-          else
-            master_class = klass
-            query = {:votes => nil}
-            update = { '$set' => { :votes => DEFAULT_VOTES } }
+          voteable[voteable.keys.first].each do |voting_hash|
+            if klass.embedded?
+              master_class = klass._parent_klass
+              query = { "#{klass._inverse_relation}.#{voting_hash[:voting_field]}" => nil}
+              update = { "$set" => {"#{klass._inverse_relation}.$.#{voting_hash[:voting_field]}" => DEFAULT_VOTES } }
+            else
+              master_class = klass
+              query = { voting_hash[:voting_field] => nil}
+              update = { '$set' => { voting_hash[:voting_field] => DEFAULT_VOTES } }
+            end
+            puts "Init stats for #{class_name}" if log
+            master_class.collection.update(query, update, {
+              :safe => true,
+              :multi => true
+            })
           end
-          puts "Init stats for #{class_name}" if log
-          master_class.collection.update(query, update, {
-            :safe => true,
-            :multi => true
-          })
         end
       end
 
@@ -32,20 +33,23 @@ module Mongo
       # How can we test uninitialized records?
       def self.reset_stats(klass, log = false)
         puts "Reset stats for #{klass.name}" if log
-        if klass.embedded?
-          master_class = klass._parent_klass
-          query = { "#{klass._inverse_relation}.votes" => {"$exists" => true}}
-          update = { "$set" => {"#{klass._inverse_relation}.$.votes" => DEFAULT_VOTES } }
-        else
-          master_class = klass
-          query = {}
-          update = { '$set' => { :votes => DEFAULT_VOTES } }
+        voteables = VOTEABLE.find{|k,v| k == klass.name }.last
+        voteables[voteables.keys.first].each do |voting_hash|
+          if klass.embedded?
+            master_class = klass._parent_klass
+            query = { "#{klass._inverse_relation}.#{voting_hash[:voting_field]}" => {"$exists" => true}}
+            update = { "$set" => {"#{klass._inverse_relation}.$.#{voting_hash[:voting_field]}" => DEFAULT_VOTES } }
+          else
+            master_class = klass
+            query = {}
+            update = { '$set' => { voting_hash[:voting_field] => DEFAULT_VOTES } }
+          end
+          puts "Init stats for #{class_name}" if log
+          master_class.collection.update(query, update, {
+            :safe => true,
+            :multi => true
+          })
         end
-        puts "Init stats for #{class_name}" if log
-        master_class.collection.update(query, update, {
-          :safe => true,
-          :multi => true
-        })
       end
 
       # Re-generate vote counters and vote points
@@ -67,20 +71,24 @@ module Mongo
       
       def self.remake_stats_for_all_master_classes(master_classes, log)
         master_classes.each do |klass, voteable|
-          klass_voteable = voteable[klass.name]
-          klass.all.each{ |doc|
-            remake_stats_for(doc, klass_voteable)
-          }
+          klass_voteables = voteable[klass.name]
+          klass_voteables.each do |klass_voteable|
+            klass.all.each{ |doc|
+              remake_stats_for(doc, klass_voteable)
+            }
+          end
         end
       end
       
       def self.remake_stats_for_all_embedded_classes(embedded_classes, log)
         embedded_classes.each do |klass, voteable|
           master_klass = klass._parent_klass
-          klass_voteable = voteable[klass.name]
-          master_klass.all.each do |master_doc|
-            master_doc.send(klass._inverse_relation).each do |doc|
-              remake_stats_for(doc, klass_voteable)
+          klass_voteables = voteable[klass.name]
+          klass_voteables.each do |klass_voteable|
+            master_klass.all.each do |master_doc|
+              master_doc.send(klass._inverse_relation).each do |doc|
+                remake_stats_for(doc, klass_voteable)
+              end
             end
           end
         end
@@ -88,15 +96,17 @@ module Mongo
       
       def self.update_parent_for_master_classes(master_classes, log)
         master_classes.each do |klass, voteable|
-          voteable.each do |parent_class_name, parent_voteable|
-            metadata = klass.voteable_relation(parent_class_name)
-            if metadata
-              parent_class = parent_class_name.constantize
-              foreign_key = klass.voteable_foreign_key(metadata)
-              puts "Updating stats for #{class_name} > #{parent_class_name}" if log
-              klass.all.each{ |doc|
-                update_parent_stats_for(doc, parent_class, parent_voteable, foreign_key)
-              }
+          voteable.each do |parent_class_name, parent_voteables|
+            parent_voteables.each do |parent_voteable|
+              metadata = klass.voteable_relation(parent_class_name)
+              if metadata
+                parent_class = parent_class_name.constantize
+                foreign_key = klass.voteable_foreign_key(metadata)
+                puts "Updating stats for #{class_name} > #{parent_class_name}" if log
+                klass.all.each{ |doc|
+                  update_parent_stats_for(doc, parent_class, parent_voteable, foreign_key)
+                }
+              end
             end
           end
         end
@@ -104,14 +114,16 @@ module Mongo
       
       def self.update_parent_for_embedded_classes(embedded_classes, log)
         embedded_classes.each do |klass, voteable|
-          voteable.each do |parent_class_name, parent_voteable|
-            metadata = klass.voteable_relation(parent_class_name)
-            if metadata
-              parent_class = parent_class_name.constantize
-              puts "Updating stats for #{class_name} > #{parent_class_name}" if log
-              parent_class.all.each do |master_doc|
-                master_doc.send(klass._inverse_relation).each do |doc|
-                  update_parent_stats_for(doc, parent_class, parent_voteable)
+          voteable.each do |parent_class_name, parent_voteables|
+            parent_voteables.each do |parent_voteable|
+              metadata = klass.voteable_relation(parent_class_name)
+              if metadata
+                parent_class = parent_class_name.constantize
+                puts "Updating stats for #{class_name} > #{parent_class_name}" if log
+                parent_class.all.each do |master_doc|
+                  master_doc.send(klass._inverse_relation).each do |doc|
+                    update_parent_stats_for(doc, parent_class, parent_voteable)
+                  end
                 end
               end
             end
@@ -126,7 +138,7 @@ module Mongo
         faceless_down_count = doc.faceless_down_count
 
         doc.update_attributes(
-        'votes' => {
+        voteable[:voting_field] => {
           'up' => doc.up_voter_ids,
           'down' => doc.down_voter_ids,
           'up_count' => up_count,
@@ -155,16 +167,16 @@ module Mongo
           return if up_count == 0 && down_count == 0 && faceless_up_count == 0 && faceless_down_count == 0
 
           inc_options = {
-            'votes.point' => voteable[:up].to_i*(up_count+faceless_up_count) + voteable[:down].to_i*(down_count+faceless_down_count)
+            "#{voteable[:voting_field]}.point" => voteable[:up].to_i*(up_count+faceless_up_count) + voteable[:down].to_i*(down_count+faceless_down_count)
           }
 
           unless voteable[:update_counters] == false
             inc_options.merge!(
-            'votes.count' => up_count + down_count,
-            'votes.up_count' => up_count,
-            'votes.down_count' => down_count,
-            'votes.faceless_up_count' => faceless_up_count,
-            'votes.faceless_down_count' => faceless_down_count
+            "#{voteable[:voting_field]}.count" => up_count + down_count,
+            "#{voteable[:voting_field]}.up_count" => up_count,
+            "#{voteable[:voting_field]}.down_count" => down_count,
+            "#{voteable[:voting_field]}.faceless_up_count" => faceless_up_count,
+            "#{voteable[:voting_field]}.faceless_down_count" => faceless_down_count
             )
           end
 

@@ -15,38 +15,47 @@ module Mongo
         #   - :unvote: if true undo the voting
         #
         # @return [votee, false]
-        def vote(options)
+        def set_vote(options)
           validate_and_normalize_vote_options(options)
-          options[:voteable] = VOTEABLE[name][name]
-          return unless options[:voteable]
+          return unless VOTEABLE[self.name][self.name]
+          setup_voteable(options)
           query, update = if options[:revote]
-          revote_query_and_update(options)
-        elsif options[:unvote]
-          unvote_query_and_update(options)
-        else
-          new_vote_query_and_update(options)
+            revote_query_and_update(options)
+          elsif options[:unvote]
+            unvote_query_and_update(options)
+          else
+            new_vote_query_and_update(options)
+          end
+          # http://www.mongodb.org/display/DOCS/findAndModify+Command
+          begin
+            doc = voteable_collection.find_and_modify(
+            :query => query,
+            :update => update,
+            :new => true
+            )
+          rescue Mongo::OperationFailure => e
+            puts e.inspect
+            doc = nil
+          end
+          if doc
+            inner_doc = embedded? ? find_inner_doc(doc, options) : doc
+            update_parent_votes(doc, options) if options[:voteable][:update_parents]
+            # Return new vote attributes to instance
+            options[:votee].write_attribute(options[:voting_field], inner_doc[options[:voting_field]]) if options[:votee]
+            options[:votee] || new(inner_doc)
+          else
+            false
+          end
         end
-
-        # http://www.mongodb.org/display/DOCS/findAndModify+Command
-        begin
-          doc = voteable_collection.find_and_modify(
-          :query => query,
-          :update => update,
-          :new => true
-          )
-        rescue Mongo::OperationFailure
-          doc = nil
-        end
-        if doc
-          inner_doc = embedded? ? find_inner_doc(doc, options) : doc
-          update_parent_votes(doc, options) if options[:voteable][:update_parents]
-          # Return new vote attributes to instance
-          options[:votee].write_attribute('votes', inner_doc['votes']) if options[:votee]
-          options[:votee] || new(inner_doc)
-        else
-          false
-        end
+        
+      def setup_voteable(options)
+        options[:voting_field] ||= "votes"
+        options[:voteable] = VOTEABLE[name][name].find{ |voteable| voteable[:voting_field] == options[:voting_field]}
+        return unless options[:voteable]
+        options[:voteable][:up] ||= +1 
+        options[:voteable][:down] ||= -1
       end
+      
 
       def find_inner_doc(doc, options)
         doc[_inverse_relation].find{|img| img["_id"] == options[:votee_id] }
@@ -66,18 +75,18 @@ module Mongo
             _inverse_relation => {
               '$elemMatch' => {
                 "_id" => options[:votee_id],
-                'votes.up' => { '$ne' => options[:voter_id] },
-                'votes.down' => { '$ne' => options[:voter_id] },
-                'votes.ip' => { '$ne' => options[:ip]}
+                "#{options[:voting_field]}.up" => { '$ne' => options[:voter_id] },
+                "#{options[:voting_field]}.down" => { '$ne' => options[:voter_id] },
+                "#{options[:voting_field]}.ip" => { '$ne' => options[:ip]}
               }
             }
           }
         else
           {
             :_id => options[:votee_id],
-            'votes.up' => { '$ne' => options[:voter_id] },
-            'votes.down' => { '$ne' => options[:voter_id] },
-            'votes.ip' => { '$ne' => options[:ip]}
+            "#{options[:voting_field]}.up" => { '$ne' => options[:voter_id] },
+            "#{options[:voting_field]}.down" => { '$ne' => options[:voter_id] },
+            "#{options[:voting_field]}.ip" => { '$ne' => options[:ip]}
           }
         end
       end
@@ -93,11 +102,11 @@ module Mongo
 
       def new_vote_query_and_update(options)
         val = options[:value] # :up or :down
-        vote_option_ids = "votes.#{val}"
-        vote_option_count = options[:voter_id] ? "votes.#{val}_count" : "votes.faceless_#{val}_count"
-        vote_count = "votes.count"
-        vote_point = "votes.point"
-        ip_option = "votes.ip"
+        vote_option_ids = "#{options[:voting_field]}.#{val}"
+        vote_option_count = options[:voter_id] ? "#{options[:voting_field]}.#{val}_count" : "#{options[:voting_field]}.faceless_#{val}_count"
+        vote_count = "#{options[:voting_field]}.count"
+        vote_point = "#{options[:voting_field]}.point"
+        ip_option = "#{options[:voting_field]}.ip"
         if embedded?
           rel = "#{_inverse_relation}.$." # prepend relation for embedded collections
           vote_option_ids.prepend rel
@@ -118,21 +127,20 @@ module Mongo
       def revote_query_and_update(options)
         rel = embedded? && _inverse_relation
         if options[:value] == :up
-          positive_voter_ids =    ['votes.up', "#{rel}.$.votes.up"]
-          negative_voter_ids =    ['votes.down', "#{rel}.$.votes.down"]
-          positive_votes_count =  ['votes.up_count', "#{rel}.$.votes.up_count"]
-          negative_votes_count =  ['votes.down_count',"#{rel}.$.votes.down_count"]
+          positive_voter_ids =    ["#{options[:voting_field]}.up", "#{rel}.$.#{options[:voting_field]}.up"]
+          negative_voter_ids =    ["#{options[:voting_field]}.down", "#{rel}.$.#{options[:voting_field]}.down"]
+          positive_votes_count =  ["#{options[:voting_field]}.up_count", "#{rel}.$.#{options[:voting_field]}.up_count"]
+          negative_votes_count =  ["#{options[:voting_field]}.down_count","#{rel}.$.#{options[:voting_field]}.down_count"]
           point_delta = options[:voteable][:up] - options[:voteable][:down]
         else
-          positive_voter_ids =    ['votes.down', "#{rel}.$.votes.down"]
-          negative_voter_ids =    ['votes.up', "#{rel}.$.votes.up"]
-          positive_votes_count =  ['votes.down_count', "#{rel}.$.votes.down_count"]
-          negative_votes_count =  ['votes.up_count', "#{rel}.$.votes.up_count"]
+          positive_voter_ids =    ["#{options[:voting_field]}.down", "#{rel}.$.#{options[:voting_field]}.down"]
+          negative_voter_ids =    ["#{options[:voting_field]}.up", "#{rel}.$.#{options[:voting_field]}.up"]
+          positive_votes_count =  ["#{options[:voting_field]}.down_count", "#{rel}.$.#{options[:voting_field]}.down_count"]
+          negative_votes_count =  ["#{options[:voting_field]}.up_count", "#{rel}.$.#{options[:voting_field]}.up_count"]
           point_delta = -options[:voteable][:up] + options[:voteable][:down]
         end
         query = query_for_revote(options, negative_voter_ids, rel)
         update = update_for_revote(options, negative_voter_ids, positive_voter_ids, positive_votes_count, negative_votes_count, point_delta, rel)
-
         return query, update
       end
 
@@ -145,7 +153,7 @@ module Mongo
             '$inc' => {
               positive_votes_count.last => +1,
               negative_votes_count.last => -1,
-              "#{rel}.$.votes.point" => point_delta
+              "#{rel}.$.#{options[:voting_field]}.point" => point_delta
             }
           }
         else
@@ -155,7 +163,7 @@ module Mongo
             '$inc' => {
               positive_votes_count.first => +1,
               negative_votes_count.first => -1,
-              'votes.point' => point_delta
+              "#{options[:voting_field]}.point" => point_delta
             }
           }
         end
@@ -220,18 +228,18 @@ module Mongo
           }
         end
       end
-
+      
       def unvote_query_and_update(options)
         rel = embedded? && _inverse_relation
         if options[:value] == :up
-          positive_voter_ids    = ['votes.up', "#{rel}.$.votes.up"]
-          positive_votes_count  = ['votes.up_count', "#{rel}.$.votes.up_count"]
+          positive_voter_ids    = ["#{options[:voting_field]}.up", "#{rel}.$.#{options[:voting_field]}.up"]
+          positive_votes_count  = ["#{options[:voting_field]}.up_count", "#{rel}.$.#{options[:voting_field]}.up_count"]
         else
-          positive_voter_ids    = ['votes.down', "#{rel}.$.votes.down"]
-          positive_votes_count  = ['votes.down_count',"#{rel}.$.votes.down_count"]
+          positive_voter_ids    = ["#{options[:voting_field]}.down", "#{rel}.$.#{options[:voting_field]}.down"]
+          positive_votes_count  = ["#{options[:voting_field]}.down_count","#{rel}.$.#{options[:voting_field]}.down_count"]
         end
-        votes_count           = ['votes.count', "#{rel}.$.votes.count"]
-        votes_point           = ['votes.point', "#{rel}.$.votes.point"]
+        votes_count           = ["#{options[:voting_field]}.count", "#{rel}.$.#{options[:voting_field]}.count"]
+        votes_point           = ["#{options[:voting_field]}.point", "#{rel}.$.#{options[:voting_field]}.point"]
 
         query = query_for_unvote(options, positive_voter_ids, rel)
         update = update_for_unvote(options, positive_voter_ids, votes_count, votes_point, positive_votes_count)
@@ -265,42 +273,43 @@ module Mongo
       end
 
       def parent_inc_options(voteable, options)
+        voteable = voteable.first
         inc_options = {}
 
         if options[:revote]
           if options[:value] == :up
-            inc_options['votes.point'] = voteable[:up] - voteable[:down]
+            inc_options["#{voteable[:voting_field]}.point"] = voteable[:up] - voteable[:down]
             unless voteable[:update_counters] == false
-              inc_options['votes.up_count'] = +1
-              inc_options['votes.down_count'] = -1
+              inc_options["#{voteable[:voting_field]}.up_count"] = +1
+              inc_options["#{voteable[:voting_field]}.down_count"] = -1
             end
           else
-            inc_options['votes.point'] = -voteable[:up] + voteable[:down]
+            inc_options["#{voteable[:voting_field]}.point"] = -voteable[:up] + voteable[:down]
             unless voteable[:update_counters] == false
-              inc_options['votes.up_count'] = -1
-              inc_options['votes.down_count'] = +1
+              inc_options["#{voteable[:voting_field]}.up_count"] = -1
+              inc_options["#{voteable[:voting_field]}.down_count"] = +1
             end
           end
 
         elsif options[:unvote]
-          inc_options['votes.point'] = -voteable[options[:value]]
+          inc_options["#{voteable[:voting_field]}.point"] = -voteable[options[:value]]
           unless voteable[:update_counters] == false
-            inc_options['votes.count'] = -1
+            inc_options["#{voteable[:voting_field]}.count"] = -1
             if options[:value] == :up
-              inc_options['votes.up_count'] = -1
+              inc_options["#{voteable[:voting_field]}.up_count"] = -1
             else
-              inc_options['votes.down_count'] = -1
+              inc_options["#{voteable[:voting_field]}.down_count"] = -1
             end
           end
 
         else # new vote
-          inc_options['votes.point'] = voteable[options[:value]]
+          inc_options["#{voteable[:voting_field]}.point"] = voteable[options[:value]]
           unless voteable[:update_counters] == false
-            inc_options['votes.count'] = +1
+            inc_options["#{voteable[:voting_field]}.count"] = +1
             if options[:value] == :up
-              options[:voter_id].present? ? inc_options['votes.up_count'] = +1 : inc_options['votes.faceless_up_count'] = +1
+              options[:voter_id].present? ? inc_options["#{voteable[:voting_field]}.up_count"] = +1 : inc_options["#{voteable[:voting_field]}.faceless_up_count"] = +1
             else
-              options[:voter_id].present? ? inc_options['votes.down_count'] = +1 : inc_options['votes.faceless_down_count'] = +1
+              options[:voter_id].present? ? inc_options["#{voteable[:voting_field]}.down_count"] = +1 : inc_options["#{voteable[:voting_field]}.faceless_down_count"] = +1
             end
           end
         end

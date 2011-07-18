@@ -5,7 +5,7 @@ module Mongo
         extend ActiveSupport::Concern
 
         included do
-          field :votes, :type => Hash, :default => DEFAULT_VOTES
+          # field :votes, :type => Hash, :default => DEFAULT_VOTES
 
           class << self
             alias_method :voteable_index, :index
@@ -19,14 +19,10 @@ module Mongo
 
           def voteable_collection
             if self.embedded?
-              Post.collection.master.collection
+              _parent_klass.collection.master.collection
             else
               collection.master.collection
             end
-          end
-          
-          def evoteable_collection
-            Post.collection.master.collection
           end
 
           def voteable_foreign_key(metadata)

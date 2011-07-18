@@ -24,12 +24,12 @@ describe Mongo::Voteable::Tasks do
     @post2.votes = nil
     @post2.save
     
-    @post3.vote(:value => :up)
+    @post3.set_vote(:value => :up)
     
     @image1.votes = nil
     @image1.save
     
-    @image2.vote(:value => :down)
+    @image2.set_vote(:value => :down)
   end
   
   describe ".init_stats" do

@@ -10,6 +10,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 # 
 # Category
 #   voteable self, :index => true
+# 
+# VOTEABLE
+# {"Category"=>{"Category"=>{:index=>true, :voting_field=>"votes"}}, 
+# "Image"=>{"Image"=>{:up=>1, :down=>-1, :index=>true, :voting_field=>"votes", :update_parents=>true}, "Post"=>{:up=>2, :down=>-1, :voting_field=>"votes"}}, 
+# "Post"=>{"Post"=>{:up=>1, :down=>-1, :index=>true, :voting_field=>"votes", :update_parents=>true}, "Category"=>{:up=>3, :down=>-5, :update_counters=>false, :voting_field=>"votes"}}, 
+# "Comment"=>{"Comment"=>{:up=>1, :down=>-3, :voting_field=>"votes", :update_parents=>true}, "Post"=>{:up=>2, :down=>-1, :voting_field=>"votes"}}, 
+# "User"=>{"User"=>{:voting_field=>"points"}}, 
+# "DynamicDoc"=>{"DynamicDoc"=>[{:voting_field=>"moderations", :update_parents=>true},{:voting_field=>"likes", :update_parents=>true}], "User"=>{:voting_field=>"points", :up=>5, :down=>-5}}}
 
 describe Mongo::Voteable do
   
@@ -43,7 +51,7 @@ describe Mongo::Voteable do
   end
   
   before :all do
-    Mongoid.master.collections.select {|c| c.name !~ /system/ }.each(&:drop)
+    Mongoid.master.collections.select {|c| c.name !~ /system/ }.each(&:drop) if defined? Mongoid
     @category1 = Category.create!(:name => 'xyz')
     @category2 = Category.create!(:name => 'abc')
     
@@ -103,12 +111,12 @@ describe Mongo::Voteable do
     end
         
     it 'revote post1 has no effect' do
-      @post1.vote(:revote => true, :voter => @user1, :value => 'up')
+      @post1.set_vote(:revote => true, :voter => @user1, :value => 'up')
       stats_for(@post1, [0,0,0,0,0,0])
     end
     
     it 'revote post2 has no effect' do
-      Post.vote(:revote => true, :votee_id => @post2.id, :voter_id => @user2.id, :value => :down)
+      Post.set_vote(:revote => true, :votee_id => @post2.id, :voter_id => @user2.id, :value => :down)
       stats_for(@post2, [0,0,0,0,0,0])
     end
   end
@@ -120,7 +128,7 @@ describe Mongo::Voteable do
   # 
   context 'user1 vote up post1 the first time' do
     before :all do
-      @post = @post1.vote(:voter_id => @user1.id, :value => :up)
+      @post = @post1.set_vote(:voter_id => @user1.id, :value => :up)
     end
     
     it 'returns valid document' do
@@ -175,7 +183,7 @@ describe Mongo::Voteable do
   # 
   context "user1 vote post1 for the second time" do
     it "has no effect" do
-      Post.vote(:revote => false, :votee_id => @post1.id, :voter_id => @user1.id, :value => :up)
+      Post.set_vote(:revote => false, :votee_id => @post1.id, :voter_id => @user1.id, :value => :up)
       
       stats_for(@post1, [1,0,0,0,1,1])
       @post1.vote_value(@user1.id).should == :up
@@ -190,7 +198,7 @@ describe Mongo::Voteable do
   
   context 'user2 vote down post1 the first time' do
     before :all do
-      Post.vote(:votee_id => @post1.id, :voter_id => @user2.id, :value => :down)
+      Post.set_vote(:votee_id => @post1.id, :voter_id => @user2.id, :value => :down)
       @post1.reload
     end
     
@@ -227,7 +235,7 @@ describe Mongo::Voteable do
   #
   context 'user1 change vote on post1 from up to down' do
     before :all do
-      Post.vote(:revote => true, :votee_id => @post1.id, :voter_id => @user1.id, :value => :down)
+      Post.set_vote(:revote => true, :votee_id => @post1.id, :voter_id => @user1.id, :value => :down)
     end
     
     it 'stats' do
@@ -256,7 +264,7 @@ describe Mongo::Voteable do
   #   @post2      [0,0,0,0,0,0]
   context 'user1 vote down post2 the first time' do
     before :all do
-      @post2.vote(:voter_id => @user1.id, :value => :down)
+      @post2.set_vote(:voter_id => @user1.id, :value => :down)
     end
     
     it 'stats' do
@@ -275,7 +283,7 @@ describe Mongo::Voteable do
   #
   context 'user1 change vote on post2 from down to up' do
     before :all do
-      Post.vote(:revote => true, :votee_id => @post2.id.to_s, :voter_id => @user1.id.to_s, :value => :up)
+      Post.set_vote(:revote => true, :votee_id => @post2.id.to_s, :voter_id => @user1.id.to_s, :value => :up)
     end
     it 'stats' do
       stats_for(@post2, [1,0,0,0,1,1])
@@ -291,7 +299,7 @@ describe Mongo::Voteable do
   # 
   context 'user1 vote up post2 comment the first time' do
     before :all do
-      @comment.vote(:voter_id => @user1.id, :value => :up)
+      @comment.set_vote(:voter_id => @user1.id, :value => :up)
     end
     
     it 'post2 stats' do
@@ -338,7 +346,7 @@ describe Mongo::Voteable do
   #
   context "user1 unvote on post1" do
     before(:all) do
-      @post1.vote(:voter_id => @user1.id, :votee_id => @post1.id, :unvote => true)
+      @post1.set_vote(:voter_id => @user1.id, :votee_id => @post1.id, :unvote => true)
     end
     
     it 'stats' do

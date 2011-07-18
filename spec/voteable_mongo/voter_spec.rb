@@ -14,14 +14,14 @@ describe Mongo::Voter do
       Post.voted_by(@user1).should be_empty
       Post.up_voted_by(@user1).should be_empty
       Post.down_voted_by(@user1).should be_empty
-      @user1.voted?(@post1).should be_false
-      @user1.voted?(@post2).should be_false
+      @user1.voter_voted?(@post1).should be_false
+      @user1.voter_voted?(@post2).should be_false
       
       Post.voted_by(@user2).should be_empty
       Post.up_voted_by(@user2).should be_empty
       Post.down_voted_by(@user2).should be_empty
-      @user2.voted?(@post1).should be_false
-      @user2.voted?(@post2).should be_false
+      @user2.voter_voted?(@post1).should be_false
+      @user2.voter_voted?(@post2).should be_false
     end
     
     it 'revote has no effect' do      
@@ -43,11 +43,11 @@ describe Mongo::Voter do
       @post1.votes_count.should == 1
       @post1.votes_point.should == 1
 
-      @user1.vote_value(@post1).should == :up
-      @user2.vote_value(:votee_class => Post, :votee_id => @post1.id).should be_nil
+      @user1.voter_vote_value(@post1).should == :up
+      @user2.voter_vote_value(:votee_class => Post, :votee_id => @post1.id).should be_nil
       
-      @user1.should be_voted(@post1)
-      @user2.should_not be_voted(:votee_class => Post, :votee_id => @post1.id)
+      @user1.should be_voter_voted(@post1)
+      @user2.should_not be_voter_voted(:votee_class => Post, :votee_id => @post1.id)
       
       Post.voted_by(@user1).to_a.should == [ @post1 ]
       Post.up_voted_by(@user1).to_a.should == [ @post1 ]
@@ -80,8 +80,8 @@ describe Mongo::Voter do
       @post1.votes_count.should == 2
       @post1.votes_point.should == 0
       
-      @user1.vote_value(@post1).should == :up
-      @user2.vote_value(@post1).should == :down
+      @user1.voter_vote_value(@post1).should == :up
+      @user2.voter_vote_value(@post1).should == :down
 
       Post.voted_by(@user1).to_a.should == [ @post1 ]
       Post.voted_by(@user2).to_a.should == [ @post1 ]
@@ -104,8 +104,8 @@ describe Mongo::Voter do
       @post1.votes_count.should == 2
       @post1.votes_point.should == -2
 
-      @user1.vote_value(@post1).should == :down
-      @user2.vote_value(@post1).should == :down
+      @user1.voter_vote_value(@post1).should == :down
+      @user2.voter_vote_value(@post1).should == :down
 
       Post.voted_by(@user1).to_a.should == [ @post1 ]
       Post.voted_by(@user2).to_a.should == [ @post1 ]
@@ -122,8 +122,8 @@ describe Mongo::Voter do
       @post2.votes_count.should == 1
       @post2.votes_point.should == -1
       
-      @user1.vote_value(@post2).should == :down
-      @user2.vote_value(@post2).should be_nil
+      @user1.voter_vote_value(@post2).should == :down
+      @user2.voter_vote_value(@post2).should be_nil
 
       Post.voted_by(@user1).to_a.should == [ @post1, @post2 ]
     end
@@ -139,8 +139,8 @@ describe Mongo::Voter do
       @post2.votes_count.should == 1
       @post2.votes_point.should == 1
       
-      @user1.vote_value(@post2).should == :up
-      @user2.vote_value(@post2).should be_nil
+      @user1.voter_vote_value(@post2).should == :up
+      @user2.voter_vote_value(@post2).should be_nil
 
       Post.voted_by(@user1).size.should == 2
       Post.voted_by(@user1).should be_include @post1
