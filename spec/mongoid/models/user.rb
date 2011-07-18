@@ -3,6 +3,6 @@ class User
   include Mongo::Voter
   include Mongo::Voteable
   
-  # voteable self, :voting_field => :points
+  voteable self, :voting_field => :points
   has_many :dynamic_docs
 end

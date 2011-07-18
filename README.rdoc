@@ -80,7 +80,66 @@ user.rb
       include Mongoid::Document
       include Mongo::Voter
     end
+    
+== Exclusive Features
 
+== Embedded Documents
+image.rb
+
+  class Image
+    include Mongoid::Document
+    include Mongo::Voteable
+  
+    embedded_in :post
+  
+    voteable self, :up => +1, :down => -1, :index => true
+    voteable Post, :up => +2, :down => -1
+  end
+
+== Custom Voting Field Name
+
+video.rb
+
+  class Video
+    include Mongoid::Document
+    include Mongo::Voteable
+  
+    embedded_in :dynamic_doc
+  
+    voteable self, :up => +1, :down => -1, :index => true, :voting_field => :reviews
+    voteable DynamicDoc, :up => +2, :down => -2, :voting_field => :moderations
+  end
+
+== Multiple Voting Field For Document  
+dynamic_doc.rb
+
+  class DynamicDoc
+    include Mongoid::Document
+    include Mongo::Voteable
+
+    voteable self, :voting_field => :moderations  
+    voteable self, :voting_field => :likes, :up => +2, :down => -2
+    voteable User, :voting_field => :points, :up => +5, :down => -5
+  
+    belongs_to :user
+    embeds_many :videos
+  end
+
+== Document as Voteable and Voter
+user.rb
+
+  class User
+    include Mongoid::Document
+    include Mongo::Voter
+    include Mongo::Voteable
+  
+    voteable self, :voting_field => :points
+    has_many :dynamic_docs
+  end
+
+== Anonymous Votes
+  Just omit the user responsible for the vote during a #set_vote call.
+  You can optionally provide an IP to avoid vote duplication
 
 == MongoMapper
 post.rb
@@ -119,16 +178,20 @@ user.rb
 
 === Make a vote
 
+    use #vote when calling from Voter
+    user #set_vote when calling from Voteable
+    
     @user.vote(@post, :up)
 
 Is equivalent to
     @user.vote(:votee => @post, :value => :up)
-    @post.vote(:voter => @user, :value => :up)
+    
+    @post.set_vote(:voter => @user, :value => :up)
 
 In case you don't need to init voter and / or votee objects you can
     @user.vote(:votee_class => Post, :votee_id => post_id, :value => :down)
-    @post.vote(:voter_id => user_id, :value => :up)
-    Post.vote(:voter_id => user_id, :votee_id => post_id, :value => :up)
+    @post.set_vote(:voter_id => user_id, :value => :up)
+    Post.set_vote(:voter_id => user_id, :votee_id => post_id, :value => :up)
 
 === Undo a vote
 
@@ -137,42 +200,56 @@ In case you don't need to init voter and / or votee objects you can
 === If have voter_id, votee_id and vote value you don't need to init voter and votee objects (suitable for API calls)
 
 New vote
-    Post.vote(:voter_id => user_id, :votee_id => post_id, :value => :up)
+    Post.set_vote(:voter_id => user_id, :votee_id => post_id, :value => :up)
 
 Re-vote
-    Post.vote(:voter_id => user_id, :votee_id => post_id, :value => :up, :revote => true)
+    Post.set_vote(:voter_id => user_id, :votee_id => post_id, :value => :up, :revote => true)
 
 Un-vote
-    Post.vote(:voter_id => user_id, :votee_id => post_id, :value => :up, :unvote => true)
+    Post.set_vote(:voter_id => user_id, :votee_id => post_id, :value => :up, :unvote => true)
 
 Note: vote function always return updated votee object
 
-=== Get vote_value
+=== Get vote_value for default "votes" field
     
-    @user.vote_value(@post)
-    @user.vote_value(:votee_class => Post, :votee_id => post_id)
+    @user.voter_vote_value(:votee => @post)
+    @user.voter_vote_value(:votee_class => Post, :votee_id => post_id)
     @post.vote_value(@user)
     @post.vote_value(user_id)
+    
+=== Get vote_value for custom voting field "moderations"
 
-=== Check if voted?
+    @user.voter_vote_value(:votee => @post, :voting_field => "moderations")
+    @user.voter_vote_value(:votee_class => Post, :votee_id => post_id, :voting_field => "moderations")
+    @post.vote_value(@user, "moderations")
+    @post.vote_value(user_id, "moderations")
 
-    @user.voted?(@post)
-    @user.voted?(:votee_class => Post, :votee_id => post_id)
+=== Check if voted? for default field name "votes"
+
+    @user.voter_vote_value?(:votee => @post)
+    @user.voter_vote_value?(:votee_class => Post, :votee_id => post_id)
     @post.voted_by?(@user)
     @post.voted_by?(user_id)
 
+=== Check if voted? for custom voting field "moderations"
+
+    @user.voter_vote_value?(:votee => @post, :voting_field => "moderations")
+    @user.voter_vote_value?(:votee_class => Post, :votee_id => post_id, :voting_field => "moderations")
+    @post.voted_by?(@user, "moderations")
+    @post.voted_by?(user_id, "moderations")
+
 === Get votes counts and points
 
-    puts @post.votes_point
-    puts @post.votes_count
-    puts @post.up_votes_count
-    puts @post.down_votes_count
+    puts @post.votes_point || @post.votes_point("moderations")
+    puts @post.votes_count || @post.votes_count("moderations")
+    puts @post.up_votes_count || @post.up_votes_count("moderations")
+    puts @post.down_votes_count || @post.down_votes_count("moderations")
 
 === Get voters given voted object and voter class
 
-    @post.up_voters(User)
-    @post.down_voters(User)
-    @post.voters(User)
+    @post.up_voters(User) || @post.up_voters(User, "moderations")
+    @post.down_voters(User) || @post.down_voters(User, "moderations")
+    @post.voters(User) || @post.voters(User, "moderations")
     - or -
     User.up_voted_for(@post)
     User.down_voted_for(@post)
@@ -191,6 +268,11 @@ Rails
     rake mongo:voteable:init_stats
 Ruby
     Mongo::Voteable::Tasks::init_stats
+=== Reset all voting fields for a particular class (including the ones with content)
+Rails
+    mongo:voteable:reset_stats[klass]
+Ruby
+    Mongo::Voteable::Tasks::reset_stats(klass)
 
 === Re-generate counters and vote points in case you change :up / :down vote points
 Rails
@@ -206,6 +288,7 @@ Ruby
 
 == Credits
 * Alex Nguyen - Author
+* Alexandre Angelim - Mongoid Exclusive Features
 * Contributors[https://github.com/vinova/voteable_mongo/contributors]
 
 Copyright (c) 2010-2011 Vinova Pte Ltd

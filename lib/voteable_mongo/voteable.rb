@@ -58,8 +58,10 @@ module Mongo
       # 
       # @param [Hash] options a hash containings:
       # 
-      # voteable self, :up => +1, :down => -3, :as => :moderations
+      # voteable self, :up => +1, :down => -3
       # voteable Post, :up => +2, :down => -1, :update_counters => false # skip counter update
+      # voteable self, :voting_field => :moderations
+      # 
       def voteable(klass = self, options = nil)
         VOTEABLE[name] ||= {}
         options[:voting_field] = options[:voting_field].present? ? options[:voting_field].to_s : "votes"

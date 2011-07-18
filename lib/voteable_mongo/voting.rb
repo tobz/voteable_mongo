@@ -23,6 +23,7 @@ module Mongo
         #   - :value: :up or :down
         #   - :revote: if true change vote vote from :up to :down and vise versa
         #   - :unvote: if true undo the voting
+        #   - :voting_field: which voting field to use
         #
         # @return [votee, false]
         def set_vote(options)
