@@ -16,8 +16,8 @@ module Mongo
         if self.class.embedded?
           klass = self.class
           self.attributes = klass._parent_klass.find(eval(klass._parent_name).id) # Post.find(post.id)
-                            .send(klass._inverse_relation)                       # .images
-                            .find(id).attributes                                # .find(id).attributes
+                            .send(klass._inverse_relation)                        # .images
+                            .find(id).attributes                                  # .find(id).attributes
         else
           super
         end
