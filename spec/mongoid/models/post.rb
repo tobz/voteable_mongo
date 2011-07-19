@@ -9,7 +9,6 @@ class Post
   field :content
   
   # callbacks
-  define_model_callbacks :vote
   before_vote :before_post_vote
   after_vote :after_post_vote
   

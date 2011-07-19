@@ -36,7 +36,7 @@ module Mongo
       #   before_vote :do_something_before
       #   after_vote :do_something_after
       # 
-      # define_model_callbacks :vote
+      define_model_callbacks :vote
       
       # 
       # 
