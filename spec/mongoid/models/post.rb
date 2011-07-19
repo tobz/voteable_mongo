@@ -8,6 +8,13 @@ class Post
   field :title
   field :content
   
+  # callbacks
+  before_vote :before_post_vote
+  after_vote :after_post_vote
+  
+  def before_post_vote; end;
+  def after_post_vote; end;
+  
   has_and_belongs_to_many :categories
   has_many :comments
   embeds_many :images

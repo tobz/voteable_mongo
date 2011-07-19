@@ -28,6 +28,16 @@ module Mongo
         include Mongo::Voteable::Integrations::MongoMapper
       end
       
+      # Define callbacks for voting if defined in voteable model
+      # This is useful because the gem interacts with the database
+      # through the ruby-mongo driver directly, skipping ActiveModel::Callbacks
+      # 
+      # Example:
+      #   before_vote :do_something_before
+      #   after_vote :do_something_after
+      # 
+      define_model_callbacks :vote
+      
       # 
       # 
       # No support for embedded documents
@@ -148,18 +158,20 @@ module Mongo
       #   - :unvote: unvote the vote value (:up or :down)
       # 
       def set_vote(options)
-        options[:votee_id] = id
-        options[:votee] = self
-        options[:voter_id] ||= options[:voter].try(:id)
-        options[:voting_field] ||= "votes"
+        _run_vote_callbacks do
+          options[:votee_id] = id
+          options[:votee] = self
+          options[:voter_id] ||= options[:voter].try(:id)
+          options[:voting_field] ||= "votes"
 
-        if options[:unvote]
-          options[:value] ||= vote_value(options[:voter_id], options[:voting_field])
-        else
-          options[:revote] ||= options[:voter_id] && vote_value(options[:voter_id], options[:voting_field]).present?
+          if options[:unvote]
+            options[:value] ||= vote_value(options[:voter_id], options[:voting_field])
+          else
+            options[:revote] ||= options[:voter_id] && vote_value(options[:voter_id], options[:voting_field]).present?
+          end
+
+          self.class.set_vote(options)
         end
-
-        self.class.set_vote(options)
       end
       
       # Get a voted value on this votee
