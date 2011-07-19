@@ -75,11 +75,11 @@ describe Mongo::Voteable do
   
   context "just created" do
     it 'up_votes_count, down_votes_count, faceless_up_count, faceless_down_count, votes_count, votes_point' do
-      stats_for(@category1, [0,0,0,0,0,0])
-      stats_for(@category2, [0,0,0,0,0,0])
-      stats_for(@post1, [0,0,0,0,0,0])
-      stats_for(@post2, [0,0,0,0,0,0])
-      stats_for(@comment, [0,0,0,0,0,0])
+      stats_for(@category1, [0,0,0,0,0,0,0,0])
+      stats_for(@category2, [0,0,0,0,0,0,0,0])
+      stats_for(@post1, [0,0,0,0,0,0,0,0])
+      stats_for(@post2, [0,0,0,0,0,0,0,0])
+      stats_for(@comment, [0,0,0,0,0,0,0,0])
     end
     
     it "votes ratio is 0" do
@@ -120,19 +120,19 @@ describe Mongo::Voteable do
         
     it 'revote post1 has no effect' do
       @post1.set_vote(:revote => true, :voter => @user1, :value => 'up')
-      stats_for(@post1, [0,0,0,0,0,0])
+      stats_for(@post1, [0,0,0,0,0,0,0,0])
     end
     
     it 'revote post2 has no effect' do
       Post.set_vote(:revote => true, :votee_id => @post2.id, :voter_id => @user2.id, :value => :down)
-      stats_for(@post2, [0,0,0,0,0,0])
+      stats_for(@post2, [0,0,0,0,0,0,0,0])
     end
   end
 
   # Last stats:
-  #   @post1      [0,0,0,0,0,0]
-  #   @category1  [0,0,0,0,0,0]
-  #   @category2  [0,0,0,0,0,0]
+  #   @post1      [0,0,0,0,0,0,0,0]
+  #   @category1  [0,0,0,0,0,0,0,0]
+  #   @category2  [0,0,0,0,0,0,0,0]
   # 
   context 'user1 vote up post1 the first time' do
     before :all do
@@ -150,6 +150,8 @@ describe Mongo::Voteable do
         'faceless_down_count' => 0,
         'up_count' => 1,
         'down_count' => 0,
+        'total_up_count' => 1,
+        'total_down_count' => 0,
         'count' => 1,
         'point' => 1,
         'ip' => []
@@ -157,7 +159,7 @@ describe Mongo::Voteable do
     end
     
     it 'stats' do
-      stats_for(@post1, [1,0,0,0,1,1])
+      stats_for(@post1, [1,0,0,0,1,0,1,1])
     end
     
     it "post1 votes ratio is 1" do
@@ -180,32 +182,32 @@ describe Mongo::Voteable do
     end
     
     it "category1 stats" do
-      stats_for(@category1, [0,0,0,0,0,3])
+      stats_for(@category1, [0,0,0,0,0,0,0,3])
     end
     
     it "category2 stats" do
-      stats_for(@category2, [0,0,0,0,0,3])
+      stats_for(@category2, [0,0,0,0,0,0,0,3])
     end
   end
   
   # Last Stats
-  #   @post1      [1,0,0,0,1,1]
-  #   @category1  [0,0,0,0,0,3]
-  #   @category2  [0,0,0,0,0,3]
+  #   @post1      [1,0,0,0,1,0,1,1]
+  #   @category1  [0,0,0,0,0,0,0,3]
+  #   @category2  [0,0,0,0,0,0,0,3]
   # 
   context "user1 vote post1 for the second time" do
     it "has no effect" do
       Post.set_vote(:revote => false, :votee_id => @post1.id, :voter_id => @user1.id, :value => :up)
       
-      stats_for(@post1, [1,0,0,0,1,1])
+      stats_for(@post1, [1,0,0,0,1,0,1,1])
       @post1.vote_value(@user1.id).should == :up
     end
   end 
   
   # Last Stats
-  #   @post1      [1,0,0,0,1,1]
-  #   @category1  [0,0,0,0,0,3]
-  #   @category2  [0,0,0,0,0,3]
+  #   @post1      [1,0,0,0,1,0,1,1]
+  #   @category1  [0,0,0,0,0,0,0,3]
+  #   @category2  [0,0,0,0,0,0,0,3]
   #
   
   context 'user2 vote down post1 the first time' do
@@ -215,7 +217,7 @@ describe Mongo::Voteable do
     end
     
     it "stats" do
-      stats_for(@post1, [1,1,0,0,2,0])
+      stats_for(@post1, [1,1,0,0,1,1,2,0])
     end
     
     it "post1 votes ratio is 0.5" do
@@ -236,18 +238,18 @@ describe Mongo::Voteable do
     end
     
     it 'category1 stats' do
-      stats_for(@category1, [0,0,0,0,0,-2])
+      stats_for(@category1, [0,0,0,0,0,0,0,-2])
     end
     
     it "category2 stats" do
-      stats_for(@category2, [0,0,0,0,0,-2])
+      stats_for(@category2, [0,0,0,0,0,0,0,-2])
     end
   end
   
   # Last Stats
-  #   @post1      [1,1,0,0,2,0]
-  #   @category1  [0,0,0,0,0,-2]
-  #   @category2  [0,0,0,0,0,-2]
+  #   @post1      [1,1,0,0,1,1,2,0]
+  #   @category1  [0,0,0,0,0,0,0,-2]
+  #   @category2  [0,0,0,0,0,0,0,-2]
   #
   context 'user1 change vote on post1 from up to down' do
     before :all do
@@ -255,7 +257,7 @@ describe Mongo::Voteable do
     end
     
     it 'stats' do
-      stats_for(@post1, [0,2,0,0,2,-2])
+      stats_for(@post1, [0,2,0,0,0,2,2,-2])
     end
     
     it "post1 votes ratio is 0" do
@@ -263,11 +265,11 @@ describe Mongo::Voteable do
     end
     
     it 'category1 stats' do
-      stats_for(@category1, [0,0,0,0,0,-10])
+      stats_for(@category1, [0,0,0,0,0,0,0,-10])
     end
     
     it 'category2 stats' do
-      stats_for(@category2, [0,0,0,0,0,-10])
+      stats_for(@category2, [0,0,0,0,0,0,0,-10])
     end
     
     it 'changes user1 vote' do
@@ -281,14 +283,14 @@ describe Mongo::Voteable do
   end
   
   # Last Stats
-  #   @post2      [0,0,0,0,0,0]
+  #   @post2      [0,0,0,0,0,0,0,0]
   context 'user1 vote down post2 the first time' do
     before :all do
       @post2.set_vote(:voter_id => @user1.id, :value => :down)
     end
     
     it 'stats' do
-      stats_for(@post2, [0,1,0,0,1,-1])
+      stats_for(@post2, [0,1,0,0,0,1,1,-1])
     end
     
     it "post2 votes ratio is 0" do
@@ -304,14 +306,14 @@ describe Mongo::Voteable do
   end
   
   # Last stats:
-  #   @post2 [0,1,0,0,1,-1]
+  #   @post2 [0,1,0,0,0,1,1,-1]
   #
   context 'user1 change vote on post2 from down to up' do
     before :all do
       Post.set_vote(:revote => true, :votee_id => @post2.id.to_s, :voter_id => @user1.id.to_s, :value => :up)
     end
     it 'stats' do
-      stats_for(@post2, [1,0,0,0,1,1])
+      stats_for(@post2, [1,0,0,0,1,0,1,1])
     end
     
     it "post2 votes ratio is 1" do
@@ -324,8 +326,8 @@ describe Mongo::Voteable do
   end
   
   # Last stats:
-  #   @post2    [1,0,0,0,1,1]
-  #   @comment  [0,0,0,0,0,0]
+  #   @post2    [1,0,0,0,1,0,1,1]
+  #   @comment  [0,0,0,0,0,0,0,0]
   # 
   context 'user1 vote up post2 comment the first time' do
     before :all do
@@ -333,14 +335,14 @@ describe Mongo::Voteable do
     end
     
     it 'post2 stats' do
-      stats_for(@post2, [2,0,0,0,2,3])
+      stats_for(@post2, [2,0,0,0,2,0,2,3])
     end
     it "post2 votes ratio is 1" do
       @post2.votes_ratio.should == 1
     end
     
     it 'comment stats' do
-      stats_for(@comment, [1,0,0,0,1,1])
+      stats_for(@comment, [1,0,0,0,1,0,1,1])
     end
     
     it "comment votes ratio is 1" do
@@ -349,8 +351,8 @@ describe Mongo::Voteable do
   end
   
   # Last stats:
-  #   @post2    [2,0,0,0,2,3]
-  #   @comment  [1,0,0,0,1,1]
+  #   @post2    [2,0,0,0,2,0,2,3]
+  #   @comment  [1,0,0,0,1,0,1,1]
   #
   context 'user1 revote post2 comment from up to down' do
     before :all do
@@ -360,7 +362,7 @@ describe Mongo::Voteable do
     end
     
     it 'post2 stats' do
-      stats_for(@post2, [1,1,0,0,2,0])
+      stats_for(@post2, [1,1,0,0,1,1,2,0])
     end
     
     it "post2 votes ratio is 0.5" do
@@ -368,7 +370,7 @@ describe Mongo::Voteable do
     end
     
     it 'comment stats' do
-      stats_for(@comment, [0,1,0,0,1,-3])
+      stats_for(@comment, [0,1,0,0,0,1,1,-3])
     end
     
     it "comment votes ratio is 0" do
@@ -377,18 +379,18 @@ describe Mongo::Voteable do
   end
   
   # Last stats:
-  #   @post2    [1,1,0,0,2,0]
-  #   @comment  [0,1,0,0,1,-3]
+  #   @post2    [1,1,0,0,1,1,2,0]
+  #   @comment  [0,1,0,0,0,1,1,-3]
   #
   context "user1 revotes comment with same vote" do
     it 'has no effect' do
-      stats_for(@post2, [1,1,0,0,2,0])
-      stats_for(@comment, [0,1,0,0,1,-3])
+      stats_for(@post2, [1,1,0,0,1,1,2,0])
+      stats_for(@comment, [0,1,0,0,0,1,1,-3])
     end
   end
   
   # Last stats:
-  #   @post1, [0,2,0,0,2,-2]
+  #   @post1, [0,2,0,0,0,2,2,-2]
   #
   context "user1 unvote on post1" do
     before(:all) do
@@ -396,7 +398,7 @@ describe Mongo::Voteable do
     end
     
     it 'stats' do
-      stats_for(@post1, [0,1,0,0,1,-1])
+      stats_for(@post1, [0,1,0,0,0,1,1,-1])
     end
     
     it 'removes user1 from voters' do
@@ -406,8 +408,8 @@ describe Mongo::Voteable do
   end
   
   # Last stats:
-  #   @post2    [1,1,0,0,2,0]
-  #   @comment  [0,1,0,0,1,-3]
+  #   @post2    [1,1,0,0,1,1,2,0]
+  #   @comment  [0,1,0,0,0,1,1,-3]
   #
   context "user1 unvote on comment" do
     before(:all) do
@@ -415,21 +417,21 @@ describe Mongo::Voteable do
     end
     
     it "comment stats" do      
-      stats_for(@comment, [0,0,0,0,0,0])
+      stats_for(@comment, [0,0,0,0,0,0,0,0])
     end
     
     it "comment votes ratio is 0" do
       @comment.votes_ratio.should == 0
     end
     it "post2 stats" do
-      stats_for(@post2, [1,0,0,0,1,1])
+      stats_for(@post2, [1,0,0,0,1,0,1,1])
     end
   end
   
   # Last stats:
-  #   @post1    [0,1,0,0,1,-1]
-  #   @post2    [1,0,0,0,1,1]
-  #   @comment  [0,0,0,0,0,0]
+  #   @post1    [0,1,0,0,0,1,1,-1]
+  #   @post2    [1,0,0,0,1,0,1,1]
+  #   @comment  [0,0,0,0,0,0,0,0]
   #
   describe 'test remake stats' do
     before(:all) do
@@ -438,19 +440,19 @@ describe Mongo::Voteable do
     end
     
     it "@post1 == last stats" do
-      stats_for(@post1, [0,1,0,0,1,-1])
+      stats_for(@post1, [0,1,0,0,0,1,1,-1])
     end
     it "@post2 == last stats" do
-      stats_for(@post2, [1,0,0,0,1,1])
+      stats_for(@post2, [1,0,0,0,1,0,1,1])
     end
     it "@comment == last stats" do
-      stats_for(@comment, [0,0,0,0,0,0])
+      stats_for(@comment, [0,0,0,0,0,0,0,0])
     end  
     it "@category1 == last stats" do
-       stats_for(@category1, [0,0,0,0,0,-5])
+       stats_for(@category1, [0,0,0,0,0,0,0,-5])
     end
     it "@category2 == last stats" do
-       stats_for(@category2, [0,0,0,0,0,-5])
+       stats_for(@category2, [0,0,0,0,0,0,0,-5])
     end
     
   end

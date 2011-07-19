@@ -17,16 +17,16 @@ describe Mongo::Voteable, "Embedded Documents" do
 
   context "just created" do
     it 'image1 stats' do
-      stats_for(@image1, [0,0,0,0,0,0])
+      stats_for(@image1, [0,0,0,0,0,0,0,0])
     end
     it "image2 stats" do
-      stats_for(@image2, [0,0,0,0,0,0])
+      stats_for(@image2, [0,0,0,0,0,0,0,0])
     end
     it "post1 stats" do
-      stats_for(@post1, [0,0,0,0,0,0])
+      stats_for(@post1, [0,0,0,0,0,0,0,0])
     end
     it "post2 stats" do
-      stats_for(@post1, [0,0,0,0,0,0])
+      stats_for(@post1, [0,0,0,0,0,0,0,0])
     end
     
     it "image1 votes ratio is 0" do
@@ -51,19 +51,19 @@ describe Mongo::Voteable, "Embedded Documents" do
   context "revote post1" do
     it 'has no effect' do
       @post1.set_vote(:revote => true, :voter => @user1, :value => 'up')
-      stats_for(@image1, [0,0,0,0,0,0])
+      stats_for(@image1, [0,0,0,0,0,0,0,0])
     end
   end
   context "revote post2" do
     it 'has no effect' do
       Image.set_vote(:revote => true, :votee_id => @image2.id, :voter_id => @user2.id, :value => :down)
-      stats_for(@image1, [0,0,0,0,0,0])
+      stats_for(@image1, [0,0,0,0,0,0,0,0])
     end
   end
   
   # Last stats:
-  #   @image1     [0,0,0,0,0,0]
-  #   @post1      [0,0,0,0,0,0]
+  #   @image1     [0,0,0,0,0,0,0,0]
+  #   @post1      [0,0,0,0,0,0,0,0]
   #
   context 'user1 vote up image1 the first time' do
     before :all do
@@ -81,6 +81,8 @@ describe Mongo::Voteable, "Embedded Documents" do
         'faceless_down_count' => 0,
         'up_count' => 1,
         'down_count' => 0,
+        'total_up_count' => 1,
+        'total_down_count' => 0,
         'count' => 1,
         'point' => 1,
         'ip' => []
@@ -88,7 +90,7 @@ describe Mongo::Voteable, "Embedded Documents" do
     end
     
     it 'image1 stats' do
-      stats_for(@image1, [1,0,0,0,1,1])
+      stats_for(@image1, [1,0,0,0,1,0,1,1])
     end
     
     it "image1 votes ratio is 1" do
@@ -104,7 +106,7 @@ describe Mongo::Voteable, "Embedded Documents" do
       @image1.down_voters(User).should be_empty
     end
     it "post1 stats" do
-      stats_for(@post1, [1,0,0,0,1,2])
+      stats_for(@post1, [1,0,0,0,1,0,1,2])
     end
     
     it "post1 votes ratio is 1" do
@@ -114,21 +116,21 @@ describe Mongo::Voteable, "Embedded Documents" do
   end
   
   # Last stats:
-  #   @image1     [1,0,0,0,1,1]
-  #   @post1      [1,0,0,0,1,2]
+  #   @image1     [1,0,0,0,1,0,1,1]
+  #   @post1      [1,0,0,0,1,0,1,2]
   #
   context "user1 votes image1 again" do
     it 'has no effect' do
       Image.set_vote(:revote => false, :votee_id => @image1.id, :voter_id => @user1.id, :value => :up)
-      stats_for(@image1, [1,0,0,0,1,1])
-      stats_for(@post1, [1,0,0,0,1,2])
+      stats_for(@image1, [1,0,0,0,1,0,1,1])
+      stats_for(@post1, [1,0,0,0,1,0,1,2])
       @image1.vote_value(@user1.id).should == :up
     end
   end
   
   # Last stats:
-  #   @image1     [1,0,0,0,1,1]
-  #   @post1      [1,0,0,0,1,2]
+  #   @image1     [1,0,0,0,1,0,1,1]
+  #   @post1      [1,0,0,0,1,0,1,2]
   #
   context 'user2 vote down image1 the first time' do
      before :all do
@@ -136,7 +138,7 @@ describe Mongo::Voteable, "Embedded Documents" do
      end
      
      it "image1 stats" do
-       stats_for(@image1, [1,1,0,0,2,0])
+       stats_for(@image1, [1,1,0,0,1,1,2,0])
      end
      
      it "image1 votes ratio is 0.5" do
@@ -144,7 +146,7 @@ describe Mongo::Voteable, "Embedded Documents" do
      end
      
      it "post1 stats" do
-       stats_for(@post1, [1,1,0,0,2,1])
+       stats_for(@post1, [1,1,0,0,1,1,2,1])
      end
      it "post1 votes ratio is 0.5" do
        @post1.votes_ratio.should == 0.5
@@ -160,24 +162,24 @@ describe Mongo::Voteable, "Embedded Documents" do
    end
    
    # Last Stats
-   #   @image1      [1,1,0,0,2,0]
-   #   @post1       [1,1,0,0,2,1]
+   #   @image1      [1,1,0,0,1,1,2,0]
+   #   @post1       [1,1,0,0,1,1,2,1]
    #
    context 'user1 change vote on image1 from up to down' do
      before :all do
        Image.set_vote(:revote => true, :votee_id => @image1.id, :voter_id => @user1.id, :value => :down)
      end
      it 'image1 stats' do
-       stats_for(@image1, [0,2,0,0,2,-2])
+       stats_for(@image1, [0,2,0,0,0,2,2,-2])
      end
      it "post1 stats" do
-       stats_for(@post1, [0,2,0,0,2,-2])
+       stats_for(@post1, [0,2,0,0,0,2,2,-2])
      end
    end
    
    # Last Stats
-   #   @image2      [0,0,0,0,0,0]
-   #   @post1       [0,2,0,0,2,-2]
+   #   @image2      [0,0,0,0,0,0,0,0]
+   #   @post1       [0,2,0,0,0,2,2,-2]
    #
    context 'user1 vote down image2 the first time' do
      before :all do
@@ -185,7 +187,7 @@ describe Mongo::Voteable, "Embedded Documents" do
      end
 
      it "image2 stats" do
-       stats_for(@image2, [0,1,0,0,1,-1])
+       stats_for(@image2, [0,1,0,0,0,1,1,-1])
      end
      
      it "image2 votes ratio is 0" do
@@ -193,7 +195,7 @@ describe Mongo::Voteable, "Embedded Documents" do
      end
      
      it "post1 stats" do
-       stats_for(@post1, [0,3,0,0,3,-3])
+       stats_for(@post1, [0,3,0,0,0,3,3,-3])
      end
      
      it "post1 votes ratio is 0" do
@@ -202,8 +204,8 @@ describe Mongo::Voteable, "Embedded Documents" do
    end
    
    # Last Stats
-   #   @image2      [0,1,0,0,1,-1]
-   #   @post1       [0,3,0,0,3,-3]
+   #   @image2      [0,1,0,0,0,1,1,-1]
+   #   @post1       [0,3,0,0,0,3,3,-3]
    #
    context 'user1 change vote on image2 from down to up' do
      before :all do
@@ -211,7 +213,7 @@ describe Mongo::Voteable, "Embedded Documents" do
      end
      
      it "image2 stats" do
-       stats_for(@image2, [1,0,0,0,1,1])
+       stats_for(@image2, [1,0,0,0,1,0,1,1])
      end
      
      it "image2 votes ratio is 1" do
@@ -219,13 +221,13 @@ describe Mongo::Voteable, "Embedded Documents" do
      end
      
      it "post1 stats" do
-       stats_for(@post1, [1,2,0,0,3,0])
+       stats_for(@post1, [1,2,0,0,1,2,3,0])
      end
    end
    
    # Last Stats
-   #   @image3      [0,0,0,0,0,0]
-   #   @post2       [0,0,0,0,0,0]
+   #   @image3      [0,0,0,0,0,0,0,0]
+   #   @post2       [0,0,0,0,0,0,0,0]
    #
    context 'user1 vote up post2 image3 the first time' do
      before :all do
@@ -233,17 +235,17 @@ describe Mongo::Voteable, "Embedded Documents" do
        @user1.vote(@image3, :up)
      end
      it "image3 stats" do
-       stats_for(@image3, [1,0,0,0,1,1])
+       stats_for(@image3, [1,0,0,0,1,0,1,1])
      end
      
      it "post2 stats" do
-       stats_for(@post2, [1,0,0,0,1,2])
+       stats_for(@post2, [1,0,0,0,1,0,1,2])
      end
    end
    
    # Last Stats
-   #   @image1      [0,2,0,0,2,-2]
-   #   @post1       [1,2,0,0,3,0]
+   #   @image1      [0,2,0,0,0,2,2,-2]
+   #   @post1       [1,2,0,0,1,2,3,0]
    #
    context "user1 unvote on image1" do
      before(:all) do
@@ -251,18 +253,18 @@ describe Mongo::Voteable, "Embedded Documents" do
      end
      
      it "image1 stats" do
-       stats_for(@image1, [0,1,0,0,1,-1])
+       stats_for(@image1, [0,1,0,0,0,1,1,-1])
      end
      
      it "post1 stats" do
-       stats_for(@post1, [1,1,0,0,2,1])
+       stats_for(@post1, [1,1,0,0,1,1,2,1])
      end
    end
    
    # Last Stats
-   #   @image3      [1,0,0,0,1,1]
-   #   @post2       [1,0,0,0,1,2]
-   #
+   #   @image3      [1,0,0,0,1,0,1,1]
+   #   @post2       [1,0,0,0,1,0,1,2]
+   #   @post1       [1,1,0,0,1,1,2,1]
    context "user1 unvote on image3" do
      before(:all) do
        # @image3.vote(:voter_id => @user1.id, :unvote => true)
@@ -270,10 +272,10 @@ describe Mongo::Voteable, "Embedded Documents" do
      end
 
      it "image3 stats" do      
-      stats_for(@image3, [0,0,0,0,0,0])
+      stats_for(@image3, [0,0,0,0,0,0,0,0])
      end
      it "post2 stats" do
-       stats_for(@post2, [0,0,0,0,0,0])
+       stats_for(@post2, [0,0,0,0,0,0,0,0])
      end
    end
    
@@ -284,19 +286,19 @@ describe Mongo::Voteable, "Embedded Documents" do
      end
 
      it "@image1 == last stats" do
-       stats_for(@image1, [0,1,0,0,1,-1])
+       stats_for(@image1, [0,1,0,0,0,1,1,-1])
      end
      it "@image2 == last stats" do
-       stats_for(@image2, [1,0,0,0,1,1])
+       stats_for(@image2, [1,0,0,0,1,0,1,1])
      end
      it "@image3 == last stats" do
-       stats_for(@image3, [0,0,0,0,0,0])
+       stats_for(@image3, [0,0,0,0,0,0,0,0])
      end  
      it "@post1 == last stats" do
-        stats_for(@post1, [1,1,0,0,2,1])
+       stats_for(@post1, [1,1,0,0,1,1,2,1])
      end
      it "@post2 == last stats" do
-        stats_for(@post2, [0,0,0,0,0,0])
+        stats_for(@post2, [0,0,0,0,0,0,0,0])
      end
 
    end

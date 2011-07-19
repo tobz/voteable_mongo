@@ -134,19 +134,23 @@ module Mongo
       def self.remake_stats_for(doc, voteable)
         up_count = doc.up_voter_ids(voteable[:voting_field]).length
         down_count = doc.down_voter_ids(voteable[:voting_field]).length
-        faceless_up_count = doc.faceless_up_count(voteable[:voting_field])
-        faceless_down_count = doc.faceless_down_count(voteable[:voting_field])
-
+        faceless_up_count = doc.faceless_up_votes_count(voteable[:voting_field])
+        faceless_down_count = doc.faceless_down_votes_count(voteable[:voting_field])
+        total_up_count = up_count + faceless_up_count
+        total_down_count = down_count + faceless_down_count
+        
         doc.update_attributes(
         voteable[:voting_field] => {
           'up' => doc.up_voter_ids(voteable[:voting_field]),
           'down' => doc.down_voter_ids(voteable[:voting_field]),
           'up_count' => up_count,
+          'down_count' => down_count,
           'faceless_up_count' => faceless_up_count,
           'faceless_down_count' => faceless_down_count,
-          'down_count' => down_count,
-          'count' => up_count + down_count,
-          'point' => voteable[:up].to_i*up_count + voteable[:down].to_i*down_count
+          'total_up_count' => total_up_count,
+          'total_down_count' => total_down_count,
+          'count' => total_up_count + total_down_count,
+          'point' => voteable[:up].to_i*total_up_count + voteable[:down].to_i*total_down_count
         }
         )
       end
@@ -161,22 +165,26 @@ module Mongo
         if parent_id
           up_count = doc.up_voter_ids.length
           down_count = doc.down_voter_ids.length
-          faceless_up_count = doc.faceless_up_count
-          faceless_down_count = doc.faceless_down_count
+          faceless_up_count = doc.faceless_up_votes_count
+          faceless_down_count = doc.faceless_down_votes_count
+          total_up_count = doc.total_up_votes_count
+          total_down_count = doc.total_down_votes_count
 
           return if up_count == 0 && down_count == 0 && faceless_up_count == 0 && faceless_down_count == 0
 
           inc_options = {
-            "#{voteable[:voting_field]}.point" => voteable[:up].to_i*(up_count+faceless_up_count) + voteable[:down].to_i*(down_count+faceless_down_count)
+            "#{voteable[:voting_field]}.point" => voteable[:up].to_i*(total_up_count) + voteable[:down].to_i*(total_down_count)
           }
 
           unless voteable[:update_counters] == false
             inc_options.merge!(
-            "#{voteable[:voting_field]}.count" => up_count + down_count,
+            "#{voteable[:voting_field]}.count" => total_up_count + total_down_count,
             "#{voteable[:voting_field]}.up_count" => up_count,
             "#{voteable[:voting_field]}.down_count" => down_count,
             "#{voteable[:voting_field]}.faceless_up_count" => faceless_up_count,
-            "#{voteable[:voting_field]}.faceless_down_count" => faceless_down_count
+            "#{voteable[:voting_field]}.faceless_down_count" => faceless_down_count,
+            "#{voteable[:voting_field]}.total_up_count" => total_up_count,
+            "#{voteable[:voting_field]}.total_down_count" => total_down_count
             )
           end
 

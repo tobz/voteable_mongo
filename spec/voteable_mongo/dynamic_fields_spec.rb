@@ -28,6 +28,8 @@ describe Mongo::Voteable, "Dynamic fields" do
           'faceless_down_count' => 0,
           'up_count' => 1,
           'down_count' => 0,
+          'total_up_count' => 1,
+          'total_down_count' => 0,
           'count' => 1,
           'point' => 1,
           'ip' => []
@@ -35,7 +37,7 @@ describe Mongo::Voteable, "Dynamic fields" do
       end
 
       it 'stats' do
-        stats_for(@post1, [1,0,0,0,1,1])
+        stats_for(@post1, [1,0,0,0,1,0,1,1])
       end
       
       it "post1 votes ratio is 1" do
@@ -65,7 +67,7 @@ describe Mongo::Voteable, "Dynamic fields" do
         @dynamic_doc.should_not respond_to :points
       end
       it "dynamic fields initialized with default valued" do
-        stats_for(@dynamic_doc, [0,0,0,0,0,0], "moderations")
+        stats_for(@dynamic_doc, [0,0,0,0,0,0,0,0], "moderations")
       end
       it 'has empty up_voter_ids, down_voter_ids ' do
         @dynamic_doc.up_voter_ids("moderations").should be_empty
@@ -78,8 +80,8 @@ describe Mongo::Voteable, "Dynamic fields" do
     end
   
     # Last stats:
-    #   @dynamic_doc(moderations)      [0,0,0,0,0,0]
-    #   @user(moderations)             [0,0,0,0,0,0]
+    #   @dynamic_doc(moderations)      [0,0,0,0,0,0,0,0]
+    #   @user(moderations)             [0,0,0,0,0,0,0,0]
     context 'user votes up dynamic_doc the first time' do
       before :all do
         @doc = @dynamic_doc.set_vote(:voter_id => @user.id, :value => :up, :voting_field => "moderations")
@@ -96,6 +98,8 @@ describe Mongo::Voteable, "Dynamic fields" do
           'faceless_down_count' => 0,
           'up_count' => 1,
           'down_count' => 0,
+          'total_up_count' => 1,
+          'total_down_count' => 0,
           'count' => 1,
           'point' => 1,
           'ip' => []
@@ -103,7 +107,7 @@ describe Mongo::Voteable, "Dynamic fields" do
       end
     
       it 'dynamic_doc stats' do
-        stats_for(@dynamic_doc, [1,0,0,0,1,1], "moderations")
+        stats_for(@dynamic_doc, [1,0,0,0,1,0,1,1], "moderations")
       end
       
       it "dynamic_doc votes ratio is 1" do
@@ -123,31 +127,31 @@ describe Mongo::Voteable, "Dynamic fields" do
       end
       
       it "User stats" do
-        stats_for(@user, [1,0,0,0,1,5], "points")
+        stats_for(@user, [1,0,0,0,1,0,1,5], "points")
       end
     end
     # Last Stats
-    #   @dynamic_field      [1,0,0,0,1,1]
+    #   @dynamic_field      [1,0,0,0,1,0,1,1]
     # 
     context "user1 vote post1 for the second time" do
       it "has no effect" do
         DynamicDoc.set_vote(:revote => false, :votee_id => @dynamic_doc.id, :voter_id => @user.id, :value => :up, :voting_field => "moderations")
 
-        stats_for(@dynamic_doc, [1,0,0,0,1,1], 'moderations')
+        stats_for(@dynamic_doc, [1,0,0,0,1,0,1,1], 'moderations')
         @dynamic_doc.vote_value(@user.id, 'moderations').should == :up
       end
     end
     
     # Last Stats
-    #   @dynamic_doc(moderations)      [1,0,0,0,1,1]
-    #   @user(likes)                   [1,0,0,0,1,5]
+    #   @dynamic_doc(moderations)      [1,0,0,0,1,0,1,1]
+    #   @user(likes)                   [1,0,0,0,1,0,1,5]
     context 'user2 vote down post1 the first time' do
       before :all do
         DynamicDoc.set_vote(:votee_id => @dynamic_doc.id, :voter_id => @user2.id, :value => :down, :voting_field => "moderations")
       end
 
       it "stats" do
-        stats_for(@dynamic_doc, [1,1,0,0,2,0], "moderations")
+        stats_for(@dynamic_doc, [1,1,0,0,1,1,2,0], "moderations")
       end
       
       it "dynamic_doc votes ratio is 0.5" do
@@ -167,19 +171,19 @@ describe Mongo::Voteable, "Dynamic fields" do
         DynamicDoc.voted_by(@user2, "moderations").to_a.should == [ @dynamic_doc ]
       end
       it "User stats" do
-        stats_for(@user, [1,1,0,0,2,0], "points")
+        stats_for(@user, [1,1,0,0,1,1,2,0], "points")
       end
     end
     # Last Stats
-    #   @dynamic_doc(moderations)      [1,1,0,0,2,0]
-    #   @user(likes)                   [1,1,0,0,2,0]
+    #   @dynamic_doc(moderations)      [1,1,0,0,1,1,2,0]
+    #   @user(likes)                   [1,1,0,0,1,1,2,0]
     context 'user change vote on dynamic_doc from up to down' do
       before :all do
         DynamicDoc.set_vote(:revote => true, :votee_id => @dynamic_doc.id, :voter_id => @user.id, :value => :down, :voting_field => "moderations")
       end
 
       it 'stats' do
-        stats_for(@dynamic_doc, [0,2,0,0,2,-2], "moderations")
+        stats_for(@dynamic_doc, [0,2,0,0,0,2,2,-2], "moderations")
       end
       
       it "dynamic_doc votes ratio is 0" do
@@ -195,13 +199,13 @@ describe Mongo::Voteable, "Dynamic fields" do
         DynamicDoc.voted_by(@user2, "moderations").to_a.should == [ @dynamic_doc ]
       end
       it "User stats" do
-        stats_for(@user, [0,2,0,0,2,-10], "points")
+        stats_for(@user, [0,2,0,0,0,2,2,-10], "points")
       end
     end
     
     # Last stats:
-    #   @dynamic_doc(moderations) [0,2,0,0,2,-2]
-    #   @user(moderations)        [0,2,0,0,2,-10]
+    #   @dynamic_doc(moderations) [0,2,0,0,0,2,2,-2]
+    #   @user(moderations)        [0,2,0,0,0,2,2,-10]
     # 
     context "user unvote on dynamic_doc" do
       before(:all) do
@@ -209,7 +213,7 @@ describe Mongo::Voteable, "Dynamic fields" do
       end
 
       it 'dynamic moderations stats' do
-        stats_for(@dynamic_doc, [0,1,0,0,1,-1], "moderations")
+        stats_for(@dynamic_doc, [0,1,0,0,0,1,1,-1], "moderations")
       end
       
       it "dynamic_doc votes ratio is 0" do
@@ -221,7 +225,7 @@ describe Mongo::Voteable, "Dynamic fields" do
         DynamicDoc.voted_by(@user, "moderations").to_a.should_not include(@dynamic_doc)
       end 
       it "User points stats" do
-        stats_for(@user, [0,1,0,0,1,-5], "points")
+        stats_for(@user, [0,1,0,0,0,1,1,-5], "points")
       end     
     end
   end
@@ -231,7 +235,7 @@ describe Mongo::Voteable, "Dynamic fields" do
         @dynamic_doc.should respond_to :likes
       end
       it "dynamic fields initialized with default valued" do
-        stats_for(@dynamic_doc, [0,0,0,0,0,0], "likes")
+        stats_for(@dynamic_doc, [0,0,0,0,0,0,0,0], "likes")
       end
       it "dynamic_doc votes on likes ratio is 0" do
         @dynamic_doc.votes_ratio("likes").should == 0
@@ -247,8 +251,8 @@ describe Mongo::Voteable, "Dynamic fields" do
     end
   
     # Last stats:
-    #   @dynamic_doc(likes)      [0,0,0,0,0,0]
-    #   @user(points)            [0,1,0,0,1,-5]
+    #   @dynamic_doc(likes)      [0,0,0,0,0,0,0,0]
+    #   @user(points)            [0,1,0,0,0,1,1,-5]
     context 'user votes up dynamic_doc the first time' do
       before :all do
         @doc = @dynamic_doc.set_vote(:voter_id => @user.id, :value => :up, :voting_field => "likes")
@@ -265,6 +269,8 @@ describe Mongo::Voteable, "Dynamic fields" do
           'faceless_down_count' => 0,
           'up_count' => 1,
           'down_count' => 0,
+          'total_up_count' => 1,
+          'total_down_count' => 0,
           'count' => 1,
           'point' => 2,
           'ip' => []
@@ -272,7 +278,7 @@ describe Mongo::Voteable, "Dynamic fields" do
       end
     
       it 'dynamic like stats' do
-        stats_for(@dynamic_doc, [1,0,0,0,1,2], "likes")
+        stats_for(@dynamic_doc, [1,0,0,0,1,0,1,2], "likes")
       end
       
       it "dynamic_doc votes on likes ratio is 1" do
@@ -291,7 +297,7 @@ describe Mongo::Voteable, "Dynamic fields" do
         DynamicDoc.voted_by(@user, "likes").to_a.should == [ @dynamic_doc ]
       end
       it "user points stats is the same" do
-        stats_for(@user, [1,1,0,0,2,0], "points")
+        stats_for(@user, [1,1,0,0,1,1,2,0], "points")
       end
     end
   end
@@ -301,7 +307,7 @@ describe Mongo::Voteable, "Dynamic fields" do
         @video.should respond_to :reviews
       end
       it 'video stats' do
-        stats_for(@video, [0,0,0,0,0,0], "reviews")
+        stats_for(@video, [0,0,0,0,0,0,0,0], "reviews")
       end
       it "video votes on reviews ratio is 0" do
         @video.votes_ratio("reviews").should == 0
@@ -319,9 +325,9 @@ describe Mongo::Voteable, "Dynamic fields" do
     end
     
     # Last stats:
-    #   @video                         [0,0,0,0,0,0]
-    #   @dynamic_doc(moderations)      [0,1,0,0,1,-1]
-    #   @dynamic_doc(likes)            [1,0,0,0,1,2]
+    #   @video                         [0,0,0,0,0,0,0,0]
+    #   @dynamic_doc(moderations)      [0,1,0,0,0,1,1,-1]
+    #   @dynamic_doc(likes)            [1,0,0,0,1,0,1,2]
     # 
     context 'user1 vote up video the first time' do
       before :all do
@@ -339,6 +345,8 @@ describe Mongo::Voteable, "Dynamic fields" do
           'faceless_down_count' => 0,
           'up_count' => 1,
           'down_count' => 0,
+          'total_up_count' => 1,
+          'total_down_count' => 0,
           'count' => 1,
           'point' => 1,
           'ip' => []
@@ -346,7 +354,7 @@ describe Mongo::Voteable, "Dynamic fields" do
       end
 
       it 'video stats' do
-        stats_for(@video, [1,0,0,0,1,1], "reviews")
+        stats_for(@video, [1,0,0,0,1,0,1,1], "reviews")
       end
       it "video votes ratio on likes is 1" do
         @video.votes_ratio("reviews").should == 1
@@ -361,7 +369,7 @@ describe Mongo::Voteable, "Dynamic fields" do
       end
       
       it "dynamicdoc moderation stats" do
-        stats_for(@dynamic_doc, [1,1,0,0,2,1], "moderations")
+        stats_for(@dynamic_doc, [1,1,0,0,1,1,2,1], "moderations")
       end
       
       it "video votes ratio on moderations is 0.5" do
@@ -369,7 +377,7 @@ describe Mongo::Voteable, "Dynamic fields" do
       end
       
       it "does not update likes stats" do
-        stats_for(@dynamic_doc, [1,0,0,0,1,2], "likes")
+        stats_for(@dynamic_doc, [1,0,0,0,1,0,1,2], "likes")
       end
       
       it "dynamic_doc votes ratio on likes is 1" do

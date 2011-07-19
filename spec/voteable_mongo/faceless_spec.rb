@@ -29,13 +29,15 @@ describe Mongo::Voteable, "Anonymous support" do
          'faceless_down_count' => 0,
          'up_count' => 0,
          'down_count' => 0,
+         'total_up_count' => 1,
+         'total_down_count' => 0,
          'count' => 1,
          'point' => 1,
          'ip' => ["200"]
        }
      end
      it 'post1 stats' do
-       stats_for(@post1, [0,0,1,0,1,1])
+       stats_for(@post1, [0,0,1,0,1,0,1,1])
      end
      
      it "post1 votes ratio is 1" do
@@ -49,11 +51,11 @@ describe Mongo::Voteable, "Anonymous support" do
      end
      
      it "category1 stats" do
-       stats_for(@category1, [0,0,0,0,0,3])
+       stats_for(@category1, [0,0,0,0,0,0,0,3])
      end
      
      it "category2 stats" do
-       stats_for(@category2, [0,0,0,0,0,3])
+       stats_for(@category2, [0,0,0,0,0,0,0,3])
      end
    end
    
@@ -62,20 +64,20 @@ describe Mongo::Voteable, "Anonymous support" do
        @post = @post1.set_vote(:value => :up, :ip => "200")
      end
      it "does not have any effect on @post1" do
-       stats_for(@post1, [0,0,1,0,1,1])
+       stats_for(@post1, [0,0,1,0,1,0,1,1])
      end
      it "does not have any effect on @category1" do
-       stats_for(@category1, [0,0,0,0,0,3])
+       stats_for(@category1, [0,0,0,0,0,0,0,3])
      end
      it "does not have any effect on @category2" do
-       stats_for(@category2, [0,0,0,0,0,3])
+       stats_for(@category2, [0,0,0,0,0,0,0,3])
      end
    end
    
    # Last stats:
-   #   @post1      [0,0,1,0,1,1]
-   #   @category1  [0,0,0,0,0,3]
-   #   @category2  [0,0,0,0,0,3]
+   #   @post1      [0,0,1,0,1,0,1,1]
+   #   @category1  [0,0,0,0,0,0,0,3]
+   #   @category2  [0,0,0,0,0,0,0,3]
    #
    context "anonymous votes down post1 the first time" do
      before :all do
@@ -83,7 +85,7 @@ describe Mongo::Voteable, "Anonymous support" do
      end
      
      it "post1 stats" do
-       stats_for(@post1, [0,0,1,1,2,0])
+       stats_for(@post1, [0,0,1,1,1,1,2,0])
      end
      
      it "post1 votes ratio is 0.5" do
@@ -91,18 +93,18 @@ describe Mongo::Voteable, "Anonymous support" do
      end
      
      it "category1 stats" do
-       stats_for(@category1, [0,0,0,0,0,-2])
+       stats_for(@category1, [0,0,0,0,0,0,0,-2])
      end
      
      it "category2 stats" do
-       stats_for(@category1, [0,0,0,0,0,-2])
+       stats_for(@category1, [0,0,0,0,0,0,0,-2])
      end
    end
    
    # Last stats:
-   #   @post1      [0,0,1,1,2,0]
-   #   @category1  [0,0,0,0,0,-2]
-   #   @category2  [0,0,0,0,0,-2]
+   #   @post1      [0,0,1,1,1,1,2,0]
+   #   @category1  [0,0,0,0,0,0,0,-2]
+   #   @category2  [0,0,0,0,0,0,0,-2]
    #
    context "user1 votes down post1 the first time" do
      before :all do
@@ -110,7 +112,7 @@ describe Mongo::Voteable, "Anonymous support" do
      end
      
      it "post1 stats" do
-       stats_for(@post1, [0,1,1,1,3,-1])
+       stats_for(@post1, [0,1,1,1,1,2,3,-1])
      end
      
      it "post1 votes ratio is 0.3" do
@@ -118,17 +120,17 @@ describe Mongo::Voteable, "Anonymous support" do
      end
      
      it "category1 stats" do
-       stats_for(@category1, [0,0,0,0,0,-7])
+       stats_for(@category1, [0,0,0,0,0,0,0,-7])
      end
      
      it "category2 stats" do
-       stats_for(@category1, [0,0,0,0,0,-7])
+       stats_for(@category1, [0,0,0,0,0,0,0,-7])
      end
    end
    # Last stats:
-   #   @post1      [0,1,1,1,3,-1]
-   #   @category1  [0,0,0,0,0,-7]
-   #   @category2  [0,0,0,0,0,-7]
+   #   @post1      [0,1,1,1,1,2,3,-1]
+   #   @category1  [0,0,0,0,0,0,0,-7]
+   #   @category2  [0,0,0,0,0,0,0,-7]
    #
    context "user1 changes vote on post1 from down to up" do
      before :all do
@@ -136,7 +138,7 @@ describe Mongo::Voteable, "Anonymous support" do
      end
      
      it "post1 stats" do
-       stats_for(@post1, [1,0,1,1,3,1])
+       stats_for(@post1, [1,0,1,1,2,1,3,1])
      end
      
      it "post1 votes ratio is 0.7" do
@@ -144,28 +146,28 @@ describe Mongo::Voteable, "Anonymous support" do
      end
      
      it "category1 stats" do
-       stats_for(@category1, [0,0,0,0,0,1])
+       stats_for(@category1, [0,0,0,0,0,0,0,1])
      end
      
      it "category2 stats" do
-       stats_for(@category1, [0,0,0,0,0,1])
+       stats_for(@category1, [0,0,0,0,0,0,0,1])
      end
    end
    
    # Last stats:
-   #   @post2      [0,0,0,0,0,0]
-   #   @comment    [0,0,0,0,0,0]
-   #   @category2  [0,0,0,0,0,3]
+   #   @post2      [0,0,0,0,0,0,0,0]
+   #   @comment    [0,0,0,0,0,0,0,0]
+   #   @category2  [0,0,0,0,0,0,0,3]
    #
    context 'anonymous vote up for comment the first time' do
      before :all do
        @comment.set_vote(:value => :up)
      end
      its "post2 stats" do
-       stats_for(@post2, [0,0,1,0,1,2])
+       stats_for(@post2, [0,0,1,0,1,0,1,2])
      end
      it "comment stats" do
-       stats_for(@comment, [0,0,1,0,1,1])
+       stats_for(@comment, [0,0,1,0,1,0,1,1])
      end
    end
 end

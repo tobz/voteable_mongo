@@ -13,6 +13,8 @@ module Mongo
       'faceless_down_count' => 0,
       'up_count' => 0,
       'down_count' => 0,
+      'total_up_count' => 0,
+      'total_down_count' => 0,
       'count' => 0,
       'point' => 0,
       'ip' => []
@@ -203,17 +205,17 @@ module Mongo
       end
       
       # Get the total number of up votes (registered and anonymous)
-      def total_up_count(voting_field = "votes")
-        up_votes_count(voting_field) + faceless_up_count(voting_field)
+      def total_up_votes_count(voting_field = "votes")
+        eval(voting_field).try(:[], 'total_up_count') || 0
       end
       
       # Get the total number of down votes (registered and anonymous)
-      def total_down_count(voting_field = "votes")
-        down_votes_count(voting_field) + faceless_down_count(voting_field)
+      def total_down_votes_count(voting_field = "votes")
+        eval(voting_field).try(:[], 'total_down_count') || 0
       end
       
       def votes_ratio(voting_field = "votes")
-        votes_count(voting_field) > 0 ? (total_up_count(voting_field).to_f/votes_count(voting_field)) : 0
+        votes_count(voting_field) > 0 ? (total_up_votes_count(voting_field).to_f/votes_count(voting_field)) : 0
       end
 
       # Get the number of up votes
@@ -221,11 +223,11 @@ module Mongo
         eval(voting_field).try(:[], 'up_count') || 0
       end
       
-      def faceless_up_count(voting_field = "votes")
+      def faceless_up_votes_count(voting_field = "votes")
         eval(voting_field).try(:[], 'faceless_up_count') || 0
       end
       
-      def faceless_down_count(voting_field = "votes")
+      def faceless_down_votes_count(voting_field = "votes")
         eval(voting_field).try(:[], 'faceless_down_count') || 0
       end
   

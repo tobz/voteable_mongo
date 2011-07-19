@@ -25,11 +25,12 @@ module Mongo
               }
             end
           end
-          def new_vote_update(options, vote_option_count,vote_count,vote_point, push_option)
+          def new_vote_update(options, vote_option_count,vote_count,vote_point, push_option, vote_total_count)
             update = {
               '$inc' => {
                 vote_count => +1,
                 vote_option_count => +1,
+                vote_total_count => +1,
                 vote_point => options[:voteable][options[:value]]
               }
             }.merge!(push_option)
@@ -39,6 +40,7 @@ module Mongo
             val = options[:value] # :up or :down
             vote_option_ids = "#{options[:voting_field]}.#{val}"
             vote_option_count = options[:voter_id] ? "#{options[:voting_field]}.#{val}_count" : "#{options[:voting_field]}.faceless_#{val}_count"
+            vote_total_count = "#{options[:voting_field]}.total_#{val}_count"
             vote_count = "#{options[:voting_field]}.count"
             vote_point = "#{options[:voting_field]}.point"
             ip_option = "#{options[:voting_field]}.ip"
@@ -46,6 +48,7 @@ module Mongo
               rel = "#{_inverse_relation}.$." # prepend relation for embedded collections
               vote_option_ids.prepend rel
               vote_option_count.prepend rel
+              vote_total_count.prepend rel
               vote_count.prepend rel
               vote_point.prepend rel
               ip_option.prepend rel
@@ -55,7 +58,7 @@ module Mongo
             combined_push = ip_option.merge(user_option)
             push_option = combined_push.empty? ? {} : { '$push' => combined_push }
             query = new_vote_query(options)
-            update = new_vote_update(options, vote_option_count,vote_count,vote_point, push_option)
+            update = new_vote_update(options, vote_option_count,vote_count,vote_point, push_option, vote_total_count)
             return query, update
           end
         end

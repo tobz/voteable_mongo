@@ -39,12 +39,16 @@ module Mongo
                 unless voteable[:update_counters] == false
                   inc_options["#{voteable[:voting_field]}.up_count"] = +1
                   inc_options["#{voteable[:voting_field]}.down_count"] = -1
+                  inc_options["#{voteable[:voting_field]}.total_up_count"] = +1
+                  inc_options["#{voteable[:voting_field]}.total_down_count"] = -1
                 end
               else
                 inc_options["#{voteable[:voting_field]}.point"] = -voteable[:up] + voteable[:down]
                 unless voteable[:update_counters] == false
                   inc_options["#{voteable[:voting_field]}.up_count"] = -1
                   inc_options["#{voteable[:voting_field]}.down_count"] = +1
+                  inc_options["#{voteable[:voting_field]}.total_up_count"] = -1
+                  inc_options["#{voteable[:voting_field]}.total_down_count"] = +1
                 end
               end
             elsif options[:unvote]
@@ -53,8 +57,10 @@ module Mongo
                 inc_options["#{voteable[:voting_field]}.count"] = -1
                 if options[:value] == :up
                   inc_options["#{voteable[:voting_field]}.up_count"] = -1
+                  inc_options["#{voteable[:voting_field]}.total_up_count"] = -1
                 else
                   inc_options["#{voteable[:voting_field]}.down_count"] = -1
+                  inc_options["#{voteable[:voting_field]}.total_down_count"] = -1
                 end
               end
             else # new vote
@@ -63,8 +69,10 @@ module Mongo
                 inc_options["#{voteable[:voting_field]}.count"] = +1
                 if options[:value] == :up
                   options[:voter_id].present? ? inc_options["#{voteable[:voting_field]}.up_count"] = +1 : inc_options["#{voteable[:voting_field]}.faceless_up_count"] = +1
+                  inc_options["#{voteable[:voting_field]}.total_up_count"] = +1
                 else
                   options[:voter_id].present? ? inc_options["#{voteable[:voting_field]}.down_count"] = +1 : inc_options["#{voteable[:voting_field]}.faceless_down_count"] = +1
+                  inc_options["#{voteable[:voting_field]}.total_down_count"] = +1
                 end
               end
             end

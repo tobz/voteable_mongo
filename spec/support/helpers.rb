@@ -14,8 +14,10 @@ module Helpers
     obj.reload
     stats = [obj.up_votes_count(voting_field), 
             obj.down_votes_count(voting_field), 
-            obj.faceless_up_count(voting_field), 
-            obj.faceless_down_count(voting_field), 
+            obj.faceless_up_votes_count(voting_field), 
+            obj.faceless_down_votes_count(voting_field), 
+            obj.total_up_votes_count(voting_field), 
+            obj.total_down_votes_count(voting_field),
             obj.votes_count(voting_field), 
             obj.votes_point(voting_field)
             ]

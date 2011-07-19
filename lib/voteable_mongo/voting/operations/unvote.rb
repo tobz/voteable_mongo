@@ -9,15 +9,17 @@ module Mongo
             if options[:value] == :up
               positive_voter_ids    = ["#{options[:voting_field]}.up", "#{rel}.$.#{options[:voting_field]}.up"]
               positive_votes_count  = ["#{options[:voting_field]}.up_count", "#{rel}.$.#{options[:voting_field]}.up_count"]
+              votes_total_count      = ["#{options[:voting_field]}.total_up_count", "#{rel}.$.#{options[:voting_field]}.total_up_count"]
             else
               positive_voter_ids    = ["#{options[:voting_field]}.down", "#{rel}.$.#{options[:voting_field]}.down"]
               positive_votes_count  = ["#{options[:voting_field]}.down_count","#{rel}.$.#{options[:voting_field]}.down_count"]
+              votes_total_count      = ["#{options[:voting_field]}.total_down_count", "#{rel}.$.#{options[:voting_field]}.total_down_count"]
             end
             votes_count           = ["#{options[:voting_field]}.count", "#{rel}.$.#{options[:voting_field]}.count"]
             votes_point           = ["#{options[:voting_field]}.point", "#{rel}.$.#{options[:voting_field]}.point"]
 
             query = query_for_unvote(options, positive_voter_ids, rel)
-            update = update_for_unvote(options, positive_voter_ids, votes_count, votes_point, positive_votes_count)
+            update = update_for_unvote(options, positive_voter_ids, votes_count, votes_point, positive_votes_count, votes_total_count)
             return query, update
           end
           
@@ -39,7 +41,7 @@ module Mongo
             end
           end
 
-          def update_for_unvote(options, positive_voter_ids, votes_count, votes_point, positive_votes_count)
+          def update_for_unvote(options, positive_voter_ids, votes_count, votes_point, positive_votes_count, votes_total_count)
             if embedded?
               {
                 # then update
@@ -47,6 +49,7 @@ module Mongo
                 '$inc' => {
                   positive_votes_count.last => -1,
                   votes_count.last => -1,
+                  votes_total_count.last => -1,
                   votes_point.last => -options[:voteable][options[:value]]
                 }
               }
@@ -57,6 +60,7 @@ module Mongo
                 '$inc' => {
                   positive_votes_count.first => -1,
                   votes_count.first => -1,
+                  votes_total_count.first => -1,
                   votes_point.first => -options[:voteable][options[:value]]
                 }
               }
