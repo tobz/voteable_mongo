@@ -37,6 +37,10 @@ describe Mongo::Voteable, "Dynamic fields" do
       it 'stats' do
         stats_for(@post1, [1,0,0,0,1,1])
       end
+      
+      it "post1 votes ratio is 1" do
+        @post1.votes_ratio.should == 1
+      end
 
       it 'has voter stats' do
         @post1.vote_value(@user).should == :up
@@ -101,6 +105,10 @@ describe Mongo::Voteable, "Dynamic fields" do
       it 'dynamic_doc stats' do
         stats_for(@dynamic_doc, [1,0,0,0,1,1], "moderations")
       end
+      
+      it "dynamic_doc votes ratio is 1" do
+        @dynamic_doc.votes_ratio("moderations").should == 1
+      end
     
       it 'has voter stats' do
         @dynamic_doc.vote_value(@user, "moderations").should == :up
@@ -141,6 +149,10 @@ describe Mongo::Voteable, "Dynamic fields" do
       it "stats" do
         stats_for(@dynamic_doc, [1,1,0,0,2,0], "moderations")
       end
+      
+      it "dynamic_doc votes ratio is 0.5" do
+        @dynamic_doc.votes_ratio("moderations").should == 0.5
+      end
 
       it 'has voters' do
         @dynamic_doc.vote_value(@user.id, "moderations").should == :up
@@ -170,6 +182,10 @@ describe Mongo::Voteable, "Dynamic fields" do
         stats_for(@dynamic_doc, [0,2,0,0,2,-2], "moderations")
       end
       
+      it "dynamic_doc votes ratio is 0" do
+        @dynamic_doc.votes_ratio("moderations").should == 0
+      end
+      
       it 'changes user1 vote' do
         @dynamic_doc.vote_value(@user.id, "moderations").should == :down
       end
@@ -195,6 +211,10 @@ describe Mongo::Voteable, "Dynamic fields" do
       it 'dynamic moderations stats' do
         stats_for(@dynamic_doc, [0,1,0,0,1,-1], "moderations")
       end
+      
+      it "dynamic_doc votes ratio is 0" do
+        @dynamic_doc.votes_ratio("moderations").should == 0
+      end
 
       it 'removes user1 from voters' do
         @dynamic_doc.vote_value(@user.id, "moderations").should be_nil
@@ -212,6 +232,9 @@ describe Mongo::Voteable, "Dynamic fields" do
       end
       it "dynamic fields initialized with default valued" do
         stats_for(@dynamic_doc, [0,0,0,0,0,0], "likes")
+      end
+      it "dynamic_doc votes on likes ratio is 0" do
+        @dynamic_doc.votes_ratio("likes").should == 0
       end
       it 'has empty up_voter_ids, down_voter_ids ' do
         @dynamic_doc.up_voter_ids("likes").should be_empty
@@ -251,6 +274,10 @@ describe Mongo::Voteable, "Dynamic fields" do
       it 'dynamic like stats' do
         stats_for(@dynamic_doc, [1,0,0,0,1,2], "likes")
       end
+      
+      it "dynamic_doc votes on likes ratio is 1" do
+        @dynamic_doc.votes_ratio("likes").should == 1
+      end
     
       it 'has voter stats' do
         @dynamic_doc.vote_value(@user, "likes").should == :up
@@ -275,6 +302,9 @@ describe Mongo::Voteable, "Dynamic fields" do
       end
       it 'video stats' do
         stats_for(@video, [0,0,0,0,0,0], "reviews")
+      end
+      it "video votes on reviews ratio is 0" do
+        @video.votes_ratio("reviews").should == 0
       end
       it "responds to embedded doc" do
         @dynamic_doc.should respond_to :videos
@@ -318,6 +348,9 @@ describe Mongo::Voteable, "Dynamic fields" do
       it 'video stats' do
         stats_for(@video, [1,0,0,0,1,1], "reviews")
       end
+      it "video votes ratio on likes is 1" do
+        @video.votes_ratio("reviews").should == 1
+      end
       
       it 'has voter stats' do
         @video.vote_value(@user, "reviews").should == :up
@@ -331,8 +364,16 @@ describe Mongo::Voteable, "Dynamic fields" do
         stats_for(@dynamic_doc, [1,1,0,0,2,1], "moderations")
       end
       
+      it "video votes ratio on moderations is 0.5" do
+        @dynamic_doc.votes_ratio("moderations").should == 0.5
+      end
+      
       it "does not update likes stats" do
         stats_for(@dynamic_doc, [1,0,0,0,1,2], "likes")
+      end
+      
+      it "dynamic_doc votes ratio on likes is 1" do
+        @dynamic_doc.votes_ratio("likes").should == 1
       end
     end
   end

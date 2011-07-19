@@ -37,6 +37,11 @@ describe Mongo::Voteable, "Anonymous support" do
      it 'post1 stats' do
        stats_for(@post1, [0,0,1,0,1,1])
      end
+     
+     it "post1 votes ratio is 1" do
+       @post1.votes_ratio.should == 1
+     end
+     
      it "validates voters stats" do
        @post1.up_voters(User).to_a.should be_empty
        @post1.voters(User).to_a.should be_empty
@@ -81,6 +86,10 @@ describe Mongo::Voteable, "Anonymous support" do
        stats_for(@post1, [0,0,1,1,2,0])
      end
      
+     it "post1 votes ratio is 0.5" do
+       @post1.votes_ratio.should == 0.5
+     end
+     
      it "category1 stats" do
        stats_for(@category1, [0,0,0,0,0,-2])
      end
@@ -104,6 +113,10 @@ describe Mongo::Voteable, "Anonymous support" do
        stats_for(@post1, [0,1,1,1,3,-1])
      end
      
+     it "post1 votes ratio is 0.3" do
+       @post1.votes_ratio.should be_within(0.1).of(0.3)
+     end
+     
      it "category1 stats" do
        stats_for(@category1, [0,0,0,0,0,-7])
      end
@@ -124,6 +137,10 @@ describe Mongo::Voteable, "Anonymous support" do
      
      it "post1 stats" do
        stats_for(@post1, [1,0,1,1,3,1])
+     end
+     
+     it "post1 votes ratio is 0.7" do
+       @post1.votes_ratio.should be_within(0.1).of(0.7)
      end
      
      it "category1 stats" do

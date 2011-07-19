@@ -29,6 +29,14 @@ describe Mongo::Voteable, "Embedded Documents" do
       stats_for(@post1, [0,0,0,0,0,0])
     end
     
+    it "image1 votes ratio is 0" do
+      @image1.votes_ratio.should == 0
+    end
+    
+    it "post1 votes ratio is 0" do
+      @post1.votes_ratio.should == 0
+    end
+    
     it 'up_voter_ids, down_voter_ids should be empty' do
       @image1.up_voter_ids.should be_empty
       @image1.down_voter_ids.should be_empty
@@ -82,6 +90,10 @@ describe Mongo::Voteable, "Embedded Documents" do
     it 'image1 stats' do
       stats_for(@image1, [1,0,0,0,1,1])
     end
+    
+    it "image1 votes ratio is 1" do
+      @image1.votes_ratio.should == 1
+    end
     it 'has voter stats' do
       @image1.vote_value(@user1).should == :up
       @image1.should be_voted_by(@user1)
@@ -94,6 +106,11 @@ describe Mongo::Voteable, "Embedded Documents" do
     it "post1 stats" do
       stats_for(@post1, [1,0,0,0,1,2])
     end
+    
+    it "post1 votes ratio is 1" do
+      @post1.votes_ratio.should == 1
+    end
+    
   end
   
   # Last stats:
@@ -121,8 +138,16 @@ describe Mongo::Voteable, "Embedded Documents" do
      it "image1 stats" do
        stats_for(@image1, [1,1,0,0,2,0])
      end
+     
+     it "image1 votes ratio is 0.5" do
+       @image1.votes_ratio.should == 0.5
+     end
+     
      it "post1 stats" do
        stats_for(@post1, [1,1,0,0,2,1])
+     end
+     it "post1 votes ratio is 0.5" do
+       @post1.votes_ratio.should == 0.5
      end
 
      it 'has voters' do
@@ -163,8 +188,16 @@ describe Mongo::Voteable, "Embedded Documents" do
        stats_for(@image2, [0,1,0,0,1,-1])
      end
      
+     it "image2 votes ratio is 0" do
+       @image2.votes_ratio.should == 0
+     end
+     
      it "post1 stats" do
        stats_for(@post1, [0,3,0,0,3,-3])
+     end
+     
+     it "post1 votes ratio is 0" do
+       @post1.votes_ratio.should == 0
      end
    end
    
@@ -179,6 +212,10 @@ describe Mongo::Voteable, "Embedded Documents" do
      
      it "image2 stats" do
        stats_for(@image2, [1,0,0,0,1,1])
+     end
+     
+     it "image2 votes ratio is 1" do
+       @image2.votes_ratio.should == 1
      end
      
      it "post1 stats" do

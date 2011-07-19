@@ -82,6 +82,14 @@ describe Mongo::Voteable do
       stats_for(@comment, [0,0,0,0,0,0])
     end
     
+    it "votes ratio is 0" do
+      @category1.votes_ratio.should == 0
+      @category2.votes_ratio.should == 0
+      @post1.votes_ratio.should == 0
+      @post2.votes_ratio.should == 0
+      @comment.votes_ratio.should == 0
+    end
+    
     it 'up_voter_ids, down_voter_ids should be empty' do
       @category1.up_voter_ids.should be_empty
       @category1.down_voter_ids.should be_empty
@@ -152,6 +160,10 @@ describe Mongo::Voteable do
       stats_for(@post1, [1,0,0,0,1,1])
     end
     
+    it "post1 votes ratio is 1" do
+      @post1.votes_ratio.should == 1
+    end
+    
     it 'has voter stats' do
       @post1.vote_value(@user1).should == :up
       @post1.should be_voted_by(@user1)
@@ -205,6 +217,10 @@ describe Mongo::Voteable do
     it "stats" do
       stats_for(@post1, [1,1,0,0,2,0])
     end
+    
+    it "post1 votes ratio is 0.5" do
+      @post1.votes_ratio.should == 0.5
+    end
 
     it 'has voters' do
       @post1.vote_value(@user1.id).should == :up
@@ -242,6 +258,10 @@ describe Mongo::Voteable do
       stats_for(@post1, [0,2,0,0,2,-2])
     end
     
+    it "post1 votes ratio is 0" do
+      @post1.votes_ratio.should == 0
+    end
+    
     it 'category1 stats' do
       stats_for(@category1, [0,0,0,0,0,-10])
     end
@@ -270,6 +290,11 @@ describe Mongo::Voteable do
     it 'stats' do
       stats_for(@post2, [0,1,0,0,1,-1])
     end
+    
+    it "post2 votes ratio is 0" do
+      @post2.votes_ratio.should == 0
+    end
+    
     it "has user1 vote" do
       @post2.vote_value(@user1.id).should == :down
     end
@@ -288,6 +313,11 @@ describe Mongo::Voteable do
     it 'stats' do
       stats_for(@post2, [1,0,0,0,1,1])
     end
+    
+    it "post2 votes ratio is 1" do
+      @post2.votes_ratio.should == 1
+    end
+    
     it "changes user1 vote" do
       @post2.vote_value(@user1.id).should == :up
     end
@@ -305,9 +335,16 @@ describe Mongo::Voteable do
     it 'post2 stats' do
       stats_for(@post2, [2,0,0,0,2,3])
     end
+    it "post2 votes ratio is 1" do
+      @post2.votes_ratio.should == 1
+    end
     
     it 'comment stats' do
       stats_for(@comment, [1,0,0,0,1,1])
+    end
+    
+    it "comment votes ratio is 1" do
+      @comment.votes_ratio.should == 1
     end
   end
   
@@ -325,8 +362,17 @@ describe Mongo::Voteable do
     it 'post2 stats' do
       stats_for(@post2, [1,1,0,0,2,0])
     end
+    
+    it "post2 votes ratio is 0.5" do
+      @post2.votes_ratio.should == 0.5
+    end
+    
     it 'comment stats' do
       stats_for(@comment, [0,1,0,0,1,-3])
+    end
+    
+    it "comment votes ratio is 0" do
+      @comment.votes_ratio.should == 0
     end
   end
   
@@ -370,6 +416,10 @@ describe Mongo::Voteable do
     
     it "comment stats" do      
       stats_for(@comment, [0,0,0,0,0,0])
+    end
+    
+    it "comment votes ratio is 0" do
+      @comment.votes_ratio.should == 0
     end
     it "post2 stats" do
       stats_for(@post2, [1,0,0,0,1,1])

@@ -190,12 +190,18 @@ module Mongo
         up_voter_ids(voting_field) + down_voter_ids(voting_field)
       end
       
+      # Get the total number of up votes (registered and anonymous)
       def total_up_count(voting_field = "votes")
         up_votes_count(voting_field) + faceless_up_count(voting_field)
       end
       
+      # Get the total number of down votes (registered and anonymous)
       def total_down_count(voting_field = "votes")
         down_votes_count(voting_field) + faceless_down_count(voting_field)
+      end
+      
+      def votes_ratio(voting_field = "votes")
+        votes_count(voting_field) > 0 ? (total_up_count(voting_field).to_f/votes_count(voting_field)) : 0
       end
 
       # Get the number of up votes
