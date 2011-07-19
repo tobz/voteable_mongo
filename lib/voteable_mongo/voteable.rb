@@ -28,16 +28,6 @@ module Mongo
         include Mongo::Voteable::Integrations::MongoMapper
       end
       
-      # Define callbacks for voting if defined in voteable model
-      # This is useful because the gem interacts with the database
-      # through the ruby-mongo driver directly, skipping ActiveModel::Callbacks
-      # 
-      # Example:
-      #   before_vote :do_something_before
-      #   after_vote :do_something_after
-      # 
-      define_model_callbacks :vote
-      
       # 
       # 
       # No support for embedded documents
@@ -93,6 +83,15 @@ module Mongo
       def define_voting_field(voting_field)
         class_eval do
           field voting_field, :type => Hash, :default => DEFAULT_VOTES
+          # Define callbacks for voting if defined in voteable model
+          # This is useful because the gem interacts with the database
+          # through the ruby-mongo driver directly, skipping ActiveModel::Callbacks
+          # 
+          # Example:
+          #   before_vote :do_something_before
+          #   after_vote :do_something_after
+          # 
+          define_model_callbacks :vote
         end
       end
       # Check if voter_id do a vote on votee_id
