@@ -6,22 +6,31 @@ module Mongo
         module ClassMethods
           def revote_query_and_update(options)
             rel = embedded? && _inverse_relation
+            val = options[:value]
+            voting_field = options[:voting_field]
             if options[:value] == :up
-              positive_voter_ids =          ["#{options[:voting_field]}.up", "#{rel}.$.#{options[:voting_field]}.up"]
-              negative_voter_ids =          ["#{options[:voting_field]}.down", "#{rel}.$.#{options[:voting_field]}.down"]
-              positive_votes_count =        ["#{options[:voting_field]}.up_count", "#{rel}.$.#{options[:voting_field]}.up_count"]
-              negative_votes_count =        ["#{options[:voting_field]}.down_count","#{rel}.$.#{options[:voting_field]}.down_count"]
-              positive_total_votes_count =  ["#{options[:voting_field]}.total_up_count","#{rel}.$.#{options[:voting_field]}.total_up_count"]
-              negative_total_votes_count =  ["#{options[:voting_field]}.total_down_count","#{rel}.$.#{options[:voting_field]}.total_down_count"]
+              positive_voter_ids          = ["#{voting_field}.up", "#{rel}.$.#{voting_field}.up"]
+              negative_voter_ids          = ["#{voting_field}.down", "#{rel}.$.#{voting_field}.down"]
+              positive_votes_count        = ["#{voting_field}.up_count", "#{rel}.$.#{voting_field}.up_count"]
+              negative_votes_count        = ["#{voting_field}.down_count","#{rel}.$.#{voting_field}.down_count"]
+              positive_total_votes_count  = ["#{voting_field}.total_up_count","#{rel}.$.#{voting_field}.total_up_count"]
+              negative_total_votes_count  = ["#{voting_field}.total_down_count","#{rel}.$.#{voting_field}.total_down_count"]
               point_delta = options[:voteable][:up] - options[:voteable][:down]
             else
-              positive_voter_ids =          ["#{options[:voting_field]}.down", "#{rel}.$.#{options[:voting_field]}.down"]
-              negative_voter_ids =          ["#{options[:voting_field]}.up", "#{rel}.$.#{options[:voting_field]}.up"]
-              positive_votes_count =        ["#{options[:voting_field]}.down_count", "#{rel}.$.#{options[:voting_field]}.down_count"]
-              negative_votes_count =        ["#{options[:voting_field]}.up_count", "#{rel}.$.#{options[:voting_field]}.up_count"]
-              positive_total_votes_count =  ["#{options[:voting_field]}.total_down_count", "#{rel}.$.#{options[:voting_field]}.total_down_count"]
-              negative_total_votes_count =  ["#{options[:voting_field]}.total_up_count", "#{rel}.$.#{options[:voting_field]}.total_up_count"]
+              positive_voter_ids          = ["#{voting_field}.down", "#{rel}.$.#{voting_field}.down"]
+              negative_voter_ids          = ["#{voting_field}.up", "#{rel}.$.#{voting_field}.up"]
+              positive_votes_count        = ["#{voting_field}.down_count", "#{rel}.$.#{voting_field}.down_count"]
+              negative_votes_count        = ["#{voting_field}.up_count", "#{rel}.$.#{voting_field}.up_count"]
+              positive_total_votes_count  = ["#{voting_field}.total_down_count", "#{rel}.$.#{voting_field}.total_down_count"]
+              negative_total_votes_count  = ["#{voting_field}.total_up_count", "#{rel}.$.#{voting_field}.total_up_count"]
               point_delta = -options[:voteable][:up] + options[:voteable][:down]
+            end
+            vote_ratio_field = ["#{voting_field}.ratio","#{rel}.$.#{voting_field}.ratio"]
+            votee = options[:votee]
+            if val == :up
+              vote_ratio_value = (votee.total_up_votes_count(voting_field) + 1).to_f / (votee.votes_count(voting_field))
+            else
+              vote_ratio_value = (votee.total_up_votes_count(voting_field) - 1).to_f / (votee.votes_count(voting_field))
             end
             query = query_for_revote(options, negative_voter_ids, rel)
             update = update_for_revote(options, 
@@ -31,16 +40,29 @@ module Mongo
                                       negative_votes_count, 
                                       positive_total_votes_count,
                                       negative_total_votes_count,
+                                      vote_ratio_field,
+                                      vote_ratio_value,
                                       point_delta, 
                                       rel)
             return query, update
           end
-          def update_for_revote(options, negative_voter_ids, positive_voter_ids, positive_votes_count, negative_votes_count, positive_total_votes_count, negative_total_votes_count, point_delta, rel)
+          def update_for_revote(options, 
+                                negative_voter_ids, 
+                                positive_voter_ids, 
+                                positive_votes_count, 
+                                negative_votes_count, 
+                                positive_total_votes_count, 
+                                negative_total_votes_count, 
+                                vote_ratio_field, 
+                                vote_ratio_value, 
+                                point_delta, 
+                                rel)
             if embedded?
              {
                # then update
                '$pull' => { negative_voter_ids.last => options[:voter_id] },
                '$push' => { positive_voter_ids.last => options[:voter_id] },
+               '$set' =>  { vote_ratio_field.last => vote_ratio_value },
                '$inc' => {
                  positive_votes_count.last => +1,
                  negative_votes_count.last => -1,
@@ -53,6 +75,7 @@ module Mongo
              {
                '$pull' => { negative_voter_ids.first => options[:voter_id] },
                '$push' => { positive_voter_ids.first => options[:voter_id] },
+               '$set' =>  { vote_ratio_field.first => vote_ratio_value },
                '$inc' => {
                  positive_votes_count.first => +1,
                  negative_votes_count.first => -1,

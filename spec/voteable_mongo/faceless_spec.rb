@@ -33,6 +33,7 @@ describe Mongo::Voteable, "Anonymous support" do
          'total_down_count' => 0,
          'count' => 1,
          'point' => 1,
+         'ratio' => 1,
          'ip' => ["200"]
        }
      end

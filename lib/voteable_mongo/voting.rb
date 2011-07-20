@@ -15,6 +15,24 @@ module Mongo
         include Mongo::Voting::Operations::UpdateParents
       end
       module ClassMethods
+        
+        def instantiate_votee(options)
+          if options[:votee].blank?
+            klass = options[:votee_class] || self
+            begin
+              votee_id = Helpers.try_to_convert_string_to_object_id(options[:votee_id]) 
+              options[:votee] = if embedded?
+                parent_instance = klass._parent_klass.where("#{klass._inverse_relation}._id" => votee_id).first
+                parent_instance.send("#{klass._inverse_relation}").find(votee_id)
+              else
+                klass.find(votee_id)
+              end
+            rescue 
+              return false
+            end
+          end
+        end
+        
         # Make a vote on an object of this class
         #
         # @param [Hash] options a hash containings:
@@ -27,6 +45,8 @@ module Mongo
         #
         # @return [votee, false]
         def set_vote(options)
+          instantiate_votee(options)
+          return false if options[:votee].blank?
           validate_and_normalize_vote_options(options)
           return unless VOTEABLE[self.name][self.name]
           setup_voteable(options)

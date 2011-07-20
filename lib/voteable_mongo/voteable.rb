@@ -17,6 +17,7 @@ module Mongo
       'total_down_count' => 0,
       'count' => 0,
       'point' => 0,
+      'ratio' => 0,
       'ip' => []
     }
 
@@ -215,7 +216,8 @@ module Mongo
       end
       
       def votes_ratio(voting_field = "votes")
-        votes_count(voting_field) > 0 ? (total_up_votes_count(voting_field).to_f/votes_count(voting_field)) : 0
+        eval(voting_field).try(:[], 'ratio') || 0
+        # votes_count(voting_field) > 0 ? (total_up_votes_count(voting_field).to_f/votes_count(voting_field)) : 0
       end
 
       # Get the number of up votes
