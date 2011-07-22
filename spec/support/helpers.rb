@@ -7,6 +7,8 @@ module Helpers
   #   down_votes_count, 
   #   faceless_up_count, 
   #   faceless_down_count, 
+  #   total_up_votes_count,
+  #   total_down_votes_count,
   #   votes_count, 
   #   votes_point
   # 

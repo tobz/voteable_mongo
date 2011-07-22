@@ -6,6 +6,18 @@ require 'voteable_mongo/embedded_relations'
 module Mongo
   module Voteable
     extend ActiveSupport::Concern
+    # up: ids of up voters 
+    # down: ids of down voters
+    # faceless_up_count: number of anonymous up votes 
+    # faceless_down_count: number of anonymous down votes
+    # up_count: number of voters up votes
+    # down_count: number of voters down votes
+    # total_up_count: faceless + voters (up votes)
+    # total_down_count: faceless + voters (down votes)
+    # count: total number of votes
+    # point: points attributed to the votes
+    # ratio: up/total. It is being cached for querying purposes
+    # ip: IPs used in anonymous votes
     DEFAULT_VOTES = {
       'up' => [],
       'down' => [],
@@ -39,12 +51,15 @@ module Mongo
       #   before_vote :do_something_before
       #   after_vote :do_something_after
       # 
+      # TODO: If there's more than one voting field in the document, all of them
+      # will trigger the same callbacks. One should be able to test it, but
+      # it should be better to work around here.
       define_model_callbacks :vote
       
       # 
-      # 
       # No support for embedded documents
-      # 
+      # TODO: find a way to return this information for embedded documents.
+      # Maybe keeping the votes within the voters class.
       # 
       scope :voted_by, lambda { |voter, voting_field = "votes"|
         voter_id = Helpers.get_mongo_id(voter)
@@ -74,6 +89,9 @@ module Mongo
       # voteable self, :up => +1, :down => -3
       # voteable Post, :up => +2, :down => -1, :update_counters => false # skip counter update
       # voteable self, :voting_field => :moderations
+      # :voting_field will always default to "votes" so we don't break the public API
+      # 
+      # TODO: split this into setup and performing methods.
       # 
       def voteable(klass = self, options = nil)
         VOTEABLE[name] ||= {}
@@ -93,11 +111,17 @@ module Mongo
         end
       end
       
+      # Defines the oting_field in the included class
+      # with the given name.
+      # 
+      # @param [String] voting_field is the field under which 
+      # the votes will be placed.
       def define_voting_field(voting_field)
         class_eval do
           field voting_field, :type => Hash, :default => DEFAULT_VOTES
         end
       end
+      
       # Check if voter_id do a vote on votee_id
       #
       # @param [Hash] options a hash containings:
@@ -159,8 +183,10 @@ module Mongo
       #   - :value: vote :up or vote :down
       #   - :revote: change from vote up to vote down
       #   - :unvote: unvote the vote value (:up or :down)
-      # 
+      #   - :ip: ip used by anonymous voters for controlling purposes
+      #   - :voting_field: field storing the votes (default = "votes")
       def set_vote(options)
+        # we can run before and after callbacks around this method
         _run_vote_callbacks do
           options[:votee_id] = id
           options[:votee] = self
@@ -180,55 +206,72 @@ module Mongo
       # Get a voted value on this votee
       #
       # @param voter is object or the id of the voter who made the vote
+      # # @param voting_field(String) default = "votes
       def vote_value(voter, voting_field = "votes")
         voter_id = Helpers.get_mongo_id(voter)
         return :up if up_voter_ids(voting_field).include?(voter_id)
         return :down if down_voter_ids(voting_field).include?(voter_id)
       end
-    
+      
+      # Has the voter voted for record of votee?
+      # @param voting_field(String) default = "votes
+      # @return [true, false]
       def voted_by?(voter, voting_field = "votes")
         !!vote_value(voter, voting_field)
       end
 
       # Array of up voter ids
+      # @param voting_field(String) default = "votes"
       def up_voter_ids(voting_field = "votes")
         eval(voting_field).try(:[], 'up') || []
       end
 
       # Array of down voter ids
+      # @param voting_field(String) default = "votes"
       def down_voter_ids(voting_field = "votes")
         eval(voting_field).try(:[], 'down') || []
       end
 
       # Array of voter ids
+      # @param voting_field(String) default = "votes"
       def voter_ids(voting_field = "votes")
         up_voter_ids(voting_field) + down_voter_ids(voting_field)
       end
       
       # Get the total number of up votes (registered and anonymous)
+      # @param voting_field(String) default = "votes"
       def total_up_votes_count(voting_field = "votes")
         eval(voting_field).try(:[], 'total_up_count') || 0
       end
       
       # Get the total number of down votes (registered and anonymous)
+      # @param voting_field(String) default = "votes"
       def total_down_votes_count(voting_field = "votes")
         eval(voting_field).try(:[], 'total_down_count') || 0
       end
       
+      # Get the positive votes ratio in relation to the total votes count
+      # eg: 1 :up, 9 :down = 10% (ratio = 0.1) 
+      # @param voting_field(String) default = "votes"
+      # @return Float
       def votes_ratio(voting_field = "votes")
         eval(voting_field).try(:[], 'ratio') || 0
-        # votes_count(voting_field) > 0 ? (total_up_votes_count(voting_field).to_f/votes_count(voting_field)) : 0
       end
 
       # Get the number of up votes
+      # @param voting_field(String) default = "votes"
       def up_votes_count(voting_field = "votes")
         eval(voting_field).try(:[], 'up_count') || 0
       end
       
+      # Get the number of anonymous up votes
+      # @param voting_field(String) default = "votes"
       def faceless_up_votes_count(voting_field = "votes")
         eval(voting_field).try(:[], 'faceless_up_count') || 0
       end
       
+      # Get the number of anonymous down votes
+      # @param voting_field(String) default = "votes"
       def faceless_down_votes_count(voting_field = "votes")
         eval(voting_field).try(:[], 'faceless_down_count') || 0
       end

@@ -16,6 +16,7 @@
 
 * More test cases for Tasks module
 
------ angelim
+----- Alexandre
 
+* Rebuild ratio in tasks and add specs for it
 * Also Store votes in user (no scopes for embedded documents)

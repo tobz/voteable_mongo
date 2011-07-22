@@ -4,6 +4,18 @@ module Mongo
       module UpdateParents
         extend ActiveSupport::Concern
         module ClassMethods
+          # Updates parent votes
+          # 
+          # @param [Hash] class_voteable 
+          # @param [Hash] doc is the document returned by the mongo driver
+          # @param [Hash] options
+          # 
+          # Master collections can have multiple relations and should update all parents.
+          # Embedded documents in Mongoid can only have one parent and multiple updates aren't necessary
+          # Before an update can be made, an instance of the parent's document is retrieved.
+          # This is only needed for the up/total ratio calculation, but it has a cost of an aditional query.
+          # 
+          # TODO: Ratio calculation should be optional
           def update_parent_votes(class_voteable, doc, options)
             if embedded?
               voteable = class_voteable[name][_parent_klass.name]
@@ -21,6 +33,8 @@ module Mongo
                 if metadata = voteable_relation(class_name)
                   if (parent_id = doc[voteable_foreign_key(metadata)]).present?
                     parent_ids = parent_id.is_a?(Array) ? parent_id : [ parent_id ]
+                    # because of the ratio calculation we need to iterate through
+                    # all parent documents.
                     parent_ids.each do |parent_id|
                       votee = class_name.constantize.find(parent_id)
                       parent_inc_options, parent_set_options = parent_options(voteable, options, votee)
@@ -35,7 +49,14 @@ module Mongo
               end
             end
           end
-
+          
+          # Builds options for the update
+          # 
+          # @param [Hash] voteable are the voteable options for the parent document
+          # @param [Hash] options
+          # @param [Object] votee is an instance of the parent document
+          # 
+          # TODO: urgent need of refactoring
           def parent_options(voteable, options, votee)
             voteable = voteable.first
             val = options[:value]

@@ -5,8 +5,6 @@ module Mongo
       # Set counters and point to 0 for uninitialized voteable objects
       # in order sort and query
 
-      # Finds mongoid embedded-in Relation
-
       def self.init_stats(log = false)
         VOTEABLE.each do |class_name, voteable|
           klass = class_name.constantize
@@ -28,9 +26,9 @@ module Mongo
           end
         end
       end
-
-      # TODO
-      # How can we test uninitialized records?
+      
+      # Reset votes stats of a given collection or embedded document class.
+      # !! It will erase votes if already present!!
       def self.reset_stats(klass, log = false)
         puts "Reset stats for #{klass.name}" if log
         voteables = VOTEABLE.find{|k,v| k == klass.name }.last
@@ -80,6 +78,7 @@ module Mongo
         end
       end
       
+      # For embedded classes we need to iterate through all parent records.
       def self.remake_stats_for_all_embedded_classes(embedded_classes, log)
         embedded_classes.each do |klass, voteable|
           master_klass = klass._parent_klass

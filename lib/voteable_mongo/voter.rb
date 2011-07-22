@@ -13,6 +13,8 @@ module Mongo
       #
       # @param [Hash, Object] options the hash containing the votee, or the votee itself
       # @return [true, false] true if voted, false otherwise
+      # Method signature changed from #voted? to #voter_voted? 
+      # This was nedded so the voter's class could also have its own votes.
       def voter_voted?(options)
         options[:voting_field] ||= "votes"
         unless options.is_a?(Hash)
@@ -28,6 +30,8 @@ module Mongo
             votee_id = options[:votee_id]
           end
         end
+        
+        # If embedded won't delegate to the votee's class.
         if votee_class.embedded?
           Post.collection.find(
           "images" => {
@@ -46,6 +50,8 @@ module Mongo
       #
       # @param (see #voted?)
       # @return [Symbol, nil] :up or :down or nil if not voted
+      # Method signature has changed from #vote_value to #voter_vote_value
+      # for the same reasons above.
       def voter_vote_value(options)
         options[:voting_field] ||= "votes"
         votee = unless options.is_a?(Hash)

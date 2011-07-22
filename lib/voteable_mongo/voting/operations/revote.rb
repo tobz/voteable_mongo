@@ -8,6 +8,10 @@ module Mongo
             rel = embedded? && _inverse_relation
             val = options[:value]
             voting_field = options[:voting_field]
+            
+            # Every field name has its variant for master collection
+            # and embedded documents. 
+            # eg: [votes.up, imags.$.votes.up]
             if options[:value] == :up
               positive_voter_ids          = ["#{voting_field}.up", "#{rel}.$.#{voting_field}.up"]
               negative_voter_ids          = ["#{voting_field}.down", "#{rel}.$.#{voting_field}.down"]
@@ -27,6 +31,8 @@ module Mongo
             end
             vote_ratio_field = ["#{voting_field}.ratio","#{rel}.$.#{voting_field}.ratio"]
             votee = options[:votee]
+            
+            # calculating ratio
             if val == :up
               vote_ratio_value = (votee.total_up_votes_count(voting_field) + 1).to_f / (votee.votes_count(voting_field))
             else
@@ -46,6 +52,22 @@ module Mongo
                                       rel)
             return query, update
           end
+          
+          # Builds update statement for FindAndModify
+          # 
+          # @param [Array] negative_voter_ids, eg: ["votes.up", "images.$.votes.up"]
+          # @param [Array] positive_voter_ids, eg: ["votes.down", "images.$.votes.down"]
+          # @param [Array] positive_votes_count, eg: ["votes.up_count", "images.$.votes.up_count"]
+          # @param [Array] negative_votes_count, eg: ["votes.down_count", "images.$.votes.down_count"]
+          # @param [Array] positive_total_votes_count, eg: ["votes.total_up_count", "images.$.votes.total_up_count"]
+          # @param [Array] negative_total_votes_count, eg: ["votes.total_down_count", "images.$.votes.total_down_count"]
+          # @param [Array] vote_ratio_field, eg: ["votes.ratio", "images.$.votes.ratio"]
+          # @param [Float] vote_ratio_value, eg: 0.4
+          # @param [Integer] point_delta is the difference in points for the revote
+          # @param [String] rel is the embedding relation name, eg: "images"
+          # 
+          # @return [Hash] update statement
+          # TODO: place arguments inside some hash 
           def update_for_revote(options, 
                                 negative_voter_ids, 
                                 positive_voter_ids, 
@@ -87,6 +109,12 @@ module Mongo
             end
           end
 
+          # Build query statement of FindAndModify
+          # 
+          # @param [Hash] options
+          # @param [Array] negative_voter_ids, eg: ["votes.up", "images.$.votes.up"]
+          # @param [String] rel is the name of the relation for embedded document, eg: "images"
+          # 
           def query_for_revote(options, negative_voter_ids, rel)
             if embedded?
              {

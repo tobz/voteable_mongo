@@ -5,7 +5,8 @@ module Mongo
         extend ActiveSupport::Concern
 
         included do
-          # field :votes, :type => Hash, :default => DEFAULT_VOTES
+          # The field votes won't be defined here on account 
+          # of the customizeable field
 
           class << self
             alias_method :voteable_index, :index
@@ -16,7 +17,9 @@ module Mongo
           def voteable_relation(class_name)
             relations.find{ |x, r| r.class_name == class_name }.try(:last)
           end
-
+          
+          # Falling back to Ruby driver's collection.
+          # For embedded documents, it should point to the master collection.
           def voteable_collection
             if self.embedded?
               _parent_klass.collection.master.collection
