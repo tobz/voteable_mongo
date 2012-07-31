@@ -14,7 +14,6 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency 'rspec', '~> 2.5'
   s.add_development_dependency 'mongoid', '~> 3.0'
-  s.add_development_dependency 'mongo_mapper', '~> 0.9'
   s.add_development_dependency 'bson_ext', '~> 1.4'
 
   s.rubyforge_project = 'voteable_mongo'

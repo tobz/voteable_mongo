@@ -18,7 +18,7 @@ module Mongo
           end
 
           def voteable_collection
-            collection.master.collection
+            collection
           end
 
           def voteable_foreign_key(metadata)

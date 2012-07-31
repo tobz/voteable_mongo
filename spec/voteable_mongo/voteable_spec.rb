@@ -4,8 +4,8 @@ describe Mongo::Voteable do
   
   context 'when :index is passed as an argument' do
     before do
-      Post.collection.drop_indexes
-      Category.collection.drop_indexes
+      Post.remove_indexes
+      Category.remove_indexes
       
       Post.create_voteable_indexes
       Category.create_voteable_indexes
@@ -13,19 +13,19 @@ describe Mongo::Voteable do
   
     it 'defines indexes' do
       [Post, Category].each do |klass|
-        [ 'votes.up_1__id_1',
-          'votes.down_1__id_1'
+        [ {'votes.up' => 1, '_id' => 1},
+          {'votes.down' => 1, '_id' => 1},
         ].each { |index_key|
-          klass.collection.index_information.should have_key index_key
-          klass.collection.index_information[index_key]['unique'].should be_true
+          klass.collection.indexes[index_key].should_not be_nil
+          klass.collection.indexes[index_key]['unique'].should be_true
         }
   
-        [ 'votes.count_-1',
-          'votes.up_count_-1',
-          'votes.down_count_-1',
-          'votes.point_-1'
+        [ {'votes.count' => -1},
+          {'votes.up_count' => -1},
+          {'votes.down_count' => -1},
+          {'votes.point' => -1},
         ].each { |index_key|
-          klass.collection.index_information.should have_key index_key
+          klass.collection.indexes[index_key].should_not be_nil
         }
       end
     end
@@ -48,7 +48,7 @@ describe Mongo::Voteable do
   end
   
   it "vote for unexisting post" do
-    @user1.vote(:votee_class => Post, :votee_id => BSON::ObjectId.new, :value => :up).should == false
+    @user1.vote(:votee_class => Post, :votee_id => Moped::BSON::ObjectId.new, :value => :up).should == false
   end
   
   context "just created" do

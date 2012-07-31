@@ -29,12 +29,11 @@ module Mongo
 
             # http://www.mongodb.org/display/DOCS/findAndModify+Command
             begin
-              doc = voteable_collection.find_and_modify(
-                :query => query,
-                :update => update,
+              doc = where(query).find_and_modify(
+                update,
                 :new => true
               )
-            rescue Mongo::OperationFailure
+            rescue Moped::Errors::OperationFailure
               doc = nil
             end  
 
@@ -42,7 +41,7 @@ module Mongo
               update_parent_votes(doc, options) if options[:voteable][:update_parents]
               # Update new votes data
               options[:votee].write_attribute('votes', doc['votes']) if options[:votee]
-              options[:votee] || new(doc)
+              options[:votee] || new(doc.as_document)
             else
               false
             end
@@ -143,7 +142,7 @@ module Mongo
               '$inc' => {
                 positive_votes_count => -1,
                 'votes.count' => -1,
-                'votes.point' => -options[:voteable][options[:value]]
+                'votes.point' => - options[:voteable][options[:value]]
               }
             }
           end
@@ -151,13 +150,13 @@ module Mongo
 
           def update_parent_votes(doc, options)
             VOTEABLE[name].each do |class_name, voteable|
+                
               if metadata = voteable_relation(class_name)
+                
                 if (parent_id = doc[voteable_foreign_key(metadata)]).present?
                   parent_ids = parent_id.is_a?(Array) ? parent_id : [ parent_id ]
-                  class_name.constantize.collection.update( 
-                    { '_id' => { '$in' => parent_ids } },
+                  class_name.constantize.collection.find({'_id' => {'$in' => parent_ids}}).update_all(
                     { '$inc' => parent_inc_options(voteable, options) },
-                    { :multi => true }
                   )
                 end
               end

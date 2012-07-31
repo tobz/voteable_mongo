@@ -9,12 +9,7 @@ module Mongo
           klass = class_name.constantize
           klass_voteable = voteable[class_name]
           puts "Init stats for #{class_name}" if log
-          klass.collection.update({:votes => nil}, {
-            '$set' => { :votes => DEFAULT_VOTES }
-          }, {
-            :safe => true,
-            :multi => true
-          })
+          klass.with(safe: true).where(votes: nil).update_all({ '$set' => {votes: DEFAULT_VOTES} })
         end
       end
       
@@ -51,16 +46,16 @@ module Mongo
           up_count = up_voter_ids.size
           down_count = down_voter_ids.size
 
-          klass.collection.update({ :_id => doc.id }, {
+          klass.with(safe: true).where(_id: doc.id).update_all(
             '$set' => {
-                'votes' => {
-                  'up' => up_voter_ids,
-                  'down' => down_voter_ids,
-                  'up_count' => up_count,
-                  'down_count' => down_count,
-                  'count' => up_count + down_count,
-                  'point' => voteable[:up].to_i*up_count + voteable[:down].to_i*down_count
-                }
+              'votes' => {
+                'up' => up_voter_ids,
+                'down' => down_voter_ids,
+                'up_count' => up_count,
+                'down_count' => down_count,
+                'count' => up_count + down_count,
+                'point' => voteable[:up].to_i*up_count + voteable[:down].to_i*down_count
+              }
             },
             '$unset' => {
               'up_voter_ids' => true,
@@ -69,7 +64,7 @@ module Mongo
               'votes_point' => true,
               'voteable' => true
             }
-          }, { :safe => true })
+          )
         end
       end
       
@@ -142,11 +137,7 @@ module Mongo
 
           parent_ids = parent_id.is_a?(Array) ? parent_id : [ parent_id ]
           
-          parent_class.collection.update(
-            { '_id' => { '$in' => parent_ids } }, 
-            { '$inc' =>  inc_options },
-            { :safe => true, :multi => true }
-          )
+          parent_class.with(safe: true).where(:_id.in => parent_ids).update_all({ '$inc' =>  inc_options })
         end
       end
 

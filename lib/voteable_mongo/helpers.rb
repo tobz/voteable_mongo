@@ -3,7 +3,7 @@ module Mongo
     module Helpers
 
       def self.try_to_convert_string_to_object_id(x)
-        x.is_a?(String) && BSON::ObjectId.legal?(x) ? BSON::ObjectId(x) : x
+        x.is_a?(String) && Moped::BSON::ObjectId.legal?(x) ? Moped::BSON::ObjectId(x) : x
       end
 
       def self.get_mongo_id(x)
