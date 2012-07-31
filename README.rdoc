@@ -1,4 +1,4 @@
-= Voteable Mongo
+= Voteable Mongo (for Mongoid 3.0)
 
 voteable_mongo allows you to make your Mongoid::Document or MongoMapper::Document objects voteable and tabulate votes count and votes point for you. For instance, in a forum, a user can vote up (or down) on a post or a comment. It's optimized for speed by using only ONE database request per collection to validate, update, and retrieve updated data.
 
