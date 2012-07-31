@@ -9,8 +9,9 @@ if 0.6 > 0.5
   Mongoid.configure do |config|
     name = 'voteable_mongo_test'
     host = 'localhost'
-    config.master = Mongo::Connection.new.db(name)
-    config.autocreate_indexes = true
+    config.connect_to(name)
+    # no longer available
+    # config.autocreate_indexes = true
   end
 else
   puts 'MongoMapper'
