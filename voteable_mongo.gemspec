@@ -8,14 +8,13 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.authors     = ['Alex Nguyen']
   s.email       = ['alex@vinova.sg']
-  s.homepage    = 'https://github.com/vinova/voteable_mongo'
+  s.homepage    = 'https://github.com/rs-pro/voteable_mongo'
   s.summary     = %q{Add up / down voting ability to Mongoid and MongoMapper documents}
   s.description = %q{Add up / down voting ability to Mongoid and MongoMapper documents. Optimized for speed by using only ONE request to MongoDB to validate, update, and retrieve updated data.}
 
-  s.add_development_dependency 'rspec', '~> 2.5'
-  s.add_development_dependency 'mongoid', '~> 3.0'
-  s.add_development_dependency 'bson_ext', '~> 1.4'
-
+  s.add_dependency "mongoid", [">= 3.0", "< 5.0"]
+  s.add_development_dependency 'rspec', '~> 2.14.1'
+  
   s.rubyforge_project = 'voteable_mongo'
 
   s.files         = `git ls-files`.split("\n")
