@@ -1,5 +1,9 @@
 = Voteable Mongo (for Mongoid 3 / 4)
 
+{<img src="https://travis-ci.org/rs-pro/votable_mongo.png" />}[https://travis-ci.org/rs-pro/votable_mongo]
+{<img src="https://gemnasium.com/rs-pro/voteable_mongo.png" alt="Dependency Status" />}[https://gemnasium.com/rs-pro/voteable_mongo]
+{<img src="https://badge.fury.io/rb/rs_voteable_mongo.png" alt="Gem Version" />}[http://badge.fury.io/rb/rs_voteable_mongo]
+
 voteable_mongo allows you to make your Mongoid::Document or MongoMapper::Document objects voteable and tabulate votes count and votes point for you. For instance, in a forum, a user can vote up (or down) on a post or a comment. It's optimized for speed by using only ONE database request per collection to validate, update, and retrieve updated data.
 
 Initial idea based on http://cookbook.mongodb.org/patterns/votes.
