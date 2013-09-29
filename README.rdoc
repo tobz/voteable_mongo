@@ -8,11 +8,6 @@ voteable_mongo allows you to make your Mongoid::Document or MongoMapper::Documen
 
 Initial idea based on http://cookbook.mongodb.org/patterns/votes.
 
-Sample app at https://github.com/vinova/simple_qa.
-
-Wonder how fast voteable_mongo is compare to other SQL & MongoDB solutions?
-Visit benchmarks at https://github.com/vinova/voteable_benchmarks
-
 == Why voteable_mongo?
 
 There are various solutions for up / down voting problem (1[https://github.com/medihack/make_voteable], 2[https://github.com/brady8/thumbs_up], 3[https://github.com/icaruswings/mm-voteable], 4[https://github.com/jcoene/mongoid_voteable], ...). Most of them using additional votes table (SQL) or votes collection (MongoDB) to store votes and do data tabulation on that votes table or votes collection.
@@ -33,6 +28,7 @@ So use voteable_mongo for less maintain cost, data integrity and save database r
 * http://www.naiku.net
 * http://www.amorveneris.com
 * http://zheye.org
+* http://megalyrics.ru
 
 == Installation
 
@@ -81,41 +77,6 @@ user.rb
 
     class User
       include Mongoid::Document
-      include Mongo::Voter
-    end
-
-
-== MongoMapper
-post.rb
-
-    class Post
-      include MongoMapper::Document
-      include Mongo::Voteable
-
-      # set points for each vote
-      voteable self, :up => +1, :down => -1
-
-      many :comments
-    end
-
-comment.rb
-
-    require 'post'
-
-    class Comment
-      include MongoMapper::Document
-      include Mongo::Voteable
-
-      belongs_to :post
-
-      voteable self, :up => +1, :down => -3
-      voteable Post, :up => +2, :down => -1
-    end
-
-user.rb
-
-    class User
-      include MongoMapper::Document
       include Mongo::Voter
     end
 
@@ -209,7 +170,7 @@ Ruby
 
 == Credits
 * Alex Nguyen - Author
-* Contributors[https://github.com/vinova/voteable_mongo/contributors]
+* Contributors[https://github.com/rs-pro/voteable_mongo/contributors]
 
 Copyright (c) 2010-2011 Vinova Pte Ltd
 
