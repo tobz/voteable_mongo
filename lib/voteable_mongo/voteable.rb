@@ -16,12 +16,7 @@ module Mongo
 
     included do
       include Mongo::Voteable::Voting
-
-      if defined?(Mongoid) && defined?(field)
-        include Mongo::Voteable::Integrations::Mongoid
-      elsif defined?(MongoMapper)
-        include Mongo::Voteable::Integrations::MongoMapper
-      end
+      include Mongo::Voteable::Integrations::Mongoid
       
       scope :voted_by, lambda { |voter|
         voter_id = Helpers.get_mongo_id(voter)

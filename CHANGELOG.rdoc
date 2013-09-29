@@ -1,3 +1,9 @@
+== rs-1.0.0
+  * Forked gem
+  * drop mongomapper
+  * Support mongoid 3 and 4
+  * Add Travis-ci
+
 == 0.9.3
   * Support mongoid ~> 2.0, mongo_mapper ~> 0.9
   
