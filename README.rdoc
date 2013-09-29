@@ -1,4 +1,4 @@
-= Voteable Mongo (for Mongoid 3.0)
+= Voteable Mongo (for Mongoid 3 / 4)
 
 voteable_mongo allows you to make your Mongoid::Document or MongoMapper::Document objects voteable and tabulate votes count and votes point for you. For instance, in a forum, a user can vote up (or down) on a post or a comment. It's optimized for speed by using only ONE database request per collection to validate, update, and retrieve updated data.
 
@@ -36,8 +36,7 @@ So use voteable_mongo for less maintain cost, data integrity and save database r
 
 To install the gem, add this to your Gemfile
 
-  gem 'mongoid'
-  gem 'voteable_mongo'
+  gem 'rs_voteable_mongo'
 
 After that, remember to run "bundle install"
 

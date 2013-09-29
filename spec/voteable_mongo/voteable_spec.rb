@@ -32,9 +32,10 @@ describe Mongo::Voteable do
   end
   
   before :all do
+    Category.destroy_all
     @category1 = Category.create!(:name => 'xyz')
     @category2 = Category.create!(:name => 'abc')
-    
+    Post.destroy_all
     @post1 = Post.create!(:title => 'post1')
     @post2 = Post.create!(:title => 'post2')
 
@@ -48,7 +49,8 @@ describe Mongo::Voteable do
   end
   
   it "vote for unexisting post" do
-    @user1.vote(:votee_class => Post, :votee_id => Moped::BSON::ObjectId.new, :value => :up).should == false
+    object_id = defined?(Moped::BSON) ? Moped::BSON::ObjectId : BSON::ObjectId
+    @user1.vote(:votee_class => Post, :votee_id => object_id.new, :value => :up).should == false
   end
   
   context "just created" do
