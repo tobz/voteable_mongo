@@ -1,6 +1,6 @@
 = Voteable Mongo (for Mongoid 3 / 4)
 
-{<img src="https://travis-ci.org/rs-pro/votable_mongo.png" />}[https://travis-ci.org/rs-pro/votable_mongo]
+{<img src="https://travis-ci.org/rs-pro/voteable_mongo.png?branch=master" alt="Build Status" />}[https://travis-ci.org/rs-pro/voteable_mongo]
 {<img src="https://gemnasium.com/rs-pro/voteable_mongo.png" alt="Dependency Status" />}[https://gemnasium.com/rs-pro/voteable_mongo]
 {<img src="https://badge.fury.io/rb/rs_voteable_mongo.png" alt="Gem Version" />}[http://badge.fury.io/rb/rs_voteable_mongo]
 
