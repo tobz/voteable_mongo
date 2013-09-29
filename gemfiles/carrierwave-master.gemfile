@@ -1,5 +1,5 @@
 source "https://rubygems.org"
 
-gem "carrierwave", github: "carrierwaveuploader/carrierwave", branch: "master"
+gem "rs_voteable_mongo", github: "rs-pro/voteable_mongo", branch: "master"
 
 gemspec path: "../"
