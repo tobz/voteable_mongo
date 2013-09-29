@@ -12,7 +12,6 @@ rvm:
 
 gemfile:
   - Gemfile
-  - gemfiles/carrierwave-master.gemfile
   - gemfiles/mongoid-3.0.gemfile
   - gemfiles/mongoid-3.1.gemfile
   - gemfiles/mongoid-4.0.gemfile
