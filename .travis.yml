@@ -15,3 +15,8 @@ gemfile:
   - gemfiles/mongoid-3.0.gemfile
   - gemfiles/mongoid-3.1.gemfile
   - gemfiles/mongoid-4.0.gemfile
+
+matrix:
+  exclude:
+    - rvm: rbx-19mode
+      gemfile: gemfiles/mongoid-4.0.gemfile
