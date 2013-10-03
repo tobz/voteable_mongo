@@ -1,1 +1,1 @@
-require 'votable_mongo'
+require 'voteable_mongo'
