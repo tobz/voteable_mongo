@@ -29,10 +29,7 @@ module Mongo
 
             # http://www.mongodb.org/display/DOCS/findAndModify+Command
             begin
-              doc = where(query).find_and_modify(
-                update,
-                :new => true
-              )
+              doc = where(query).find_one_and_update(update, {return_document: :after})
             rescue Moped::Errors::OperationFailure
               doc = nil
             end  
@@ -155,7 +152,7 @@ module Mongo
                 
                 if (parent_id = doc[voteable_foreign_key(metadata)]).present?
                   parent_ids = parent_id.is_a?(Array) ? parent_id : [ parent_id ]
-                  class_name.constantize.collection.find({'_id' => {'$in' => parent_ids}}).update_all(
+                  class_name.constantize.collection.find({'_id' => {'$in' => parent_ids}}).update_many(
                     { '$inc' => parent_inc_options(voteable, options) },
                   )
                 end

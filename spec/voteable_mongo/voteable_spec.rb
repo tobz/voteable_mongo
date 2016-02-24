@@ -16,8 +16,9 @@ describe Mongo::Voteable do
         [ {'votes.up' => 1, '_id' => 1},
           {'votes.down' => 1, '_id' => 1},
         ].each { |index_key|
-          klass.collection.indexes[index_key].should_not be_nil
-          klass.collection.indexes[index_key]['unique'].should be_true
+
+          klass.collection.indexes.select { |i| i['key'] == index_key }.first.should_not be_nil
+          klass.collection.indexes.select { |i| i['key'] == index_key }.first['unique'].should be_true
         }
   
         [ {'votes.count' => -1},
@@ -25,7 +26,7 @@ describe Mongo::Voteable do
           {'votes.down_count' => -1},
           {'votes.point' => -1},
         ].each { |index_key|
-          klass.collection.indexes[index_key].should_not be_nil
+          klass.collection.indexes.select { |i| i['key'] == index_key }.should_not be_nil
         }
       end
     end
@@ -49,7 +50,7 @@ describe Mongo::Voteable do
   end
   
   it "vote for unexisting post" do
-    object_id = defined?(Moped::BSON) ? Moped::BSON::ObjectId : BSON::ObjectId
+    object_id = BSON::ObjectId
     @user1.vote(:votee_class => Post, :votee_id => object_id.new, :value => :up).should == false
   end
   

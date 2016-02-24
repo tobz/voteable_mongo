@@ -9,7 +9,7 @@ module Mongo
           klass = class_name.constantize
           klass_voteable = voteable[class_name]
           puts "Init stats for #{class_name}" if log
-          klass.with(safe: true).where(votes: nil).update_all({ '$set' => {votes: DEFAULT_VOTES} })
+          klass.where(votes: nil).set(votes: DEFAULT_VOTES)
         end
       end
       
@@ -46,7 +46,7 @@ module Mongo
           up_count = up_voter_ids.size
           down_count = down_voter_ids.size
 
-          klass.with(safe: true).where(_id: doc.id).update_all(
+          klass.collection.find({_id: doc.id}).update_many(
             '$set' => {
               'votes' => {
                 'up' => up_voter_ids,
@@ -137,7 +137,7 @@ module Mongo
 
           parent_ids = parent_id.is_a?(Array) ? parent_id : [ parent_id ]
           
-          parent_class.with(safe: true).where(:_id.in => parent_ids).update_all({ '$inc' =>  inc_options })
+          parent_class.collection.find({'_id' => {'$in' => parent_ids}}).update_many({ '$inc' =>  inc_options })
         end
       end
 
